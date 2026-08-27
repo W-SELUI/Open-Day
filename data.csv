@@ -1,0 +1,101 @@
+name,subjects,hobbies,career
+Name1,Math;Physics,Chess,Engineer
+Name2,Computer Science;Math,Coding,Engineer
+Name3,Physics;Design,Analysis,Engineer
+Name4,Math;Economics,Chess,Engineer
+Name5,Computer Science;Physics,Gaming,Engineer
+Name6,Math;Design,Design,Engineer
+Name7,Physics;Computer Science,Coding,Engineer
+Name8,Math;Physics,Analysis,Engineer
+Name9,Computer Science;Math,Gaming,Engineer
+Name10,Physics;Math,Chess,Engineer
+Name11,Biology;Chemistry,Reading,Doctor
+Name12,Biology;Environmental Science,Hiking,Doctor
+Name13,Chemistry;Physics,Writing,Doctor
+Name14,Biology;Math,Chess,Doctor
+Name15,Biology;Economics,Debating,Doctor
+Name16,Chemistry;Biology,Reading,Doctor
+Name17,Biology;Chemistry,Hiking,Doctor
+Name18,Biology;Physics,Writing,Doctor
+Name19,Chemistry;Math,Reading,Doctor
+Name20,Biology;Chemistry,Debating,Doctor
+Name21,Art;Design,Painting,Designer
+Name22,Design;Computer Science,Analysis,Designer
+Name23,Art;Math,Design,Designer
+Name24,Design;Physics,Painting,Designer
+Name25,Art;Economics,Chess,Designer
+Name26,Design;Computer Science,Coding,Designer
+Name27,Art;Design,Analysis,Designer
+Name28,Design;Math,Painting,Designer
+Name29,Art;Physics,Design,Designer
+Name30,Design;Art,Painting,Designer
+Name31,Computer Science;Math,Gaming,Software Developer
+Name32,Computer Science;Physics,Coding,Software Developer
+Name33,Math;Computer Science,Analysis,Software Developer
+Name34,Computer Science;Design,Coding,Software Developer
+Name35,Math;Physics,Gaming,Software Developer
+Name36,Computer Science;Economics,Analysis,Software Developer
+Name37,Math;Computer Science,Coding,Software Developer
+Name38,Computer Science;Physics,Gaming,Software Developer
+Name39,Math;Computer Science,Analysis,Software Developer
+Name40,Computer Science;Math,Coding,Software Developer
+Name41,Economics;Business,Debating,Entrepreneur
+Name42,Economics;Math,Chess,Entrepreneur
+Name43,Business;Computer Science,Analysis,Entrepreneur
+Name44,Economics;Physics,Debating,Entrepreneur
+Name45,Business;Design,Coding,Entrepreneur
+Name46,Economics;Math,Public Speaking,Entrepreneur
+Name47,Business;Economics,Debating,Entrepreneur
+Name48,Economics;Computer Science,Analysis,Entrepreneur
+Name49,Business;Math,Chess,Entrepreneur
+Name50,Economics;Physics,Debating,Entrepreneur
+Name51,History;Literature,Writing,Teacher
+Name52,History;Math,Reading,Teacher
+Name53,Literature;Physics,Debating,Teacher
+Name54,History;Economics,Writing,Teacher
+Name55,Literature;Design,Painting,Teacher
+Name56,History;Computer Science,Reading,Teacher
+Name57,Literature;Math,Writing,Teacher
+Name58,History;Physics,Debating,Teacher
+Name59,Literature;Economics,Reading,Teacher
+Name60,History;Literature,Writing,Teacher
+Name61,Music;Drama,Singing,Musician
+Name62,Music;Math,Chess,Musician
+Name63,Drama;Design,Painting,Musician
+Name64,Music;Physics,Analysis,Musician
+Name65,Drama;Computer Science,Coding,Musician
+Name66,Music;Economics,Debating,Musician
+Name67,Drama;Math,Singing,Musician
+Name68,Music;Physics,Painting,Musician
+Name69,Drama;Economics,Public Speaking,Musician
+Name70,Music;Drama,Singing,Musician
+Name71,Accounting;Finance,Investing,Accountant
+Name72,Accounting;Math,Chess,Accountant
+Name73,Finance;Economics,Reading,Accountant
+Name74,Accounting;Physics,Analysis,Accountant
+Name75,Finance;Computer Science,Coding,Accountant
+Name76,Accounting;Economics,Debating,Accountant
+Name77,Finance;Math,Investing,Accountant
+Name78,Accounting;Physics,Chess,Accountant
+Name79,Finance;Economics,Reading,Accountant
+Name80,Accounting;Finance,Investing,Accountant
+Name81,Environmental Science;Biology,Hiking,Scientist
+Name82,Environmental Science;Physics,Analysis,Scientist
+Name83,Biology;Chemistry,Reading,Scientist
+Name84,Environmental Science;Math,Chess,Scientist
+Name85,Biology;Computer Science,Coding,Scientist
+Name86,Environmental Science;Economics,Debating,Scientist
+Name87,Biology;Physics,Hiking,Scientist
+Name88,Environmental Science;Math,Analysis,Scientist
+Name89,Biology;Chemistry,Reading,Scientist
+Name90,Environmental Science;Biology,Hiking,Scientist
+Name91,Political Science;Law,Public Speaking,Lawyer
+Name92,Law;Economics,Debating,Lawyer
+Name93,Political Science;Math,Chess,Lawyer
+Name94,Law;Physics,Analysis,Lawyer
+Name95,Political Science;Computer Science,Coding,Lawyer
+Name96,Law;Design,Painting,Lawyer
+Name97,Political Science;Economics,Debating,Lawyer
+Name98,Law;Math,Public Speaking,Lawyer
+Name99,Political Science;Physics,Analysis,Lawyer
+Name100,Law;Political Science,Public Speaking,Lawyer
