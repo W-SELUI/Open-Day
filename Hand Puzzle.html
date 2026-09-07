@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hand Puzzle - Day 12: Green Win Pulse</title>
+    <title>Open Day AI Lab — Hand Puzzle</title>
     <style>
       body {
         background: #111;
@@ -27,7 +27,10 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      object-fit: contain;
+      /* Fill a wide kiosk display instead of showing 4:3 black side bars.
+         The centre stays visible; a little of the top and bottom is cropped. */
+      object-fit: cover;
+      object-position: center;
     }
 
       video {
@@ -101,6 +104,167 @@
       h2 {
         display: none;
       }
+
+      #gameHud {
+        position: fixed;
+        top: 16px;
+        left: 20px;
+        z-index: 12;
+        display: none;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .hud-chip {
+        padding: 8px 12px;
+        border: 1px solid rgba(147, 197, 253, 0.38);
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.78);
+        color: #dbeafe;
+        font-size: 0.85rem;
+        backdrop-filter: blur(8px);
+      }
+
+      .hud-chip strong {
+        color: #67e8f9;
+      }
+
+      #progress {
+        position: static;
+        display: inline;
+        color: #dbeafe;
+        font-size: inherit;
+        text-shadow: none;
+        letter-spacing: normal;
+      }
+
+      .game-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(2, 6, 23, 0.84);
+        backdrop-filter: blur(10px);
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+
+      .game-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .overlay-card {
+        width: min(620px, 100%);
+        padding: 32px;
+        border: 1px solid rgba(96, 165, 250, 0.46);
+        border-radius: 22px;
+        background: linear-gradient(145deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.96));
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        text-align: center;
+      }
+
+      .overlay-kicker {
+        margin: 0 0 8px;
+        color: #67e8f9;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12rem;
+      }
+
+      .overlay-card h1 {
+        margin: 0;
+        color: #f8fafc;
+        font-size: clamp(2rem, 6vw, 3.6rem);
+      }
+
+      .overlay-card > p {
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin: 24px 0;
+      }
+
+      .step {
+        min-height: 118px;
+        padding: 14px 10px;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        border-radius: 14px;
+        background: rgba(15, 23, 42, 0.72);
+        color: #dbeafe;
+        font-size: 0.88rem;
+        line-height: 1.4;
+      }
+
+      .step span {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.8rem;
+      }
+
+      .primary-button {
+        border: 1px solid #67e8f9;
+        border-radius: 10px;
+        padding: 12px 22px;
+        background: linear-gradient(135deg, #0e7490, #2563eb);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .primary-button:hover {
+        background: linear-gradient(135deg, #0891b2, #4f46e5);
+      }
+
+      .camera-note {
+        margin: 14px 0 0;
+        color: #94a3b8;
+        font-size: 0.82rem;
+      }
+
+      #resultOverlay .overlay-card {
+        border-color: rgba(34, 197, 94, 0.62);
+      }
+
+      #resultTime {
+        margin: 18px 0 4px;
+        color: #f8fafc;
+        font-size: 2.4rem;
+        font-weight: 800;
+      }
+
+      #resultScore {
+        margin: 0;
+        color: #67e8f9;
+        font-size: 1.1rem;
+      }
+
+      #bestResult {
+        min-height: 22px;
+        color: #86efac;
+      }
+
+      @media (max-width: 560px) {
+        .overlay-card {
+          padding: 24px 18px;
+        }
+
+        .steps {
+          grid-template-columns: 1fr;
+        }
+
+        .step {
+          min-height: auto;
+        }
+      }
     </style>
   </head>
 
@@ -110,9 +274,41 @@
       <video id="video" autoplay playsinline></video>
       <canvas id="canvas" width="640" height="480"></canvas>
     </div>
-    <div id="status">Loading MediaPipe...</div>
-    <div id="progress">0 / 9</div>
+    <div id="gameHud" aria-live="polite">
+      <div class="hud-chip">Progress: <strong id="progress">0 / 9</strong></div>
+      <div class="hud-chip">Time: <strong id="timer">00:00.0</strong></div>
+      <div class="hud-chip">Best: <strong id="bestTime">—</strong></div>
+    </div>
+    <div id="status">Press Start Camera to begin</div>
     <button id="resetBtn">Measure Again</button>
+
+    <section id="introOverlay" class="game-overlay">
+      <div class="overlay-card">
+        <p class="overlay-kicker">OPEN DAY AI LAB</p>
+        <h1>Hand Puzzle</h1>
+        <p>Create a live puzzle using your webcam, then solve it with pinch gestures.</p>
+
+        <div class="steps">
+          <div class="step"><span>🤏</span>Pinch thumb and index finger on both hands.</div>
+          <div class="step"><span>↔️</span>Spread your hands diagonally to choose the puzzle size.</div>
+          <div class="step"><span>✋</span>Release, then pinch and drag tiles into place.</div>
+        </div>
+
+        <button id="startBtn" class="primary-button">Start Camera</button>
+        <p class="camera-note">Use good lighting and keep both hands visible. Camera access stays in this browser tab.</p>
+      </div>
+    </section>
+
+    <section id="resultOverlay" class="game-overlay hidden" aria-live="polite">
+      <div class="overlay-card">
+        <p class="overlay-kicker">PUZZLE COMPLETE</p>
+        <h1>🎉 You solved it!</h1>
+        <p id="resultTime">00:00.0</p>
+        <p id="resultScore">Score: 0</p>
+        <p id="bestResult"></p>
+        <button id="playAgainBtn" class="primary-button">Play Again</button>
+      </div>
+    </section>
 
     <!-- MediaPipe Hands (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
@@ -126,9 +322,20 @@
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
     const progressEl = document.getElementById('progress');
+    const gameHudEl = document.getElementById('gameHud');
+    const timerEl = document.getElementById('timer');
+    const bestTimeEl = document.getElementById('bestTime');
+    const introOverlayEl = document.getElementById('introOverlay');
+    const resultOverlayEl = document.getElementById('resultOverlay');
+    const startBtn = document.getElementById('startBtn');
+    const playAgainBtn = document.getElementById('playAgainBtn');
+    const resultTimeEl = document.getElementById('resultTime');
+    const resultScoreEl = document.getElementById('resultScore');
+    const bestResultEl = document.getElementById('bestResult');
 
     const W = canvasElement.width;
     const H = canvasElement.height;
+    const BEST_TIME_STORAGE_KEY = 'open-day-hand-puzzle-best-time-ms';
 
     const THUMB_TIP = 4;
     const INDEX_TIP = 8;
@@ -149,6 +356,8 @@
                                               // which is what was tanking the framerate
     const MIN_HANDEDNESS_SCORE = 0.85;       // drop low-confidence "ghost" hands entirely
     const LANDMARK_SMOOTHING_ALPHA = 0.35;   // 0..1, lower = smoother but more lag
+    const DRAG_SMOOTHING_ALPHA = 0.78;       // Faster follow only while carrying a tile.
+    const RELEASE_GRACE_FRAMES = 3;          // Ignore a single false "pinch opened" frame.
 
     let handPinchState = { Left: false, Right: false };
     let handMissingFrames = { Left: 0, Right: 0 };
@@ -158,15 +367,15 @@
     // raw position (no lerp) the first frame a hand appears or right after
     // it comes back from being missing -- otherwise you'd see it "slide in"
     // from wherever it used to be, which looks worse than the jitter did.
-    function smoothLandmarks(label, landmarks) {
+    function smoothLandmarks(label, landmarks, smoothingAlpha = LANDMARK_SMOOTHING_ALPHA) {
       const prev = smoothedLandmarks[label];
       if (!prev) {
         smoothedLandmarks[label] = landmarks.map(p => ({ x: p.x, y: p.y, z: p.z }));
         return smoothedLandmarks[label];
       }
       const smoothed = landmarks.map((p, i) => ({
-        x: prev[i].x + (p.x - prev[i].x) * LANDMARK_SMOOTHING_ALPHA,
-        y: prev[i].y + (p.y - prev[i].y) * LANDMARK_SMOOTHING_ALPHA,
+        x: prev[i].x + (p.x - prev[i].x) * smoothingAlpha,
+        y: prev[i].y + (p.y - prev[i].y) * smoothingAlpha,
         z: p.z
       }));
       smoothedLandmarks[label] = smoothed;
@@ -206,6 +415,12 @@
 
     let heldPieceIndex = null;
     let heldOriginCell = null;
+    let heldReleaseFrames = 0;
+    let cameraStarted = false;
+    let puzzleStartTime = null;
+    let solvedTimeMs = null;
+    let timerInterval = null;
+    let bestTimeMs = loadBestTime();
 
     const hands = new Hands({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -248,7 +463,12 @@
           const score = handedness[i] ? handedness[i].score : 1;
           if (score < MIN_HANDEDNESS_SCORE) return;
           const label = rawLabels[i];
-          landmarksList.push(smoothLandmarks(label, lm));
+          // A held tile needs to feel responsive. Everything else keeps the
+          // gentler smoothing so the hands and measuring square stay stable.
+          const smoothingAlpha = (
+            state === 'solving' && heldByHand === label
+          ) ? DRAG_SMOOTHING_ALPHA : LANDMARK_SMOOTHING_ALPHA;
+          landmarksList.push(smoothLandmarks(label, lm, smoothingAlpha));
           labels.push(label);
         });
       }
@@ -495,14 +715,15 @@
       heldByHand = null;
       heldPieceIndex = null;
       heldOriginCell = null;
+      heldReleaseFrames = 0;
       wasBothPinching = false;
       activeDragPoint = null;
       handPinchState = { Left: false, Right: false };
       handMissingFrames = { Left: 0, Right: 0 };
       state = 'solving';
+      startTimer();
       resetBtn.style.display = 'inline-block';
       resetBtn.innerText = 'Measure Again';
-      progressEl.style.display = 'block';
       updateProgress();
     }
 
@@ -546,6 +767,65 @@
       progressEl.innerText = `${done} / ${pieces.length}`;
     }
 
+    function formatDuration(milliseconds) {
+      const totalSeconds = milliseconds / 1000;
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(minutes).padStart(2, '0')}:${seconds.toFixed(1).padStart(4, '0')}`;
+    }
+
+    function loadBestTime() {
+      try {
+        const saved = Number(window.localStorage.getItem(BEST_TIME_STORAGE_KEY));
+        return Number.isFinite(saved) && saved > 0 ? saved : null;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function renderBestTime() {
+      bestTimeEl.innerText = bestTimeMs ? formatDuration(bestTimeMs) : '—';
+    }
+
+    function updateTimer() {
+      if (puzzleStartTime === null) return;
+      timerEl.innerText = formatDuration(performance.now() - puzzleStartTime);
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      puzzleStartTime = performance.now();
+      solvedTimeMs = null;
+      timerEl.innerText = '00:00.0';
+      timerInterval = setInterval(updateTimer, 100);
+    }
+
+    function finishPuzzle() {
+      if (solvedTimeMs !== null || puzzleStartTime === null) return;
+
+      solvedTimeMs = performance.now() - puzzleStartTime;
+      clearInterval(timerInterval);
+      timerEl.innerText = formatDuration(solvedTimeMs);
+
+      const score = Math.max(100, 1500 - Math.round((solvedTimeMs / 1000) * 15));
+      const isNewBest = bestTimeMs === null || solvedTimeMs < bestTimeMs;
+
+      if (isNewBest) {
+        bestTimeMs = solvedTimeMs;
+        try {
+          window.localStorage.setItem(BEST_TIME_STORAGE_KEY, String(bestTimeMs));
+        } catch (error) {
+          // The game still works if the browser blocks local storage.
+        }
+      }
+
+      renderBestTime();
+      resultTimeEl.innerText = formatDuration(solvedTimeMs);
+      resultScoreEl.innerText = `Score: ${score}`;
+      bestResultEl.innerText = isNewBest ? '🏆 New personal best!' : `Personal best: ${formatDuration(bestTimeMs)}`;
+      resultOverlayEl.classList.remove('hidden');
+    }
+
     // ---------- SOLVING ----------
     function handleSolving(landmarksList, labels) 
     {
@@ -567,11 +847,13 @@
             heldByHand = handLabel;
             heldPieceIndex = grabbedIdx;
             heldOriginCell = pieces[grabbedIdx].cellIndex;
+            heldReleaseFrames = 0;
           }
         }
 
         if (pinching && heldByHand === handLabel && heldPieceIndex !== null) 
         {
+          heldReleaseFrames = 0;
           const held = pieces[heldPieceIndex];
           held.x = pinchPoint.x;
           held.y = pinchPoint.y;
@@ -581,7 +863,13 @@
 
         if (!pinching && heldByHand === handLabel && heldPieceIndex !== null) 
         {
-          resolveRelease();
+          // MediaPipe can briefly misread a still-closed pinch. Requiring a
+          // few consecutive open frames prevents that one-frame glitch from
+          // dropping a tile, while still releasing quickly on purpose.
+          heldReleaseFrames++;
+          if (heldReleaseFrames >= RELEASE_GRACE_FRAMES) {
+            resolveRelease();
+          }
         }
       });
 
@@ -593,10 +881,11 @@
       }
     );
 
-      if (pieces.every(p => p.locked)) 
+      if (pieces.every(p => p.locked) && state !== 'won')
       {
         state = 'won';
         resetBtn.innerText = 'Play Again';
+        finishPuzzle();
       }
 
       if (state === 'won') 
@@ -675,6 +964,7 @@
       heldByHand = null;
       heldPieceIndex = null;
       heldOriginCell = null;
+      heldReleaseFrames = 0;
       activeDragPoint = null;
       updateProgress();
     }
@@ -871,7 +1161,8 @@
     }
 
     // ---------- RESET ----------
-    resetBtn.addEventListener('click', () => {
+    function resetPuzzle() {
+      clearInterval(timerInterval);
       state = 'measuring';
       lastGoodSquare = null;
       wasBothPinching = false;
@@ -882,13 +1173,21 @@
       heldByHand = null;
       heldPieceIndex = null;
       heldOriginCell = null;
+      heldReleaseFrames = 0;
       activeDragPoint = null;
       handPinchState = { Left: false, Right: false };
       handMissingFrames = { Left: 0, Right: 0 };
       smoothedLandmarks = { Left: null, Right: null };
       resetBtn.style.display = 'none';
-      progressEl.style.display = 'none';
-    });
+      timerEl.innerText = '00:00.0';
+      resultOverlayEl.classList.add('hidden');
+      statusEl.innerText = 'Pinch thumb + index on BOTH hands, then spread diagonally';
+      statusEl.className = '';
+      updateProgress();
+    }
+
+    resetBtn.addEventListener('click', resetPuzzle);
+    playAgainBtn.addEventListener('click', resetPuzzle);
 
     const camera = new Camera(videoElement, {
       onFrame: async () => {
@@ -898,11 +1197,27 @@
       height: H
     });
 
-    camera.start()
-      .catch((err) => {
+    startBtn.addEventListener('click', async () => {
+      if (cameraStarted) return;
+
+      startBtn.disabled = true;
+      startBtn.innerText = 'Starting camera...';
+      statusEl.innerText = 'Starting MediaPipe camera...';
+
+      try {
+        await camera.start();
+        cameraStarted = true;
+        introOverlayEl.classList.add('hidden');
+        gameHudEl.style.display = 'flex';
+        renderBestTime();
+        statusEl.innerText = 'Show both hands — pinch thumb + index on each hand together';
+      } catch (err) {
         statusEl.innerText = "Camera error: " + err.message;
+        startBtn.disabled = false;
+        startBtn.innerText = 'Try Camera Again';
         console.error(err);
-      });
+      }
+    });
     </script>
   </body>
 </html>

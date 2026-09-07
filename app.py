@@ -4,19 +4,157 @@ import streamlit as st
 
 from career_model import predict_careers
 from ollama_explainer import generate_career_explanation
+from UI_theme import apply_theme
 
 
 st.set_page_config(page_title="Career Quest", page_icon="🎓")
 
-# Sidebar navigation
-option = st.sidebar.selectbox("Choose a module", ["Puzzle", "Career Prediction"])
+apply_theme()
 
-if option == "Puzzle":
-    st.title("Hand-Tracking Puzzle 🧩")
-    st.caption(
-        "Use two hands to measure the puzzle area. Then pinch and drag "
-        "the tiles to solve your camera puzzle."
+if "page" not in st.session_state:
+    st.session_state.page = "home"
+
+page = st.session_state.page
+
+if page == "home":
+    st.markdown(
+        """
+        <section class="hero">
+            <div class="eyebrow">OPEN DAY · AI EXPERIENCE</div>
+            <h1>Discover how you think.</h1>
+            <p>
+                Try a hands-on puzzle challenge or explore career paths
+                with a machine-learning model built for this project.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
     )
+
+    puzzle_column, career_column = st.columns(2, gap="large")
+
+    with puzzle_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">🧩</div>
+                <h2>Hand Puzzle</h2>
+                <p>
+                    Use hand tracking and pinching gestures to solve a
+                    live camera puzzle.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Play the Hand Puzzle", key="open_puzzle"):
+            st.session_state.page = "puzzle"
+            st.rerun()
+
+    with career_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">🎓</div>
+                <h2>Career Quest</h2>
+                <p>
+                    Tell our trained model what you enjoy, then see career
+                    matches and an AI-powered explanation.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Explore Career Quest", key="open_career"):
+            st.session_state.page = "career"
+            st.rerun()
+
+    st.markdown(
+        '<p class="small-note">Built for Open Day · Your answers stay in this session.</p>',
+        unsafe_allow_html=True,
+    )
+
+elif page == "puzzle":
+    # This route is intentionally a kiosk-style game screen. These rules are
+    # added only while the puzzle is open, so the home and career pages keep
+    # their normal Streamlit layout.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                height: 100vh !important;
+                min-height: 100vh !important;
+                width: 100vw !important;
+                overflow: hidden !important;
+            }
+
+            /* Overrides the 1100px max-width used by the normal app theme. */
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            /* The only Streamlit button on this route floats over the game. */
+            .st-key-back_from_puzzle,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_puzzle button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            /* Pin the game itself to the entire viewport, independent of
+               Streamlit's normal content-column layout. */
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to AI Lab", key="back_from_puzzle"):
+        st.session_state.page = "home"
+        st.rerun()
 
     puzzle_file = Path(__file__).with_name("Hand Puzzle.html")
 
@@ -25,11 +163,16 @@ if option == "Puzzle":
     else:
         st.iframe(
             puzzle_file,
-            height=760,
+            height="stretch",
             tab_index=0,
         )
 
-elif option == "Career Prediction":
+elif page == "career":
+
+    if st.button("← Back to AI Lab", key="back_from_career"):
+        st.session_state.page = "home"
+        st.rerun()
+
     st.title("Career Quest 🎓")
     st.write("Tell us about the subjects and activities you enjoy. Use your own words.")
 
