@@ -1,101 +1,299 @@
 name,subjects,hobbies,career
-Name1,Math;Physics,Chess,Engineer
-Name2,Computer Science;Math,Coding,Engineer
-Name3,Physics;Design,Analysis,Engineer
-Name4,Math;Economics,Chess,Engineer
-Name5,Computer Science;Physics,Gaming,Engineer
-Name6,Math;Design,Design,Engineer
-Name7,Physics;Computer Science,Coding,Engineer
-Name8,Math;Physics,Analysis,Engineer
-Name9,Computer Science;Math,Gaming,Engineer
-Name10,Physics;Math,Chess,Engineer
-Name11,Biology;Chemistry,Reading,Doctor
-Name12,Biology;Environmental Science,Hiking,Doctor
-Name13,Chemistry;Physics,Writing,Doctor
-Name14,Biology;Math,Chess,Doctor
-Name15,Biology;Economics,Debating,Doctor
-Name16,Chemistry;Biology,Reading,Doctor
-Name17,Biology;Chemistry,Hiking,Doctor
-Name18,Biology;Physics,Writing,Doctor
-Name19,Chemistry;Math,Reading,Doctor
-Name20,Biology;Chemistry,Debating,Doctor
-Name21,Art;Design,Painting,Designer
-Name22,Design;Computer Science,Analysis,Designer
-Name23,Art;Math,Design,Designer
-Name24,Design;Physics,Painting,Designer
-Name25,Art;Economics,Chess,Designer
-Name26,Design;Computer Science,Coding,Designer
-Name27,Art;Design,Analysis,Designer
-Name28,Design;Math,Painting,Designer
-Name29,Art;Physics,Design,Designer
-Name30,Design;Art,Painting,Designer
-Name31,Computer Science;Math,Gaming,Software Developer
-Name32,Computer Science;Physics,Coding,Software Developer
-Name33,Math;Computer Science,Analysis,Software Developer
-Name34,Computer Science;Design,Coding,Software Developer
-Name35,Math;Physics,Gaming,Software Developer
-Name36,Computer Science;Economics,Analysis,Software Developer
-Name37,Math;Computer Science,Coding,Software Developer
-Name38,Computer Science;Physics,Gaming,Software Developer
-Name39,Math;Computer Science,Analysis,Software Developer
-Name40,Computer Science;Math,Coding,Software Developer
-Name41,Economics;Business,Debating,Entrepreneur
-Name42,Economics;Math,Chess,Entrepreneur
-Name43,Business;Computer Science,Analysis,Entrepreneur
-Name44,Economics;Physics,Debating,Entrepreneur
-Name45,Business;Design,Coding,Entrepreneur
-Name46,Economics;Math,Public Speaking,Entrepreneur
-Name47,Business;Economics,Debating,Entrepreneur
-Name48,Economics;Computer Science,Analysis,Entrepreneur
-Name49,Business;Math,Chess,Entrepreneur
-Name50,Economics;Physics,Debating,Entrepreneur
-Name51,History;Literature,Writing,Teacher
-Name52,History;Math,Reading,Teacher
-Name53,Literature;Physics,Debating,Teacher
-Name54,History;Economics,Writing,Teacher
-Name55,Literature;Design,Painting,Teacher
-Name56,History;Computer Science,Reading,Teacher
-Name57,Literature;Math,Writing,Teacher
-Name58,History;Physics,Debating,Teacher
-Name59,Literature;Economics,Reading,Teacher
-Name60,History;Literature,Writing,Teacher
-Name61,Music;Drama,Singing,Musician
-Name62,Music;Math,Chess,Musician
-Name63,Drama;Design,Painting,Musician
-Name64,Music;Physics,Analysis,Musician
-Name65,Drama;Computer Science,Coding,Musician
-Name66,Music;Economics,Debating,Musician
-Name67,Drama;Math,Singing,Musician
-Name68,Music;Physics,Painting,Musician
-Name69,Drama;Economics,Public Speaking,Musician
-Name70,Music;Drama,Singing,Musician
-Name71,Accounting;Finance,Investing,Accountant
-Name72,Accounting;Math,Chess,Accountant
-Name73,Finance;Economics,Reading,Accountant
-Name74,Accounting;Physics,Analysis,Accountant
-Name75,Finance;Computer Science,Coding,Accountant
-Name76,Accounting;Economics,Debating,Accountant
-Name77,Finance;Math,Investing,Accountant
-Name78,Accounting;Physics,Chess,Accountant
-Name79,Finance;Economics,Reading,Accountant
-Name80,Accounting;Finance,Investing,Accountant
-Name81,Environmental Science;Biology,Hiking,Scientist
-Name82,Environmental Science;Physics,Analysis,Scientist
-Name83,Biology;Chemistry,Reading,Scientist
-Name84,Environmental Science;Math,Chess,Scientist
-Name85,Biology;Computer Science,Coding,Scientist
-Name86,Environmental Science;Economics,Debating,Scientist
-Name87,Biology;Physics,Hiking,Scientist
-Name88,Environmental Science;Math,Analysis,Scientist
-Name89,Biology;Chemistry,Reading,Scientist
-Name90,Environmental Science;Biology,Hiking,Scientist
-Name91,Political Science;Law,Public Speaking,Lawyer
-Name92,Law;Economics,Debating,Lawyer
-Name93,Political Science;Math,Chess,Lawyer
-Name94,Law;Physics,Analysis,Lawyer
-Name95,Political Science;Computer Science,Coding,Lawyer
-Name96,Law;Design,Painting,Lawyer
-Name97,Political Science;Economics,Debating,Lawyer
-Name98,Law;Math,Public Speaking,Lawyer
-Name99,Political Science;Physics,Analysis,Lawyer
-Name100,Law;Political Science,Public Speaking,Lawyer
+Student_001,"Mathematics, Economics, Accounting","budgeting, tracking expenses, working with spreadsheets, careful with details and deadlines",Accountant
+Student_002,"Mathematics, Economics, Accounting","budgeting, tracking expenses, working with spreadsheets, interested in responsible financial decisions",Accountant
+Student_003,"Mathematics, Economics, Accounting","budgeting, tracking expenses, working with spreadsheets, enjoys finding patterns in numbers",Accountant
+Student_004,"Mathematics, Economics, Accounting","solving number problems, planning costs, organising records, careful with details and deadlines",Accountant
+Student_005,"Mathematics, Economics, Accounting","solving number problems, planning costs, organising records, interested in responsible financial decisions",Accountant
+Student_006,"Mathematics, Economics, Accounting","solving number problems, planning costs, organising records, enjoys finding patterns in numbers",Accountant
+Student_007,"Mathematics, Economics, Accounting","analysing data, comparing prices, keeping things accurate, careful with details and deadlines",Accountant
+Student_008,"Mathematics, Economics, Accounting","analysing data, comparing prices, keeping things accurate, interested in responsible financial decisions",Accountant
+Student_009,"Mathematics, Economics, Accounting","analysing data, comparing prices, keeping things accurate, enjoys finding patterns in numbers",Accountant
+Student_010,"Statistics, Business Studies, Mathematics","budgeting, tracking expenses, working with spreadsheets, careful with details and deadlines",Accountant
+Student_011,"Statistics, Business Studies, Mathematics","budgeting, tracking expenses, working with spreadsheets, interested in responsible financial decisions",Accountant
+Student_012,"Statistics, Business Studies, Mathematics","budgeting, tracking expenses, working with spreadsheets, enjoys finding patterns in numbers",Accountant
+Student_013,"Statistics, Business Studies, Mathematics","solving number problems, planning costs, organising records, careful with details and deadlines",Accountant
+Student_014,"Statistics, Business Studies, Mathematics","solving number problems, planning costs, organising records, interested in responsible financial decisions",Accountant
+Student_015,"Statistics, Business Studies, Mathematics","solving number problems, planning costs, organising records, enjoys finding patterns in numbers",Accountant
+Student_016,"Statistics, Business Studies, Mathematics","analysing data, comparing prices, keeping things accurate, careful with details and deadlines",Accountant
+Student_017,"Statistics, Business Studies, Mathematics","analysing data, comparing prices, keeping things accurate, interested in responsible financial decisions",Accountant
+Student_018,"Statistics, Business Studies, Mathematics","analysing data, comparing prices, keeping things accurate, enjoys finding patterns in numbers",Accountant
+Student_019,"Economics, Computer Science, Accounting","budgeting, tracking expenses, working with spreadsheets, careful with details and deadlines",Accountant
+Student_020,"Economics, Computer Science, Accounting","budgeting, tracking expenses, working with spreadsheets, interested in responsible financial decisions",Accountant
+Student_021,"Economics, Computer Science, Accounting","budgeting, tracking expenses, working with spreadsheets, enjoys finding patterns in numbers",Accountant
+Student_022,"Economics, Computer Science, Accounting","solving number problems, planning costs, organising records, careful with details and deadlines",Accountant
+Student_023,"Economics, Computer Science, Accounting","solving number problems, planning costs, organising records, interested in responsible financial decisions",Accountant
+Student_024,"Economics, Computer Science, Accounting","solving number problems, planning costs, organising records, enjoys finding patterns in numbers",Accountant
+Student_025,"Economics, Computer Science, Accounting","analysing data, comparing prices, keeping things accurate, careful with details and deadlines",Accountant
+Student_026,"Economics, Computer Science, Accounting","analysing data, comparing prices, keeping things accurate, interested in responsible financial decisions",Accountant
+Student_027,"Economics, Computer Science, Accounting","analysing data, comparing prices, keeping things accurate, enjoys finding patterns in numbers",Accountant
+Student_028,"Art, Design, Digital Technology","drawing, creating posters, experimenting with colours, enjoys turning ideas into visuals",Designer
+Student_029,"Art, Design, Digital Technology","drawing, creating posters, experimenting with colours, likes creative problem solving",Designer
+Student_030,"Art, Design, Digital Technology","drawing, creating posters, experimenting with colours, notices colours, layouts and details",Designer
+Student_031,"Art, Design, Digital Technology","photography, editing videos, designing social media graphics, enjoys turning ideas into visuals",Designer
+Student_032,"Art, Design, Digital Technology","photography, editing videos, designing social media graphics, likes creative problem solving",Designer
+Student_033,"Art, Design, Digital Technology","photography, editing videos, designing social media graphics, notices colours, layouts and details",Designer
+Student_034,"Art, Design, Digital Technology","sketching ideas, making models, improving how things look, enjoys turning ideas into visuals",Designer
+Student_035,"Art, Design, Digital Technology","sketching ideas, making models, improving how things look, likes creative problem solving",Designer
+Student_036,"Art, Design, Digital Technology","sketching ideas, making models, improving how things look, notices colours, layouts and details",Designer
+Student_037,"Visual Arts, Media Studies, English","drawing, creating posters, experimenting with colours, enjoys turning ideas into visuals",Designer
+Student_038,"Visual Arts, Media Studies, English","drawing, creating posters, experimenting with colours, likes creative problem solving",Designer
+Student_039,"Visual Arts, Media Studies, English","drawing, creating posters, experimenting with colours, notices colours, layouts and details",Designer
+Student_040,"Visual Arts, Media Studies, English","photography, editing videos, designing social media graphics, enjoys turning ideas into visuals",Designer
+Student_041,"Visual Arts, Media Studies, English","photography, editing videos, designing social media graphics, likes creative problem solving",Designer
+Student_042,"Visual Arts, Media Studies, English","photography, editing videos, designing social media graphics, notices colours, layouts and details",Designer
+Student_043,"Visual Arts, Media Studies, English","sketching ideas, making models, improving how things look, enjoys turning ideas into visuals",Designer
+Student_044,"Visual Arts, Media Studies, English","sketching ideas, making models, improving how things look, likes creative problem solving",Designer
+Student_045,"Visual Arts, Media Studies, English","sketching ideas, making models, improving how things look, notices colours, layouts and details",Designer
+Student_046,"Design, Mathematics, Computer Science","drawing, creating posters, experimenting with colours, enjoys turning ideas into visuals",Designer
+Student_047,"Design, Mathematics, Computer Science","drawing, creating posters, experimenting with colours, likes creative problem solving",Designer
+Student_048,"Design, Mathematics, Computer Science","drawing, creating posters, experimenting with colours, notices colours, layouts and details",Designer
+Student_049,"Design, Mathematics, Computer Science","photography, editing videos, designing social media graphics, enjoys turning ideas into visuals",Designer
+Student_050,"Design, Mathematics, Computer Science","photography, editing videos, designing social media graphics, likes creative problem solving",Designer
+Student_051,"Design, Mathematics, Computer Science","photography, editing videos, designing social media graphics, notices colours, layouts and details",Designer
+Student_052,"Design, Mathematics, Computer Science","sketching ideas, making models, improving how things look, enjoys turning ideas into visuals",Designer
+Student_053,"Design, Mathematics, Computer Science","sketching ideas, making models, improving how things look, likes creative problem solving",Designer
+Student_054,"Design, Mathematics, Computer Science","sketching ideas, making models, improving how things look, notices colours, layouts and details",Designer
+Student_055,"Biology, Chemistry, Health Science","learning about the human body, first aid, helping people, calm when people need support",Doctor
+Student_056,"Biology, Chemistry, Health Science","learning about the human body, first aid, helping people, interested in improving people's health",Doctor
+Student_057,"Biology, Chemistry, Health Science","learning about the human body, first aid, helping people, patient when solving difficult problems",Doctor
+Student_058,"Biology, Chemistry, Health Science","reading about health, caring for others, solving medical puzzles, calm when people need support",Doctor
+Student_059,"Biology, Chemistry, Health Science","reading about health, caring for others, solving medical puzzles, interested in improving people's health",Doctor
+Student_060,"Biology, Chemistry, Health Science","reading about health, caring for others, solving medical puzzles, patient when solving difficult problems",Doctor
+Student_061,"Biology, Chemistry, Health Science","wellbeing, volunteering, understanding how treatments work, calm when people need support",Doctor
+Student_062,"Biology, Chemistry, Health Science","wellbeing, volunteering, understanding how treatments work, interested in improving people's health",Doctor
+Student_063,"Biology, Chemistry, Health Science","wellbeing, volunteering, understanding how treatments work, patient when solving difficult problems",Doctor
+Student_064,"Biology, Physics, Physical Education","learning about the human body, first aid, helping people, calm when people need support",Doctor
+Student_065,"Biology, Physics, Physical Education","learning about the human body, first aid, helping people, interested in improving people's health",Doctor
+Student_066,"Biology, Physics, Physical Education","learning about the human body, first aid, helping people, patient when solving difficult problems",Doctor
+Student_067,"Biology, Physics, Physical Education","reading about health, caring for others, solving medical puzzles, calm when people need support",Doctor
+Student_068,"Biology, Physics, Physical Education","reading about health, caring for others, solving medical puzzles, interested in improving people's health",Doctor
+Student_069,"Biology, Physics, Physical Education","reading about health, caring for others, solving medical puzzles, patient when solving difficult problems",Doctor
+Student_070,"Biology, Physics, Physical Education","wellbeing, volunteering, understanding how treatments work, calm when people need support",Doctor
+Student_071,"Biology, Physics, Physical Education","wellbeing, volunteering, understanding how treatments work, interested in improving people's health",Doctor
+Student_072,"Biology, Physics, Physical Education","wellbeing, volunteering, understanding how treatments work, patient when solving difficult problems",Doctor
+Student_073,"Chemistry, Mathematics, Health Education","learning about the human body, first aid, helping people, calm when people need support",Doctor
+Student_074,"Chemistry, Mathematics, Health Education","learning about the human body, first aid, helping people, interested in improving people's health",Doctor
+Student_075,"Chemistry, Mathematics, Health Education","learning about the human body, first aid, helping people, patient when solving difficult problems",Doctor
+Student_076,"Chemistry, Mathematics, Health Education","reading about health, caring for others, solving medical puzzles, calm when people need support",Doctor
+Student_077,"Chemistry, Mathematics, Health Education","reading about health, caring for others, solving medical puzzles, interested in improving people's health",Doctor
+Student_078,"Chemistry, Mathematics, Health Education","reading about health, caring for others, solving medical puzzles, patient when solving difficult problems",Doctor
+Student_079,"Chemistry, Mathematics, Health Education","wellbeing, volunteering, understanding how treatments work, calm when people need support",Doctor
+Student_080,"Chemistry, Mathematics, Health Education","wellbeing, volunteering, understanding how treatments work, interested in improving people's health",Doctor
+Student_081,"Chemistry, Mathematics, Health Education","wellbeing, volunteering, understanding how treatments work, patient when solving difficult problems",Doctor
+Student_082,"Mathematics, Physics, Design Technology","building models, fixing things, robotics, enjoys practical challenges",Engineer
+Student_083,"Mathematics, Physics, Design Technology","building models, fixing things, robotics, likes improving how things work",Engineer
+Student_084,"Mathematics, Physics, Design Technology","building models, fixing things, robotics, thinks carefully about systems and structures",Engineer
+Student_085,"Mathematics, Physics, Design Technology","working out how machines work, designing solutions, making prototypes, enjoys practical challenges",Engineer
+Student_086,"Mathematics, Physics, Design Technology","working out how machines work, designing solutions, making prototypes, likes improving how things work",Engineer
+Student_087,"Mathematics, Physics, Design Technology","working out how machines work, designing solutions, making prototypes, thinks carefully about systems and structures",Engineer
+Student_088,"Mathematics, Physics, Design Technology","coding small projects, problem solving, testing ideas, enjoys practical challenges",Engineer
+Student_089,"Mathematics, Physics, Design Technology","coding small projects, problem solving, testing ideas, likes improving how things work",Engineer
+Student_090,"Mathematics, Physics, Design Technology","coding small projects, problem solving, testing ideas, thinks carefully about systems and structures",Engineer
+Student_091,"Physics, Chemistry, Mathematics","building models, fixing things, robotics, enjoys practical challenges",Engineer
+Student_092,"Physics, Chemistry, Mathematics","building models, fixing things, robotics, likes improving how things work",Engineer
+Student_093,"Physics, Chemistry, Mathematics","building models, fixing things, robotics, thinks carefully about systems and structures",Engineer
+Student_094,"Physics, Chemistry, Mathematics","working out how machines work, designing solutions, making prototypes, enjoys practical challenges",Engineer
+Student_095,"Physics, Chemistry, Mathematics","working out how machines work, designing solutions, making prototypes, likes improving how things work",Engineer
+Student_096,"Physics, Chemistry, Mathematics","working out how machines work, designing solutions, making prototypes, thinks carefully about systems and structures",Engineer
+Student_097,"Physics, Chemistry, Mathematics","coding small projects, problem solving, testing ideas, enjoys practical challenges",Engineer
+Student_098,"Physics, Chemistry, Mathematics","coding small projects, problem solving, testing ideas, likes improving how things work",Engineer
+Student_099,"Physics, Chemistry, Mathematics","coding small projects, problem solving, testing ideas, thinks carefully about systems and structures",Engineer
+Student_100,"Computer Science, Mathematics, Design","building models, fixing things, robotics, enjoys practical challenges",Engineer
+Student_101,"Computer Science, Mathematics, Design","building models, fixing things, robotics, likes improving how things work",Engineer
+Student_102,"Computer Science, Mathematics, Design","building models, fixing things, robotics, thinks carefully about systems and structures",Engineer
+Student_103,"Computer Science, Mathematics, Design","working out how machines work, designing solutions, making prototypes, enjoys practical challenges",Engineer
+Student_104,"Computer Science, Mathematics, Design","working out how machines work, designing solutions, making prototypes, likes improving how things work",Engineer
+Student_105,"Computer Science, Mathematics, Design","working out how machines work, designing solutions, making prototypes, thinks carefully about systems and structures",Engineer
+Student_106,"Computer Science, Mathematics, Design","coding small projects, problem solving, testing ideas, enjoys practical challenges",Engineer
+Student_107,"Computer Science, Mathematics, Design","coding small projects, problem solving, testing ideas, likes improving how things work",Engineer
+Student_108,"Computer Science, Mathematics, Design","coding small projects, problem solving, testing ideas, thinks carefully about systems and structures",Engineer
+Student_109,"Business Studies, Economics, Digital Technology","coming up with ideas, planning events, selling things, likes turning ideas into action",Entrepreneur
+Student_110,"Business Studies, Economics, Digital Technology","coming up with ideas, planning events, selling things, comfortable taking initiative",Entrepreneur
+Student_111,"Business Studies, Economics, Digital Technology","coming up with ideas, planning events, selling things, enjoys finding opportunities",Entrepreneur
+Student_112,"Business Studies, Economics, Digital Technology","marketing, creating projects, organising teams, likes turning ideas into action",Entrepreneur
+Student_113,"Business Studies, Economics, Digital Technology","marketing, creating projects, organising teams, comfortable taking initiative",Entrepreneur
+Student_114,"Business Studies, Economics, Digital Technology","marketing, creating projects, organising teams, enjoys finding opportunities",Entrepreneur
+Student_115,"Business Studies, Economics, Digital Technology","learning how businesses work, budgeting, solving customer problems, likes turning ideas into action",Entrepreneur
+Student_116,"Business Studies, Economics, Digital Technology","learning how businesses work, budgeting, solving customer problems, comfortable taking initiative",Entrepreneur
+Student_117,"Business Studies, Economics, Digital Technology","learning how businesses work, budgeting, solving customer problems, enjoys finding opportunities",Entrepreneur
+Student_118,"Economics, Accounting, Mathematics","coming up with ideas, planning events, selling things, likes turning ideas into action",Entrepreneur
+Student_119,"Economics, Accounting, Mathematics","coming up with ideas, planning events, selling things, comfortable taking initiative",Entrepreneur
+Student_120,"Economics, Accounting, Mathematics","coming up with ideas, planning events, selling things, enjoys finding opportunities",Entrepreneur
+Student_121,"Economics, Accounting, Mathematics","marketing, creating projects, organising teams, likes turning ideas into action",Entrepreneur
+Student_122,"Economics, Accounting, Mathematics","marketing, creating projects, organising teams, comfortable taking initiative",Entrepreneur
+Student_123,"Economics, Accounting, Mathematics","marketing, creating projects, organising teams, enjoys finding opportunities",Entrepreneur
+Student_124,"Economics, Accounting, Mathematics","learning how businesses work, budgeting, solving customer problems, likes turning ideas into action",Entrepreneur
+Student_125,"Economics, Accounting, Mathematics","learning how businesses work, budgeting, solving customer problems, comfortable taking initiative",Entrepreneur
+Student_126,"Economics, Accounting, Mathematics","learning how businesses work, budgeting, solving customer problems, enjoys finding opportunities",Entrepreneur
+Student_127,"Business Studies, Media Studies, English","coming up with ideas, planning events, selling things, likes turning ideas into action",Entrepreneur
+Student_128,"Business Studies, Media Studies, English","coming up with ideas, planning events, selling things, comfortable taking initiative",Entrepreneur
+Student_129,"Business Studies, Media Studies, English","coming up with ideas, planning events, selling things, enjoys finding opportunities",Entrepreneur
+Student_130,"Business Studies, Media Studies, English","marketing, creating projects, organising teams, likes turning ideas into action",Entrepreneur
+Student_131,"Business Studies, Media Studies, English","marketing, creating projects, organising teams, comfortable taking initiative",Entrepreneur
+Student_132,"Business Studies, Media Studies, English","marketing, creating projects, organising teams, enjoys finding opportunities",Entrepreneur
+Student_133,"Business Studies, Media Studies, English","learning how businesses work, budgeting, solving customer problems, likes turning ideas into action",Entrepreneur
+Student_134,"Business Studies, Media Studies, English","learning how businesses work, budgeting, solving customer problems, comfortable taking initiative",Entrepreneur
+Student_135,"Business Studies, Media Studies, English","learning how businesses work, budgeting, solving customer problems, enjoys finding opportunities",Entrepreneur
+Student_136,"English, History, Social Studies","debating issues, reading about current events, public speaking, enjoys clear reasoning",Lawyer
+Student_137,"English, History, Social Studies","debating issues, reading about current events, public speaking, cares about fairness and justice",Lawyer
+Student_138,"English, History, Social Studies","debating issues, reading about current events, public speaking, confident explaining an argument",Lawyer
+Student_139,"English, History, Social Studies","solving arguments, researching rules, helping people understand choices, enjoys clear reasoning",Lawyer
+Student_140,"English, History, Social Studies","solving arguments, researching rules, helping people understand choices, cares about fairness and justice",Lawyer
+Student_141,"English, History, Social Studies","solving arguments, researching rules, helping people understand choices, confident explaining an argument",Lawyer
+Student_142,"English, History, Social Studies","writing persuasive points, analysing evidence, discussing fairness, enjoys clear reasoning",Lawyer
+Student_143,"English, History, Social Studies","writing persuasive points, analysing evidence, discussing fairness, cares about fairness and justice",Lawyer
+Student_144,"English, History, Social Studies","writing persuasive points, analysing evidence, discussing fairness, confident explaining an argument",Lawyer
+Student_145,"Law, Economics, English","debating issues, reading about current events, public speaking, enjoys clear reasoning",Lawyer
+Student_146,"Law, Economics, English","debating issues, reading about current events, public speaking, cares about fairness and justice",Lawyer
+Student_147,"Law, Economics, English","debating issues, reading about current events, public speaking, confident explaining an argument",Lawyer
+Student_148,"Law, Economics, English","solving arguments, researching rules, helping people understand choices, enjoys clear reasoning",Lawyer
+Student_149,"Law, Economics, English","solving arguments, researching rules, helping people understand choices, cares about fairness and justice",Lawyer
+Student_150,"Law, Economics, English","solving arguments, researching rules, helping people understand choices, confident explaining an argument",Lawyer
+Student_151,"Law, Economics, English","writing persuasive points, analysing evidence, discussing fairness, enjoys clear reasoning",Lawyer
+Student_152,"Law, Economics, English","writing persuasive points, analysing evidence, discussing fairness, cares about fairness and justice",Lawyer
+Student_153,"Law, Economics, English","writing persuasive points, analysing evidence, discussing fairness, confident explaining an argument",Lawyer
+Student_154,"History, Politics, Debate","debating issues, reading about current events, public speaking, enjoys clear reasoning",Lawyer
+Student_155,"History, Politics, Debate","debating issues, reading about current events, public speaking, cares about fairness and justice",Lawyer
+Student_156,"History, Politics, Debate","debating issues, reading about current events, public speaking, confident explaining an argument",Lawyer
+Student_157,"History, Politics, Debate","solving arguments, researching rules, helping people understand choices, enjoys clear reasoning",Lawyer
+Student_158,"History, Politics, Debate","solving arguments, researching rules, helping people understand choices, cares about fairness and justice",Lawyer
+Student_159,"History, Politics, Debate","solving arguments, researching rules, helping people understand choices, confident explaining an argument",Lawyer
+Student_160,"History, Politics, Debate","writing persuasive points, analysing evidence, discussing fairness, enjoys clear reasoning",Lawyer
+Student_161,"History, Politics, Debate","writing persuasive points, analysing evidence, discussing fairness, cares about fairness and justice",Lawyer
+Student_162,"History, Politics, Debate","writing persuasive points, analysing evidence, discussing fairness, confident explaining an argument",Lawyer
+Student_163,"Music, Art, English","playing instruments, writing songs, performing, enjoys expressing ideas through sound",Musician
+Student_164,"Music, Art, English","playing instruments, writing songs, performing, patiently practises skills",Musician
+Student_165,"Music, Art, English","playing instruments, writing songs, performing, likes performing and working creatively with others",Musician
+Student_166,"Music, Art, English","recording music, listening to different styles, practising rhythms, enjoys expressing ideas through sound",Musician
+Student_167,"Music, Art, English","recording music, listening to different styles, practising rhythms, patiently practises skills",Musician
+Student_168,"Music, Art, English","recording music, listening to different styles, practising rhythms, likes performing and working creatively with others",Musician
+Student_169,"Music, Art, English","singing, creating beats, collaborating with performers, enjoys expressing ideas through sound",Musician
+Student_170,"Music, Art, English","singing, creating beats, collaborating with performers, patiently practises skills",Musician
+Student_171,"Music, Art, English","singing, creating beats, collaborating with performers, likes performing and working creatively with others",Musician
+Student_172,"Music, Media Studies, Digital Technology","playing instruments, writing songs, performing, enjoys expressing ideas through sound",Musician
+Student_173,"Music, Media Studies, Digital Technology","playing instruments, writing songs, performing, patiently practises skills",Musician
+Student_174,"Music, Media Studies, Digital Technology","playing instruments, writing songs, performing, likes performing and working creatively with others",Musician
+Student_175,"Music, Media Studies, Digital Technology","recording music, listening to different styles, practising rhythms, enjoys expressing ideas through sound",Musician
+Student_176,"Music, Media Studies, Digital Technology","recording music, listening to different styles, practising rhythms, patiently practises skills",Musician
+Student_177,"Music, Media Studies, Digital Technology","recording music, listening to different styles, practising rhythms, likes performing and working creatively with others",Musician
+Student_178,"Music, Media Studies, Digital Technology","singing, creating beats, collaborating with performers, enjoys expressing ideas through sound",Musician
+Student_179,"Music, Media Studies, Digital Technology","singing, creating beats, collaborating with performers, patiently practises skills",Musician
+Student_180,"Music, Media Studies, Digital Technology","singing, creating beats, collaborating with performers, likes performing and working creatively with others",Musician
+Student_181,"Music, Mathematics, Drama","playing instruments, writing songs, performing, enjoys expressing ideas through sound",Musician
+Student_182,"Music, Mathematics, Drama","playing instruments, writing songs, performing, patiently practises skills",Musician
+Student_183,"Music, Mathematics, Drama","playing instruments, writing songs, performing, likes performing and working creatively with others",Musician
+Student_184,"Music, Mathematics, Drama","recording music, listening to different styles, practising rhythms, enjoys expressing ideas through sound",Musician
+Student_185,"Music, Mathematics, Drama","recording music, listening to different styles, practising rhythms, patiently practises skills",Musician
+Student_186,"Music, Mathematics, Drama","recording music, listening to different styles, practising rhythms, likes performing and working creatively with others",Musician
+Student_187,"Music, Mathematics, Drama","singing, creating beats, collaborating with performers, enjoys expressing ideas through sound",Musician
+Student_188,"Music, Mathematics, Drama","singing, creating beats, collaborating with performers, patiently practises skills",Musician
+Student_189,"Music, Mathematics, Drama","singing, creating beats, collaborating with performers, likes performing and working creatively with others",Musician
+Student_190,"Biology, Chemistry, Environmental Science","running experiments, asking why things happen, discovering new ideas, curious about how the world works",Scientist
+Student_191,"Biology, Chemistry, Environmental Science","running experiments, asking why things happen, discovering new ideas, enjoys careful investigation",Scientist
+Student_192,"Biology, Chemistry, Environmental Science","running experiments, asking why things happen, discovering new ideas, likes collecting evidence before making conclusions",Scientist
+Student_193,"Biology, Chemistry, Environmental Science","adventure, hiking, exploring nature, learning about wildlife, curious about how the world works",Scientist
+Student_194,"Biology, Chemistry, Environmental Science","adventure, hiking, exploring nature, learning about wildlife, enjoys careful investigation",Scientist
+Student_195,"Biology, Chemistry, Environmental Science","adventure, hiking, exploring nature, learning about wildlife, likes collecting evidence before making conclusions",Scientist
+Student_196,"Biology, Chemistry, Environmental Science","researching, analysing results, testing theories, curious about how the world works",Scientist
+Student_197,"Biology, Chemistry, Environmental Science","researching, analysing results, testing theories, enjoys careful investigation",Scientist
+Student_198,"Biology, Chemistry, Environmental Science","researching, analysing results, testing theories, likes collecting evidence before making conclusions",Scientist
+Student_199,"Chemistry, Physics, Mathematics","running experiments, asking why things happen, discovering new ideas, curious about how the world works",Scientist
+Student_200,"Chemistry, Physics, Mathematics","running experiments, asking why things happen, discovering new ideas, enjoys careful investigation",Scientist
+Student_201,"Chemistry, Physics, Mathematics","running experiments, asking why things happen, discovering new ideas, likes collecting evidence before making conclusions",Scientist
+Student_202,"Chemistry, Physics, Mathematics","adventure, hiking, exploring nature, learning about wildlife, curious about how the world works",Scientist
+Student_203,"Chemistry, Physics, Mathematics","adventure, hiking, exploring nature, learning about wildlife, enjoys careful investigation",Scientist
+Student_204,"Chemistry, Physics, Mathematics","adventure, hiking, exploring nature, learning about wildlife, likes collecting evidence before making conclusions",Scientist
+Student_205,"Chemistry, Physics, Mathematics","researching, analysing results, testing theories, curious about how the world works",Scientist
+Student_206,"Chemistry, Physics, Mathematics","researching, analysing results, testing theories, enjoys careful investigation",Scientist
+Student_207,"Chemistry, Physics, Mathematics","researching, analysing results, testing theories, likes collecting evidence before making conclusions",Scientist
+Student_208,"Biology, Geography, Computer Science","running experiments, asking why things happen, discovering new ideas, curious about how the world works",Scientist
+Student_209,"Biology, Geography, Computer Science","running experiments, asking why things happen, discovering new ideas, enjoys careful investigation",Scientist
+Student_210,"Biology, Geography, Computer Science","running experiments, asking why things happen, discovering new ideas, likes collecting evidence before making conclusions",Scientist
+Student_211,"Biology, Geography, Computer Science","adventure, hiking, exploring nature, learning about wildlife, curious about how the world works",Scientist
+Student_212,"Biology, Geography, Computer Science","adventure, hiking, exploring nature, learning about wildlife, enjoys careful investigation",Scientist
+Student_213,"Biology, Geography, Computer Science","adventure, hiking, exploring nature, learning about wildlife, likes collecting evidence before making conclusions",Scientist
+Student_214,"Biology, Geography, Computer Science","researching, analysing results, testing theories, curious about how the world works",Scientist
+Student_215,"Biology, Geography, Computer Science","researching, analysing results, testing theories, enjoys careful investigation",Scientist
+Student_216,"Biology, Geography, Computer Science","researching, analysing results, testing theories, likes collecting evidence before making conclusions",Scientist
+Student_217,"Computer Science, Mathematics, Digital Technology","coding projects, making games, solving logic puzzles, enjoys breaking big problems into steps",Software Developer
+Student_218,"Computer Science, Mathematics, Digital Technology","coding projects, making games, solving logic puzzles, likes testing and improving ideas",Software Developer
+Student_219,"Computer Science, Mathematics, Digital Technology","coding projects, making games, solving logic puzzles, interested in how software works",Software Developer
+Student_220,"Computer Science, Mathematics, Digital Technology","building websites, testing apps, learning new technology, enjoys breaking big problems into steps",Software Developer
+Student_221,"Computer Science, Mathematics, Digital Technology","building websites, testing apps, learning new technology, likes testing and improving ideas",Software Developer
+Student_222,"Computer Science, Mathematics, Digital Technology","building websites, testing apps, learning new technology, interested in how software works",Software Developer
+Student_223,"Computer Science, Mathematics, Digital Technology","creating programs, debugging, designing user experiences, enjoys breaking big problems into steps",Software Developer
+Student_224,"Computer Science, Mathematics, Digital Technology","creating programs, debugging, designing user experiences, likes testing and improving ideas",Software Developer
+Student_225,"Computer Science, Mathematics, Digital Technology","creating programs, debugging, designing user experiences, interested in how software works",Software Developer
+Student_226,"Computer Science, Physics, Mathematics","coding projects, making games, solving logic puzzles, enjoys breaking big problems into steps",Software Developer
+Student_227,"Computer Science, Physics, Mathematics","coding projects, making games, solving logic puzzles, likes testing and improving ideas",Software Developer
+Student_228,"Computer Science, Physics, Mathematics","coding projects, making games, solving logic puzzles, interested in how software works",Software Developer
+Student_229,"Computer Science, Physics, Mathematics","building websites, testing apps, learning new technology, enjoys breaking big problems into steps",Software Developer
+Student_230,"Computer Science, Physics, Mathematics","building websites, testing apps, learning new technology, likes testing and improving ideas",Software Developer
+Student_231,"Computer Science, Physics, Mathematics","building websites, testing apps, learning new technology, interested in how software works",Software Developer
+Student_232,"Computer Science, Physics, Mathematics","creating programs, debugging, designing user experiences, enjoys breaking big problems into steps",Software Developer
+Student_233,"Computer Science, Physics, Mathematics","creating programs, debugging, designing user experiences, likes testing and improving ideas",Software Developer
+Student_234,"Computer Science, Physics, Mathematics","creating programs, debugging, designing user experiences, interested in how software works",Software Developer
+Student_235,"Digital Technology, Design, English","coding projects, making games, solving logic puzzles, enjoys breaking big problems into steps",Software Developer
+Student_236,"Digital Technology, Design, English","coding projects, making games, solving logic puzzles, likes testing and improving ideas",Software Developer
+Student_237,"Digital Technology, Design, English","coding projects, making games, solving logic puzzles, interested in how software works",Software Developer
+Student_238,"Digital Technology, Design, English","building websites, testing apps, learning new technology, enjoys breaking big problems into steps",Software Developer
+Student_239,"Digital Technology, Design, English","building websites, testing apps, learning new technology, likes testing and improving ideas",Software Developer
+Student_240,"Digital Technology, Design, English","building websites, testing apps, learning new technology, interested in how software works",Software Developer
+Student_241,"Digital Technology, Design, English","creating programs, debugging, designing user experiences, enjoys breaking big problems into steps",Software Developer
+Student_242,"Digital Technology, Design, English","creating programs, debugging, designing user experiences, likes testing and improving ideas",Software Developer
+Student_243,"Digital Technology, Design, English","creating programs, debugging, designing user experiences, interested in how software works",Software Developer
+Student_244,"English, History, Social Studies","explaining ideas, helping classmates, leading study groups, patient when others are learning",Teacher
+Student_245,"English, History, Social Studies","explaining ideas, helping classmates, leading study groups, enjoys helping people grow",Teacher
+Student_246,"English, History, Social Studies","explaining ideas, helping classmates, leading study groups, communicates ideas clearly",Teacher
+Student_247,"English, History, Social Studies","creating lessons, mentoring younger students, public speaking, patient when others are learning",Teacher
+Student_248,"English, History, Social Studies","creating lessons, mentoring younger students, public speaking, enjoys helping people grow",Teacher
+Student_249,"English, History, Social Studies","creating lessons, mentoring younger students, public speaking, communicates ideas clearly",Teacher
+Student_250,"English, History, Social Studies","reading, learning new topics, making difficult things easier, patient when others are learning",Teacher
+Student_251,"English, History, Social Studies","reading, learning new topics, making difficult things easier, enjoys helping people grow",Teacher
+Student_252,"English, History, Social Studies","reading, learning new topics, making difficult things easier, communicates ideas clearly",Teacher
+Student_253,"Mathematics, Science, English","explaining ideas, helping classmates, leading study groups, patient when others are learning",Teacher
+Student_254,"Mathematics, Science, English","explaining ideas, helping classmates, leading study groups, enjoys helping people grow",Teacher
+Student_255,"Mathematics, Science, English","explaining ideas, helping classmates, leading study groups, communicates ideas clearly",Teacher
+Student_256,"Mathematics, Science, English","creating lessons, mentoring younger students, public speaking, patient when others are learning",Teacher
+Student_257,"Mathematics, Science, English","creating lessons, mentoring younger students, public speaking, enjoys helping people grow",Teacher
+Student_258,"Mathematics, Science, English","creating lessons, mentoring younger students, public speaking, communicates ideas clearly",Teacher
+Student_259,"Mathematics, Science, English","reading, learning new topics, making difficult things easier, patient when others are learning",Teacher
+Student_260,"Mathematics, Science, English","reading, learning new topics, making difficult things easier, enjoys helping people grow",Teacher
+Student_261,"Mathematics, Science, English","reading, learning new topics, making difficult things easier, communicates ideas clearly",Teacher
+Student_262,"Art, Music, English","explaining ideas, helping classmates, leading study groups, patient when others are learning",Teacher
+Student_263,"Art, Music, English","explaining ideas, helping classmates, leading study groups, enjoys helping people grow",Teacher
+Student_264,"Art, Music, English","explaining ideas, helping classmates, leading study groups, communicates ideas clearly",Teacher
+Student_265,"Art, Music, English","creating lessons, mentoring younger students, public speaking, patient when others are learning",Teacher
+Student_266,"Art, Music, English","creating lessons, mentoring younger students, public speaking, enjoys helping people grow",Teacher
+Student_267,"Art, Music, English","creating lessons, mentoring younger students, public speaking, communicates ideas clearly",Teacher
+Student_268,"Art, Music, English","reading, learning new topics, making difficult things easier, patient when others are learning",Teacher
+Student_269,"Art, Music, English","reading, learning new topics, making difficult things easier, enjoys helping people grow",Teacher
+Student_270,"Art, Music, English","reading, learning new topics, making difficult things easier, communicates ideas clearly",Teacher
+Student_271,"Mathematics, Calculus, Statistics","solving difficult equations, patterns, logical puzzles, enjoys abstract thinking",Mathematician
+Student_272,"Mathematics, Calculus, Statistics","solving difficult equations, patterns, logical puzzles, patiently works through complex problems",Mathematician
+Student_273,"Mathematics, Calculus, Statistics","solving difficult equations, patterns, logical puzzles, likes using logic to find answers",Mathematician
+Student_274,"Mathematics, Calculus, Statistics","proofs, number theory, mathematical challenges, enjoys abstract thinking",Mathematician
+Student_275,"Mathematics, Calculus, Statistics","proofs, number theory, mathematical challenges, patiently works through complex problems",Mathematician
+Student_276,"Mathematics, Calculus, Statistics","proofs, number theory, mathematical challenges, likes using logic to find answers",Mathematician
+Student_277,"Mathematics, Calculus, Statistics","probability, analysing data, finding patterns in numbers, enjoys abstract thinking",Mathematician
+Student_278,"Mathematics, Calculus, Statistics","probability, analysing data, finding patterns in numbers, patiently works through complex problems",Mathematician
+Student_279,"Mathematics, Calculus, Statistics","probability, analysing data, finding patterns in numbers, likes using logic to find answers",Mathematician
+Student_280,"Algebra, Geometry, Mathematics","solving difficult equations, patterns, logical puzzles, enjoys abstract thinking",Mathematician
+Student_281,"Algebra, Geometry, Mathematics","solving difficult equations, patterns, logical puzzles, patiently works through complex problems",Mathematician
+Student_282,"Algebra, Geometry, Mathematics","solving difficult equations, patterns, logical puzzles, likes using logic to find answers",Mathematician
+Student_283,"Algebra, Geometry, Mathematics","proofs, number theory, mathematical challenges, enjoys abstract thinking",Mathematician
+Student_284,"Algebra, Geometry, Mathematics","proofs, number theory, mathematical challenges, patiently works through complex problems",Mathematician
+Student_285,"Algebra, Geometry, Mathematics","proofs, number theory, mathematical challenges, likes using logic to find answers",Mathematician
+Student_286,"Algebra, Geometry, Mathematics","probability, analysing data, finding patterns in numbers, enjoys abstract thinking",Mathematician
+Student_287,"Algebra, Geometry, Mathematics","probability, analysing data, finding patterns in numbers, patiently works through complex problems",Mathematician
+Student_288,"Algebra, Geometry, Mathematics","probability, analysing data, finding patterns in numbers, likes using logic to find answers",Mathematician
+Student_289,"Calculus, Physics, Mathematics","solving difficult equations, patterns, logical puzzles, enjoys abstract thinking",Mathematician
+Student_290,"Calculus, Physics, Mathematics","solving difficult equations, patterns, logical puzzles, patiently works through complex problems",Mathematician
+Student_291,"Calculus, Physics, Mathematics","solving difficult equations, patterns, logical puzzles, likes using logic to find answers",Mathematician
+Student_292,"Calculus, Physics, Mathematics","proofs, number theory, mathematical challenges, enjoys abstract thinking",Mathematician
+Student_293,"Calculus, Physics, Mathematics","proofs, number theory, mathematical challenges, patiently works through complex problems",Mathematician
+Student_294,"Calculus, Physics, Mathematics","proofs, number theory, mathematical challenges, likes using logic to find answers",Mathematician
+Student_295,"Calculus, Physics, Mathematics","probability, analysing data, finding patterns in numbers, enjoys abstract thinking",Mathematician
+Student_296,"Calculus, Physics, Mathematics","probability, analysing data, finding patterns in numbers, patiently works through complex problems",Mathematician
+Student_297,"Calculus, Physics, Mathematics","probability, analysing data, finding patterns in numbers, likes using logic to find answers",Mathematician
+Student_298,"History , Economics, Geography","Tree Planting, Hiking, Reading, Community Cleanups, Green Gardening", Environmental Management

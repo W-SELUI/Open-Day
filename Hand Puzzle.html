@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hand Puzzle - Day 12: Green Win Pulse</title>
+    <style>
+      body {
+        background: #111;
+        color: #eee;
+        font-family: sans-serif;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      #container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+    }
+
+      video {
+        transform: scaleX(-1);
+      }
+
+      canvas {
+        transform: scaleX(-1);
+      }
+
+      #status {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        font-size: 18px;
+        min-height: 24px;
+        text-align: center;
+      }
+
+      #status.measuring {
+        color: #3B82F6;
+        text-shadow: 0 0 8px #3B82F6;
+      }
+
+      #status.grabbing {
+        color: #60A5FA;
+        text-shadow: 0 0 10px #60A5FA;
+      }
+
+      #status.win {
+        color: #22D3EE;
+        text-shadow: 0 0 16px #22D3EE;
+        font-weight: bold;
+      }
+
+      #resetBtn {
+        position: fixed;
+        bottom: 60px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: none;
+
+        background: #1e293b;
+        color: #3B82F6;
+        border: 1px solid #3B82F6;
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      #resetBtn:hover {
+        background: #3B82F6;
+        color: #111;
+      }
+
+      #progress {
+        position: fixed;
+        top: 16px;
+        right: 20px;
+        z-index: 10;
+        font-size: 15px;
+        color: #93C5FD;
+        text-shadow: 0 0 6px #3B82F6;
+        letter-spacing: 0.5px;
+        display: none;
+      }
+
+      h2 {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Day 12: Green correct-cell hint, green border + full-screen pulse on solve</h2>
+    <div id="container">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+    <div id="status">Loading MediaPipe...</div>
+    <div id="progress">0 / 9</div>
+    <button id="resetBtn">Measure Again</button>
+
+    <!-- MediaPipe Hands (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+
+    <script>
+    const videoElement = document.getElementById('video');
+    const canvasElement = document.getElementById('canvas');
+    const canvasCtx = canvasElement.getContext('2d');
+    const statusEl = document.getElementById('status');
+    const resetBtn = document.getElementById('resetBtn');
+    const progressEl = document.getElementById('progress');
+
+    const W = canvasElement.width;
+    const H = canvasElement.height;
+
+    const THUMB_TIP = 4;
+    const INDEX_TIP = 8;
+    const WRIST = 0;
+    const MIDDLE_MCP = 9;
+
+    const PINCH_CLOSE_RATIO = 0.35;
+    const PINCH_OPEN_RATIO = 0.55;
+
+    const MISSING_HAND_GRACE_FRAMES = 6;
+
+    // Stability tuning (fixes: ghost hands showing with nothing in frame,
+    // and the skeleton jittering/wobbling on a hand that's holding still).
+    const MIN_DETECTION_CONFIDENCE = 0.75;   // was 0.6 -- fewer false-positive ghost hands
+    const MIN_TRACKING_CONFIDENCE = 0.5;     // keep this LOW -- high values force MediaPipe
+                                              // to re-run the expensive full palm detector
+                                              // almost every frame instead of cheap tracking,
+                                              // which is what was tanking the framerate
+    const MIN_HANDEDNESS_SCORE = 0.85;       // drop low-confidence "ghost" hands entirely
+    const LANDMARK_SMOOTHING_ALPHA = 0.35;   // 0..1, lower = smoother but more lag
+
+    let handPinchState = { Left: false, Right: false };
+    let handMissingFrames = { Left: 0, Right: 0 };
+    let smoothedLandmarks = { Left: null, Right: null };
+
+    // Exponential moving average per landmark point. Snaps straight to the
+    // raw position (no lerp) the first frame a hand appears or right after
+    // it comes back from being missing -- otherwise you'd see it "slide in"
+    // from wherever it used to be, which looks worse than the jitter did.
+    function smoothLandmarks(label, landmarks) {
+      const prev = smoothedLandmarks[label];
+      if (!prev) {
+        smoothedLandmarks[label] = landmarks.map(p => ({ x: p.x, y: p.y, z: p.z }));
+        return smoothedLandmarks[label];
+      }
+      const smoothed = landmarks.map((p, i) => ({
+        x: prev[i].x + (p.x - prev[i].x) * LANDMARK_SMOOTHING_ALPHA,
+        y: prev[i].y + (p.y - prev[i].y) * LANDMARK_SMOOTHING_ALPHA,
+        z: p.z
+      }));
+      smoothedLandmarks[label] = smoothed;
+      return smoothed;
+    }
+
+    const MIN_SQUARE = 90;
+    const MAX_SQUARE = H - 20;
+
+    const GRID = 3;
+    const SNAP_DISTANCE = 30;
+
+    // How far (px) proximity glow starts ramping up as a held piece approaches
+    // an empty slot. Beyond this distance a slot sits at its dim base tint.
+    const PROXIMITY_RANGE = 160;
+
+    // Drag hint (Day 10): while holding a piece, the cell it's nearest to
+    // glows RED if that's the piece's actual home, or the old neutral BLUE
+    // otherwise -- see drawPiece() for the actual color logic.
+
+    const snapshotCanvas = document.createElement('canvas');
+    snapshotCanvas.width = W;
+    snapshotCanvas.height = H;
+    const snapshotCtx = snapshotCanvas.getContext('2d');
+
+    let state = 'measuring';
+    let lastGoodSquare = null;
+    let wasBothPinching = false;
+
+    let pieces = [];
+    let heldByHand = null;
+    let activeDragPoint = null;
+
+    let cells = [];
+    let board = [];
+    let lockedSquare = null;
+
+    let heldPieceIndex = null;
+    let heldOriginCell = null;
+
+    const hands = new Hands({
+      locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+    });
+
+    hands.setOptions({
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: MIN_DETECTION_CONFIDENCE,
+      minTrackingConfidence: MIN_TRACKING_CONFIDENCE
+    });
+
+    hands.onResults(onResults);
+
+    function getHandLabels(results) {
+      const landmarksList = results.multiHandLandmarks || [];
+      const handedness = results.multiHandedness || [];
+      return landmarksList.map((_, i) => {
+        const h = handedness[i];
+        return (h && h.label) ? h.label : `Hand${i}`;
+      });
+    }
+
+    function onResults(results) 
+    {
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, W, H);
+
+      const rawDetected = results.multiHandLandmarks && results.multiHandLandmarks.length > 0;
+
+      // Filter out low-confidence "ghost" detections (background/shadows
+      // that MediaPipe briefly misreads as a hand) and smooth whatever's
+      // left so a still hand doesn't visibly jitter.
+      let landmarksList = [];
+      let labels = [];
+      if (rawDetected) {
+        const rawLabels = getHandLabels(results);
+        const handedness = results.multiHandedness || [];
+        results.multiHandLandmarks.forEach((lm, i) => {
+          const score = handedness[i] ? handedness[i].score : 1;
+          if (score < MIN_HANDEDNESS_SCORE) return;
+          const label = rawLabels[i];
+          landmarksList.push(smoothLandmarks(label, lm));
+          labels.push(label);
+        });
+      }
+      const handsDetected = landmarksList.length > 0;
+
+      for (const label of Object.keys(handPinchState)) {
+        if (!labels.includes(label)) {
+          handMissingFrames[label]++;
+          if (handMissingFrames[label] >= MISSING_HAND_GRACE_FRAMES) {
+            handPinchState[label] = false;
+            smoothedLandmarks[label] = null; // force a clean snap next time it appears
+            if (state === 'solving' && heldByHand === label && heldPieceIndex !== null) {
+              resolveRelease();
+            }
+          }
+        } else {
+          handMissingFrames[label] = 0;
+        }
+      }
+
+      if (state === 'measuring') {
+        handleMeasuring(landmarksList, labels);
+      } else if (state === 'solving') {
+        drawLockedGrid();
+        handleSolving(landmarksList, labels);
+      } else if (state === 'won') {
+        drawLockedGrid();
+        pieces.forEach(drawPiece);
+        if (handsDetected) {
+          landmarksList.forEach((lm, i) => drawGlowingHand(lm, isPinching(lm, labels[i])));
+        }
+        drawWinPulse();
+      }
+
+      canvasCtx.restore();
+    }
+
+    // Full-canvas green wash that breathes in and out while the puzzle is
+    // solved -- meant to be noticeable from a few steps away at a booth, not
+    // just a border you have to be looking straight at. Timed off Date.now()
+    // (not a frame counter) so the pulse speed stays constant no matter how
+    // fast/slow the camera is actually delivering frames.
+    const WIN_PULSE_PERIOD_MS = 1600;
+    const WIN_PULSE_MAX_ALPHA = 0.22;
+
+    function drawWinPulse() 
+    {
+      const phase = (Date.now() % WIN_PULSE_PERIOD_MS) / WIN_PULSE_PERIOD_MS;
+      // sin ranges -1..1 over the period; remap to 0..1 so it fades in and
+      // back out smoothly (no snap at the loop boundary).
+      const eased = (Math.sin(phase * Math.PI * 2 - Math.PI / 2) + 1) / 2;
+      const alpha = eased * WIN_PULSE_MAX_ALPHA;
+
+      canvasCtx.save();
+      canvasCtx.fillStyle = `rgba(34, 197, 94, ${alpha})`;
+      canvasCtx.fillRect(0, 0, W, H);
+      canvasCtx.restore();
+    }
+
+    // ---------- MEASURING (two-hand diagonal) ----------
+    function handleMeasuring(landmarksList, labels) 
+    {
+      if (landmarksList.length < 2) {
+        if (wasBothPinching && lastGoodSquare) {
+          lockSquareAndGeneratePuzzle(lastGoodSquare);
+          return;
+        }
+        wasBothPinching = false;
+        landmarksList.forEach((lm, i) => drawGlowingHand(lm, isPinching(lm, labels[i])));
+        statusEl.innerText = "Show both hands — pinch thumb + index on each hand together";
+        statusEl.className = '';
+        return;
+      }
+
+      const handA = landmarksList[0];
+      const handB = landmarksList[1];
+      const pinchingA = isPinching(handA, labels[0]);
+      const pinchingB = isPinching(handB, labels[1]);
+      const bothPinching = pinchingA && pinchingB;
+
+      drawGlowingHand(handA, pinchingA);
+      drawGlowingHand(handB, pinchingB);
+
+      if (bothPinching) {
+        const pA = getPinchPoint(handA);
+        const pB = getPinchPoint(handB);
+
+        const dx = pB.x - pA.x;
+        const dy = pB.y - pA.y;
+        const diagonal = Math.sqrt(dx * dx + dy * dy);
+        const rawSize = diagonal / Math.SQRT2;
+        const size = Math.max(MIN_SQUARE, Math.min(MAX_SQUARE, rawSize));
+
+        const cx = (pA.x + pB.x) / 2;
+        const cy = (pA.y + pB.y) / 2;
+        lastGoodSquare = { size, cx, cy };
+
+        drawDiagonalGuide(pA, pB);
+        drawMeasureSquare(lastGoodSquare);
+
+        statusEl.innerText = `Measuring: ${Math.round(size)}px — release either pinch to lock`;
+        statusEl.className = 'measuring';
+        wasBothPinching = true;
+      } else {
+        if (wasBothPinching && lastGoodSquare) {
+          lockSquareAndGeneratePuzzle(lastGoodSquare);
+          return;
+        }
+        wasBothPinching = false;
+        statusEl.innerText = "Pinch thumb + index on BOTH hands, then spread diagonally";
+        statusEl.className = '';
+      }
+    }
+
+    function drawDiagonalGuide(pA, pB) 
+    {
+      canvasCtx.save();
+      canvasCtx.strokeStyle = 'rgba(96, 165, 250, 0.6)';
+      canvasCtx.shadowColor = '#60A5FA';
+      canvasCtx.shadowBlur = 10;
+      canvasCtx.lineWidth = 1.5;
+      canvasCtx.setLineDash([4, 6]);
+      canvasCtx.beginPath();
+      canvasCtx.moveTo(pA.x, pA.y);
+      canvasCtx.lineTo(pB.x, pB.y);
+      canvasCtx.stroke();
+      canvasCtx.restore();
+    }
+
+    function drawLockedGrid() 
+    {
+      if (!lockedSquare) return;
+      const { size, left, top } = lockedSquare;
+
+      // Outer border: blue while still solving, switches to a green glow the
+      // moment every piece is locked -- matches the green "correct cell" hint
+      // color used during dragging, so green consistently means "right/good"
+      // everywhere in the puzzle instead of introducing a second color.
+      const solved = state === 'won';
+      const borderColor = solved ? '#22C55E' : '#3B82F6';
+
+      canvasCtx.save();
+      canvasCtx.strokeStyle = borderColor;
+      canvasCtx.shadowColor = borderColor;
+      canvasCtx.shadowBlur = solved ? 18 : 10;
+      canvasCtx.lineWidth = solved ? 3 : 2;
+      canvasCtx.setLineDash([]);
+      canvasCtx.strokeRect(left, top, size, size);
+      canvasCtx.restore();
+
+      canvasCtx.save();
+      canvasCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+      canvasCtx.lineWidth = 1;
+      canvasCtx.setLineDash([3, 3]);
+      const step = size / GRID;
+      for (let i = 1; i < GRID; i++) {
+        const x = left + step * i;
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(x, top);
+        canvasCtx.lineTo(x, top + size);
+        canvasCtx.stroke();
+
+        const y = top + step * i;
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(left, y);
+        canvasCtx.lineTo(left + size, y);
+        canvasCtx.stroke();
+      }
+      canvasCtx.restore();
+    }
+
+    function drawMeasureSquare(sq) 
+    {
+      const half = sq.size / 2;
+      const left = sq.cx - half;
+      const top = sq.cy - half;
+
+      canvasCtx.save();
+      canvasCtx.strokeStyle = '#3B82F6';
+      canvasCtx.shadowColor = '#3B82F6';
+      canvasCtx.shadowBlur = 14;
+      canvasCtx.lineWidth = 2.5;
+      canvasCtx.setLineDash([]);
+      canvasCtx.strokeRect(left, top, sq.size, sq.size);
+      canvasCtx.restore();
+
+      canvasCtx.save();
+      canvasCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+      canvasCtx.lineWidth = 1;
+      canvasCtx.setLineDash([3, 3]);
+      const step = sq.size / GRID;
+      for (let i = 1; i < GRID; i++) {
+        const x = left + step * i;
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(x, top);
+        canvasCtx.lineTo(x, top + sq.size);
+        canvasCtx.stroke();
+
+        const y = top + step * i;
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(left, y);
+        canvasCtx.lineTo(left + sq.size, y);
+        canvasCtx.stroke();
+      }
+      canvasCtx.restore();
+    }
+
+    // ---------- LOCK + GENERATE ----------
+    function lockSquareAndGeneratePuzzle(sq) 
+    {
+      let left = sq.cx - sq.size / 2;
+      let top = sq.cy - sq.size / 2;
+      left = Math.max(0, Math.min(W - sq.size, left));
+      top = Math.max(0, Math.min(H - sq.size, top));
+
+      lockedSquare = { size: sq.size, left, top };
+
+      snapshotCtx.drawImage(videoElement, 0, 0, W, H);
+
+      const tileSize = sq.size / GRID;
+      pieces = [];
+
+      for (let row = 0; row < GRID; row++) 
+      {
+        for (let col = 0; col < GRID; col++) {
+          const targetX = left + col * tileSize + tileSize / 2;
+          const targetY = top + row * tileSize + tileSize / 2;
+
+          pieces.push({
+            row, col,
+            sx: left + col * tileSize,
+            sy: top + row * tileSize,
+            tileSize,
+            target: { x: targetX, y: targetY },
+            x: 0, y: 0,
+            isHeld: false,
+            locked: false,
+            snapFrame: 0
+          });
+        }
+      }
+
+      assignShuffledBoard();
+      heldByHand = null;
+      heldPieceIndex = null;
+      heldOriginCell = null;
+      wasBothPinching = false;
+      activeDragPoint = null;
+      handPinchState = { Left: false, Right: false };
+      handMissingFrames = { Left: 0, Right: 0 };
+      state = 'solving';
+      resetBtn.style.display = 'inline-block';
+      resetBtn.innerText = 'Measure Again';
+      progressEl.style.display = 'block';
+      updateProgress();
+    }
+
+    function assignShuffledBoard() 
+    {
+      cells = pieces.map(p => ({ x: p.target.x, y: p.target.y }));
+
+      const n = pieces.length;
+      let order;
+      let attempts = 0;
+      do {
+        order = [...Array(n).keys()];
+        for (let i = n - 1; i > 0; i--) 
+        {
+          const j = Math.floor(Math.random() * (i + 1));
+          [order[i], order[j]] = [order[j], order[i]];
+        }
+        attempts++;
+      } while (order.some((pieceIdx, cellIdx) => pieceIdx === cellIdx) && attempts < 200);
+
+      board = order;
+      pieces.forEach((p, i) => 
+      {
+        p.locked = false;
+        p.isHeld = false;
+        p.snapFrame = 0;
+      });
+
+      board.forEach((pieceIdx, cellIdx) => 
+      {
+        const p = pieces[pieceIdx];
+        p.cellIndex = cellIdx;
+        p.x = cells[cellIdx].x;
+        p.y = cells[cellIdx].y;
+      });
+    }
+
+    function updateProgress() 
+    {
+      const done = pieces.filter(p => p.locked).length;
+      progressEl.innerText = `${done} / ${pieces.length}`;
+    }
+
+    // ---------- SOLVING ----------
+    function handleSolving(landmarksList, labels) 
+    {
+      let anyPinching = false;
+      let heldPieceLabel = null;
+      activeDragPoint = null;
+
+      landmarksList.forEach((landmarks, i) => 
+      {
+        const handLabel = labels[i];
+        const pinching = isPinching(landmarks, handLabel);
+        const pinchPoint = getPinchPoint(landmarks);
+        if (pinching) anyPinching = true;
+
+        if (pinching && heldByHand === null) {
+          const grabbedIdx = findGrabbablePiece(pinchPoint);
+          if (grabbedIdx !== null) {
+            pieces[grabbedIdx].isHeld = true;
+            heldByHand = handLabel;
+            heldPieceIndex = grabbedIdx;
+            heldOriginCell = pieces[grabbedIdx].cellIndex;
+          }
+        }
+
+        if (pinching && heldByHand === handLabel && heldPieceIndex !== null) 
+        {
+          const held = pieces[heldPieceIndex];
+          held.x = pinchPoint.x;
+          held.y = pinchPoint.y;
+          activeDragPoint = { x: held.x, y: held.y };
+          heldPieceLabel = `${held.row},${held.col}`;
+        }
+
+        if (!pinching && heldByHand === handLabel && heldPieceIndex !== null) 
+        {
+          resolveRelease();
+        }
+      });
+
+      pieces.forEach(drawPiece);
+
+      landmarksList.forEach((landmarks, i) => 
+      {
+        drawGlowingHand(landmarks, handPinchState[labels[i]] || false);
+      }
+    );
+
+      if (pieces.every(p => p.locked)) 
+      {
+        state = 'won';
+        resetBtn.innerText = 'Play Again';
+      }
+
+      if (state === 'won') 
+      {
+        statusEl.innerText = "🎉 Puzzle solved!";
+        statusEl.className = 'win';
+      } 
+      
+      else if (heldPieceLabel) 
+      {
+        statusEl.innerText = `Swapping piece [${heldPieceLabel}] — release near another tile`;
+        statusEl.className = 'grabbing';
+      } 
+      
+      else if (anyPinching) 
+      {
+        statusEl.innerText = "Pinching (nothing grabbed)";
+        statusEl.className = 'grabbing';
+      } 
+      
+      else 
+      {
+        statusEl.innerText = "Pinch an unlocked tile and drag it onto another to swap";
+        statusEl.className = '';
+      }
+    }
+
+    function resolveRelease() 
+    {
+      const held = pieces[heldPieceIndex];
+
+      let nearestCell = -1;
+      let nearestDist = Infinity;
+      cells.forEach((c, idx) => 
+      {
+        const dx = held.x - c.x;
+        const dy = held.y - c.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < nearestDist) 
+        {
+          nearestDist = dist;
+          nearestCell = idx;
+        }
+      });
+
+      const releaseThreshold = held.tileSize * 0.65;
+
+      const targetIsLocked = nearestCell !== -1 && pieces[board[nearestCell]].locked;
+
+      if (nearestCell !== -1 && nearestDist < releaseThreshold && nearestCell !== heldOriginCell && !targetIsLocked) 
+      {
+        const otherIdx = board[nearestCell];
+        board[heldOriginCell] = otherIdx;
+        board[nearestCell] = heldPieceIndex;
+
+        pieces[otherIdx].cellIndex = heldOriginCell;
+        pieces[otherIdx].x = cells[heldOriginCell].x;
+        pieces[otherIdx].y = cells[heldOriginCell].y;
+
+        held.cellIndex = nearestCell;
+        held.x = cells[nearestCell].x;
+        held.y = cells[nearestCell].y;
+
+        checkLock(pieces[otherIdx]);
+        checkLock(held);
+      } 
+      
+      else 
+      {
+        held.x = cells[heldOriginCell].x;
+        held.y = cells[heldOriginCell].y;
+        checkLock(held);
+      }
+
+      held.isHeld = false;
+      heldByHand = null;
+      heldPieceIndex = null;
+      heldOriginCell = null;
+      activeDragPoint = null;
+      updateProgress();
+    }
+
+    function checkLock(piece) 
+    {
+      const homeIndex = piece.row * GRID + piece.col;
+      if (!piece.locked && piece.cellIndex === homeIndex) 
+      {
+        piece.locked = true;
+        piece.snapFrame = 1;
+      }
+    }
+
+    function findGrabbablePiece(pinchPoint) {
+      let closest = null;
+      let closestDist = Infinity;
+      pieces.forEach((p, idx) => 
+      {
+        if (p.locked) return;
+        const dx = pinchPoint.x - p.x;
+        const dy = pinchPoint.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < p.tileSize * 0.5 && dist < closestDist) 
+        {
+          closest = idx;
+          closestDist = dist;
+        }
+      });
+      return closest;
+    }
+
+    function isPinching(landmarks, handLabel) 
+    {
+      const thumb = landmarks[THUMB_TIP];
+      const index = landmarks[INDEX_TIP];
+      const dx = thumb.x - index.x;
+      const dy = thumb.y - index.y;
+      const pinchDist = Math.sqrt(dx * dx + dy * dy);
+
+      const wrist = landmarks[WRIST];
+      const middleMcp = landmarks[MIDDLE_MCP];
+      const pdx = wrist.x - middleMcp.x;
+      const pdy = wrist.y - middleMcp.y;
+      const palmSize = Math.sqrt(pdx * pdx + pdy * pdy) || 0.0001;
+
+      const ratio = pinchDist / palmSize;
+
+      const wasPinching = handPinchState[handLabel] || false;
+      const nowPinching = wasPinching ? (ratio < PINCH_OPEN_RATIO) : (ratio < PINCH_CLOSE_RATIO);
+
+      handPinchState[handLabel] = nowPinching;
+      return nowPinching;
+    }
+
+    function getPinchPoint(landmarks) 
+    {
+      const thumb = landmarks[THUMB_TIP];
+      const index = landmarks[INDEX_TIP];
+      return {
+        x: ((thumb.x + index.x) / 2) * W,
+        y: ((thumb.y + index.y) / 2) * H
+      };
+    }
+
+    // ---------- DRAWING ----------
+    function drawGlowingHand(landmarks, pinching) 
+    {
+      const glowColor = pinching ? '#60A5FA' : '#3B82F6';
+      canvasCtx.shadowColor = glowColor;
+      canvasCtx.shadowBlur = pinching ? 20 : 12;
+      canvasCtx.strokeStyle = glowColor;
+      canvasCtx.lineWidth = pinching ? 2.5 : 1.5;
+
+      for (const [start, end] of HAND_CONNECTIONS)
+      {
+        const p1 = landmarks[start];
+        const p2 = landmarks[end];
+        canvasCtx.beginPath();
+        canvasCtx.moveTo(p1.x * W, p1.y * H);
+        canvasCtx.lineTo(p2.x * W, p2.y * H);
+        canvasCtx.stroke();
+      }
+
+      canvasCtx.shadowBlur = pinching ? 14 : 8;
+      canvasCtx.fillStyle = '#ffffff';
+
+      for (const point of landmarks) 
+      {
+        canvasCtx.beginPath();
+        canvasCtx.arc(point.x * W, point.y * H, 2.5, 0, 2 * Math.PI);
+        canvasCtx.fill();
+      }
+
+      canvasCtx.shadowBlur = 0;
+    }
+
+    const SNAP_PULSE_FRAMES = 12;
+
+    function drawPiece(p) {
+      const half = p.tileSize / 2;
+
+      // While a piece is being dragged, highlight whichever cell it's currently
+      // closest to -- that's where release will swap it. Skip the cell it came
+      // from (heldOriginCell) since swapping with itself is a no-op.
+      //
+      // NEW (Day 10): if that nearest cell happens to be this piece's own home
+      // cell (row*GRID+col), glow it RED instead of the usual blue -- a clear
+      // "yes, drop it here" hint for younger/first-time players who don't want
+      // to reason about grid coordinates, just watch the color change.
+      if (p.isHeld && activeDragPoint) {
+        let nearestCell = -1;
+        let nearestDist = Infinity;
+
+        cells.forEach((c, idx) => 
+        {
+          if (idx === heldOriginCell) return;
+          const dx = activeDragPoint.x - c.x;
+          const dy = activeDragPoint.y - c.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < nearestDist) 
+          {
+            nearestDist = dist;
+            nearestCell = idx;
+          }
+        });
+
+        if (nearestCell !== -1) {
+          const homeIndex = p.row * GRID + p.col;
+          const isCorrectCell = nearestCell === homeIndex;
+
+          // Day 11: only show a hint at all when the nearest cell is the
+          // CORRECT one. No more neutral blue "you're near something" glow --
+          // that was extra noise. Silence == not the right spot; green ==
+          // right spot, ramping brighter as you approach.
+          if (isCorrectCell) {
+            const proximity = Math.max(0, 1 - nearestDist / PROXIMITY_RANGE);
+            if (proximity > 0.05) {
+              const c = cells[nearestCell];
+              canvasCtx.save();
+              canvasCtx.fillStyle = `rgba(34, 197, 94, ${0.18 + proximity * 0.4})`;
+              canvasCtx.shadowColor = '#22C55E';
+              canvasCtx.shadowBlur = 8 + proximity * 20;
+              canvasCtx.fillRect(c.x - half, c.y - half, p.tileSize, p.tileSize);
+              canvasCtx.restore();
+            }
+          }
+        }
+      }
+
+      canvasCtx.save();
+
+      let pulseScale = 1;
+
+      if (p.locked && p.snapFrame > 0 && p.snapFrame <= SNAP_PULSE_FRAMES) 
+      {
+        const t = p.snapFrame / SNAP_PULSE_FRAMES;
+        pulseScale = 1 + 0.18 * Math.sin(t * Math.PI) * (1 - t * 0.3);
+        p.snapFrame++;
+      } 
+      
+      else if (p.locked) 
+      {
+        p.snapFrame = SNAP_PULSE_FRAMES + 1;
+      }
+
+      if (p.isHeld) 
+      {
+        canvasCtx.shadowColor = '#93C5FD';
+        canvasCtx.shadowBlur = 20;
+      } 
+      
+      else if (p.locked) 
+      {
+        canvasCtx.shadowColor = '#22D3EE';
+        canvasCtx.shadowBlur = p.snapFrame <= SNAP_PULSE_FRAMES ? 26 : 12;
+      }
+
+      const drawSize = p.tileSize * pulseScale;
+      const drawHalf = drawSize / 2;
+
+      canvasCtx.drawImage(
+        snapshotCanvas,
+        p.sx, p.sy, p.tileSize, p.tileSize,
+        p.x - drawHalf, p.y - drawHalf, drawSize, drawSize
+      );
+
+      canvasCtx.strokeStyle = p.isHeld ? '#93C5FD' : (p.locked ? 'rgba(34, 211, 238, 0.7)' : 'rgba(255,255,255,0.5)');
+      canvasCtx.lineWidth = p.isHeld ? 2 : 1;
+      canvasCtx.strokeRect(p.x - half, p.y - half, p.tileSize, p.tileSize);
+
+      canvasCtx.restore();
+    }
+
+    // ---------- RESET ----------
+    resetBtn.addEventListener('click', () => {
+      state = 'measuring';
+      lastGoodSquare = null;
+      wasBothPinching = false;
+      pieces = [];
+      cells = [];
+      board = [];
+      lockedSquare = null;
+      heldByHand = null;
+      heldPieceIndex = null;
+      heldOriginCell = null;
+      activeDragPoint = null;
+      handPinchState = { Left: false, Right: false };
+      handMissingFrames = { Left: 0, Right: 0 };
+      smoothedLandmarks = { Left: null, Right: null };
+      resetBtn.style.display = 'none';
+      progressEl.style.display = 'none';
+    });
+
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await hands.send({ image: videoElement });
+      },
+      width: W,
+      height: H
+    });
+
+    camera.start()
+      .catch((err) => {
+        statusEl.innerText = "Camera error: " + err.message;
+        console.error(err);
+      });
+    </script>
+  </body>
+</html>

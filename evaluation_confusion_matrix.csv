@@ -1,0 +1,12 @@
+Actual career,Accountant,Designer,Doctor,Engineer,Entrepreneur,Lawyer,Mathematician,Musician,Scientist,Software Developer,Teacher
+Accountant,5,0,0,0,0,0,0,0,0,0,0
+Designer,0,5,0,0,0,0,0,0,0,0,0
+Doctor,0,0,5,0,0,0,0,0,0,0,0
+Engineer,0,0,0,6,0,0,0,0,0,0,0
+Entrepreneur,0,0,0,0,6,0,0,0,0,0,0
+Lawyer,0,0,0,0,0,5,0,0,0,0,0
+Mathematician,0,0,0,0,0,0,6,0,0,0,0
+Musician,0,0,0,0,0,0,0,6,0,0,0
+Scientist,0,0,0,0,0,0,0,0,6,0,0
+Software Developer,0,0,0,0,0,0,0,0,0,5,0
+Teacher,0,0,0,0,0,0,0,0,0,0,5

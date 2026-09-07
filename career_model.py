@@ -1,48 +1,150 @@
+"""Train and query the project's free-text career exploration model."""
+
+from pathlib import Path
+import re
+
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.preprocessing import MultiLabelBinarizer
-import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import FeatureUnion, Pipeline
 
-# Load dataset
-df = pd.read_csv("data.csv")
 
-# Split subjects and hobbies into lists
-df["subjects"] = df["subjects"].apply(lambda x: x.split(";"))
-df["hobbies"] = df["hobbies"].apply(lambda x: x.split(";"))
+DATA_PATH = Path(__file__).with_name("data.csv")
+TOKEN_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z'-]*")
 
-# Encode with MultiLabelBinarizer
-subject_encoder = MultiLabelBinarizer()
-hobby_encoder = MultiLabelBinarizer()
 
-subjects_encoded = subject_encoder.fit_transform(df["subjects"])
-hobbies_encoded = hobby_encoder.fit_transform(df["hobbies"])
+def build_profile_text(subjects, hobbies):
+    """Combine a student's free-text answers into one model input."""
+    return f"{subjects or ''} {hobbies or ''}".strip().lower()
 
-# Combine features
-X = np.hstack([subjects_encoded, hobbies_encoded])
-y = df["career"]
 
-# Train model
-model = DecisionTreeClassifier()
-model.fit(X, y)
+def find_recognized_terms(profile_text, vocabulary):
+    """Return words from the student's answer that occur in the training data."""
+    return sorted(
+        {
+            token.lower()
+            for token in TOKEN_PATTERN.findall(profile_text)
+            if token.lower() in vocabulary
+        }
+    )
 
-# --- Normalization helper ---
-def normalize_input(user_input, known_labels):
-    # Return all labels that contain the user_input (partial match)
-    matches = [label for label in known_labels if user_input.lower() in label.lower()]
-    return matches if matches else [user_input]
 
-# --- Prediction function ---
-def predict_career(subjects, hobbies):
-    subjects_list = []
-    for s in subjects.split(";"):
-        subjects_list.extend(normalize_input(s.strip(), subject_encoder.classes_))
+# The data remains fully editable: each row describes a student and a career.
+df = pd.read_csv(DATA_PATH).fillna("")
+training_text = [
+    build_profile_text(subjects, hobbies)
+    for subjects, hobbies in zip(df["subjects"], df["hobbies"])
+]
 
-    hobbies_list = []
-    for h in hobbies.split(";"):
-        hobbies_list.extend(normalize_input(h.strip(), hobby_encoder.classes_))
+# Word features learn meaningful terms such as "biology" and "coding". Character
+# features also make the model more forgiving of spelling variations and word forms.
+features = FeatureUnion(
+    [
+        (
+            "words",
+            TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True),
+        ),
+        (
+            "characters",
+            TfidfVectorizer(
+                analyzer="char_wb",
+                ngram_range=(3, 5),
+                sublinear_tf=True,
+            ),
+        ),
+    ]
+)
 
-    subjects_encoded = subject_encoder.transform([subjects_list])
-    hobbies_encoded = hobby_encoder.transform([hobbies_list])
+model = Pipeline(
+    [
+        ("features", features),
+        (
+            "classifier",
+            LogisticRegression(
+                class_weight="balanced",
+                max_iter=2_000,
+                random_state=42,
+            ),
+        ),
+    ]
+)
+model.fit(training_text, df["career"])
 
-    data = np.hstack([subjects_encoded, hobbies_encoded])
-    return model.predict(data)[0]
+word_vectorizer = model.named_steps["features"].transformer_list[0][1]
+known_words = set(word_vectorizer.vocabulary_)
+
+
+def find_career_evidence(profile_text, career, limit=3):
+    """
+    Find the words or phrases that most positively influenced
+    one career prediction.
+    """
+    word_features = word_vectorizer.transform([profile_text])
+    classifier = model.named_steps["classifier"]
+
+    career_index = list(classifier.classes_).index(career)
+    word_feature_count = word_features.shape[1]
+
+    # The first part of the classifier contains the word features.
+    word_coefficients = classifier.coef_[
+        career_index,
+        :word_feature_count,
+    ]
+
+    contributions = word_features.multiply(
+        word_coefficients
+    ).toarray()[0]
+
+    feature_names = word_vectorizer.get_feature_names_out()
+    evidence = []
+
+    for index in contributions.argsort()[::-1]:
+        if contributions[index] <= 0:
+            break
+
+        feature = feature_names[index]
+
+        if feature not in evidence:
+            evidence.append(feature)
+
+        if len(evidence) == limit:
+            break
+
+    return evidence
+
+
+def predict_careers(subjects, hobbies, limit=3):
+    """Return the strongest career matches for any free-text student response."""
+    profile_text = build_profile_text(subjects, hobbies)
+    recognized_terms = find_recognized_terms(profile_text, known_words)
+
+    if not recognized_terms:
+        return {
+            "predictions": [],
+            "recognized_terms": [],
+        }
+
+    probabilities = model.predict_proba([profile_text])[0]
+    careers = model.named_steps["classifier"].classes_
+    top_indices = probabilities.argsort()[::-1][:limit]
+
+    predictions = []
+
+    for index in top_indices:
+        career = careers[index]
+
+        predictions.append(
+            {
+                "career": career,
+                "score": round(float(probabilities[index]) * 100),
+                "evidence": find_career_evidence(
+                    profile_text,
+                    career,
+                ),
+            }
+        )
+
+    return {
+        "predictions": predictions,
+        "recognized_terms": recognized_terms,
+    }

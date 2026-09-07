@@ -1,0 +1,23 @@
+name,subjects,hobbies,career,predicted_career,correct
+Test_001,"Maths, Economics","planning my spending, checking figures, working with budgets",Accountant,Accountant,True
+Test_002,"Statistics, Business Studies","keeping track of money, organising financial information, comparing costs",Accountant,Accountant,True
+Test_003,"Art, Digital Technology","making logos, editing photos, choosing colours and fonts",Designer,Designer,True
+Test_004,"Visual Arts, Media Studies","creating posters, arranging layouts, improving how things look",Designer,Designer,True
+Test_005,"Biology, Chemistry","learning about health, supporting sick people, first aid",Doctor,Doctor,True
+Test_006,"Science, Physical Education","understanding illnesses, caring for people, learning about the body",Doctor,Doctor,True
+Test_007,"Maths, Physics","building models, fixing broken things, understanding machines",Engineer,Engineer,True
+Test_008,"Science, Design","making prototypes, improving gadgets, solving practical problems",Engineer,Engineer,True
+Test_009,"Business Studies, Economics","thinking of products people would buy, planning a small business",Entrepreneur,Entrepreneur,True
+Test_010,"Business, Media Studies","marketing ideas, organising a team, solving customer problems",Entrepreneur,Entrepreneur,True
+Test_011,"English, History","arguing a case, finding evidence, debating important issues",Lawyer,Lawyer,True
+Test_012,"Social Studies, Economics","thinking about fairness, understanding rules, speaking up for people",Lawyer,Lawyer,True
+Test_013,"Calculus, Statistics","proving answers, solving brain teasers, working with numbers",Mathematician,Mathematician,True
+Test_014,"Algebra, Geometry","finding patterns, enjoying difficult number challenges, logical reasoning",Mathematician,Mathematician,True
+Test_015,"Music, Art","playing guitar, composing tunes, practising songs",Musician,Musician,True
+Test_016,"Music, Drama","creating beats, singing, performing for an audience",Musician,Musician,True
+Test_017,"Biology, Environmental Science","exploring outdoors, learning about animals, asking questions about nature",Scientist,Scientist,True
+Test_018,"Chemistry, Physics","doing lab work, testing ideas, finding explanations for results",Scientist,Scientist,True
+Test_019,"Computer Science, Maths","making small games, fixing code errors, solving programming problems",Software Developer,Software Developer,True
+Test_020,"Digital Technology, Design","designing websites, creating apps, testing how software works",Software Developer,Software Developer,True
+Test_021,"English, History","helping friends understand homework, explaining ideas clearly",Teacher,Teacher,True
+Test_022,"Science, English","teaching younger students, making hard topics easier, being patient",Teacher,Teacher,True
