@@ -31,7 +31,7 @@ if page == "home":
         unsafe_allow_html=True,
     )
 
-    puzzle_column, rush_column, career_column = st.columns(3, gap="large")
+    puzzle_column, rush_column = st.columns(2, gap="large")
 
     with puzzle_column:
         st.markdown(
@@ -71,6 +71,8 @@ if page == "home":
             st.session_state.page = "hand_rush"
             st.rerun()
 
+    career_column, vibe_link_column = st.columns(2, gap="large")
+
     with career_column:
         st.markdown(
             """
@@ -88,6 +90,25 @@ if page == "home":
 
         if st.button("Explore Career Quest", key="open_career"):
             st.session_state.page = "career"
+            st.rerun()
+
+    with vibe_link_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">✨</div>
+                <h2>VibeLink</h2>
+                <p>
+                    Take two temporary photos, answer quick questions, then
+                    reveal a playful Open Day vibe match.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Start VibeLink", key="open_vibe_link"):
+            st.session_state.page = "vibe_link"
             st.rerun()
 
     st.markdown(
@@ -268,6 +289,91 @@ elif page == "hand_rush":
     else:
         st.iframe(
             hand_rush_file,
+            height="stretch",
+            tab_index=0,
+        )
+
+elif page == "vibe_link":
+    # VibeLink is a full-screen camera experience, just like the two games.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                height: 100vh !important;
+                min-height: 100vh !important;
+                width: 100vw !important;
+                overflow: hidden !important;
+            }
+
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .st-key-back_from_vibe_link,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_vibe_link button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to AI Lab", key="back_from_vibe_link"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    vibe_link_file = Path(__file__).with_name("VibeLink.html")
+
+    if not vibe_link_file.exists():
+        st.error("The VibeLink.html file could not be found.")
+    else:
+        st.iframe(
+            vibe_link_file,
             height="stretch",
             tab_index=0,
         )

@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VibeLink — Open Day AI Lab</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --ink: #f8fafc;
+        --muted: #cbd5e1;
+        --panel: rgba(15, 23, 42, 0.78);
+        --line: rgba(196, 181, 253, 0.32);
+        --violet: #a78bfa;
+        --pink: #f472b6;
+        --cyan: #67e8f9;
+      }
+
+      * { box-sizing: border-box; }
+
+      html,
+      body {
+        width: 100%;
+        min-height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background:
+          radial-gradient(circle at 15% 10%, rgba(147, 51, 234, 0.28), transparent 32%),
+          radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.2), transparent 34%),
+          #020617;
+        color: var(--ink);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button,
+      input { font: inherit; }
+
+      button {
+        border: 1px solid transparent;
+        border-radius: 999px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        box-shadow: 0 12px 28px rgba(124, 58, 237, 0.25);
+        color: #fff;
+        font-weight: 800;
+        cursor: pointer;
+        transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+      }
+
+      button:hover:not(:disabled) {
+        filter: brightness(1.12);
+        transform: translateY(-2px);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.45;
+      }
+
+      .secondary-button {
+        border-color: var(--line);
+        background: rgba(15, 23, 42, 0.72);
+        box-shadow: none;
+        color: #e2e8f0;
+      }
+
+      .app-shell {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+      }
+
+      .screen {
+        display: none;
+        min-height: 100vh;
+        padding: clamp(22px, 4vw, 52px);
+        place-items: center;
+      }
+
+      .screen.active { display: grid; }
+
+      .panel {
+        width: min(1050px, 100%);
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background:
+          linear-gradient(145deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.86));
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(13px);
+      }
+
+      .landing-panel {
+        max-width: 680px;
+        padding: clamp(28px, 6vw, 56px);
+        text-align: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 10px;
+        color: var(--cyan);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.16rem;
+      }
+
+      h1,
+      h2,
+      p { margin-top: 0; }
+
+      h1 {
+        margin-bottom: 16px;
+        font-size: clamp(3.3rem, 11vw, 6.8rem);
+        line-height: 0.85;
+        letter-spacing: -0.08em;
+      }
+
+      .gradient-text {
+        background: linear-gradient(120deg, #ddd6fe, #f9a8d4, #67e8f9);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .lead {
+        margin: 0 auto;
+        max-width: 560px;
+        color: var(--muted);
+        font-size: 1.08rem;
+        line-height: 1.7;
+      }
+
+      .privacy-badge {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        margin: 26px 0 18px;
+        padding: 9px 13px;
+        border: 1px solid rgba(103, 232, 249, 0.28);
+        border-radius: 999px;
+        background: rgba(8, 47, 73, 0.38);
+        color: #cffafe;
+        font-size: 0.85rem;
+      }
+
+      .consent-list {
+        display: grid;
+        gap: 10px;
+        margin: 8px auto 22px;
+        max-width: 520px;
+        text-align: left;
+      }
+
+      .consent-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 13px 15px;
+        border: 1px solid rgba(196, 181, 253, 0.22);
+        border-radius: 15px;
+        background: rgba(2, 6, 23, 0.34);
+        color: #e2e8f0;
+        line-height: 1.45;
+      }
+
+      .consent-row input { margin-top: 4px; accent-color: #a78bfa; }
+
+      .small-print {
+        margin: 15px auto 0;
+        max-width: 540px;
+        color: #94a3b8;
+        font-size: 0.79rem;
+        line-height: 1.5;
+      }
+
+      .step-panel { padding: clamp(20px, 4vw, 36px); }
+
+      .top-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        align-items: center;
+        margin-bottom: 20px;
+        color: #c4b5fd;
+        font-size: 0.84rem;
+        font-weight: 800;
+        letter-spacing: 0.08rem;
+        text-transform: uppercase;
+      }
+
+      .capture-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(250px, 0.7fr);
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .camera-card,
+      .photo-summary,
+      .question-card,
+      .level-card,
+      .result-card {
+        border: 1px solid rgba(196, 181, 253, 0.23);
+        border-radius: 22px;
+        background: rgba(2, 6, 23, 0.4);
+      }
+
+      .camera-card {
+        position: relative;
+        min-height: min(55vh, 460px);
+        overflow: hidden;
+      }
+
+      #cameraVideo {
+        width: 100%;
+        height: 100%;
+        min-height: min(55vh, 460px);
+        object-fit: cover;
+        transform: scaleX(-1);
+      }
+
+      .camera-overlay {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        pointer-events: none;
+      }
+
+      .face-guide {
+        width: min(48%, 240px);
+        aspect-ratio: 0.78;
+        border: 2px solid rgba(103, 232, 249, 0.78);
+        border-radius: 47%;
+        box-shadow: 0 0 0 999px rgba(2, 6, 23, 0.16), 0 0 25px rgba(103, 232, 249, 0.36);
+      }
+
+      .camera-label {
+        position: absolute;
+        right: 14px;
+        bottom: 14px;
+        padding: 8px 11px;
+        border: 1px solid rgba(103, 232, 249, 0.28);
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.75);
+        color: #cffafe;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .photo-summary { padding: 20px; }
+
+      .photo-summary h2,
+      .question-card h2,
+      .level-card h2,
+      .result-card h2 { margin-bottom: 8px; }
+
+      .photo-summary p,
+      .question-card > p,
+      .level-card > p { color: var(--muted); line-height: 1.55; }
+
+      .photo-slots {
+        display: grid;
+        gap: 12px;
+        margin: 18px 0;
+      }
+
+      .photo-slot {
+        display: grid;
+        grid-template-columns: 66px 1fr;
+        gap: 12px;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid rgba(196, 181, 253, 0.16);
+        border-radius: 16px;
+        background: rgba(15, 23, 42, 0.52);
+      }
+
+      .photo-slot img,
+      .mini-photo,
+      .result-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .slot-image {
+        width: 66px;
+        height: 66px;
+        overflow: hidden;
+        border: 1px dashed rgba(196, 181, 253, 0.42);
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(124, 58, 237, 0.18), rgba(236, 72, 153, 0.14));
+      }
+
+      .photo-slot strong { display: block; color: #f1f5f9; }
+      .photo-slot span { color: #94a3b8; font-size: 0.83rem; }
+
+      .capture-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 16px;
+      }
+
+      .question-shell,
+      .level-shell { max-width: 760px; }
+
+      .question-card,
+      .level-card,
+      .result-card { padding: clamp(24px, 5vw, 44px); text-align: center; }
+
+      .player-pill {
+        display: inline-block;
+        margin-bottom: 16px;
+        padding: 8px 12px;
+        border: 1px solid rgba(103, 232, 249, 0.3);
+        border-radius: 999px;
+        background: rgba(8, 47, 73, 0.34);
+        color: #cffafe;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.08rem;
+        text-transform: uppercase;
+      }
+
+      .question-card h2,
+      .level-card h2 { font-size: clamp(1.8rem, 5vw, 3rem); }
+
+      .choice-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 11px;
+        margin-top: 26px;
+      }
+
+      .choice-button,
+      .level-button {
+        min-height: 70px;
+        border-color: rgba(196, 181, 253, 0.28);
+        border-radius: 17px;
+        background: rgba(15, 23, 42, 0.72);
+        box-shadow: none;
+        color: #e2e8f0;
+        text-align: left;
+      }
+
+      .choice-button:hover,
+      .level-button:hover { border-color: var(--cyan); }
+
+      .level-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 28px;
+      }
+
+      .level-button {
+        min-height: 155px;
+        text-align: center;
+      }
+
+      .level-button strong { display: block; margin-bottom: 8px; font-size: 1.12rem; }
+      .level-button span { color: #cbd5e1; font-size: 0.86rem; line-height: 1.4; }
+
+      .level-button.friendly { border-color: rgba(103, 232, 249, 0.42); }
+      .level-button.spicy { border-color: rgba(244, 114, 182, 0.42); }
+      .level-button.chaos { border-color: rgba(251, 191, 36, 0.42); }
+
+      .scan-panel { max-width: 800px; padding: clamp(28px, 6vw, 55px); text-align: center; }
+
+      .scanner-icon {
+        display: grid;
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 24px;
+        border: 2px solid var(--cyan);
+        border-radius: 50%;
+        place-items: center;
+        box-shadow: 0 0 28px rgba(103, 232, 249, 0.42);
+        color: var(--cyan);
+        font-size: 2.5rem;
+        animation: orbit 2s linear infinite;
+      }
+
+      @keyframes orbit { to { transform: rotate(360deg); } }
+
+      .scan-panel h2 { margin-bottom: 8px; font-size: clamp(2rem, 7vw, 4rem); }
+      .scan-panel > p { color: var(--muted); }
+
+      .progress-track {
+        height: 12px;
+        margin: 26px 0 20px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgba(148, 163, 184, 0.16);
+      }
+
+      #scanProgress {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, #67e8f9, #a78bfa, #f472b6);
+        transition: width 0.16s linear;
+      }
+
+      .scan-readouts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        text-align: left;
+      }
+
+      .scan-readout {
+        padding: 12px;
+        border: 1px solid rgba(196, 181, 253, 0.18);
+        border-radius: 14px;
+        background: rgba(2, 6, 23, 0.34);
+        color: #c4b5fd;
+        font-size: 0.84rem;
+      }
+
+      .result-panel { max-width: 1000px; padding: clamp(24px, 5vw, 48px); text-align: center; }
+
+      .result-photos {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(120px, 190px));
+        justify-content: center;
+        gap: 16px;
+        margin: 18px 0 22px;
+      }
+
+      .result-photo {
+        aspect-ratio: 0.86;
+        overflow: hidden;
+        border: 2px solid rgba(196, 181, 253, 0.48);
+        border-radius: 22px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      }
+
+      .result-photo:nth-child(2) { border-color: rgba(103, 232, 249, 0.54); }
+
+      .verdict {
+        margin: 8px 0;
+        font-size: clamp(2.3rem, 9vw, 5.5rem);
+        font-weight: 950;
+        letter-spacing: -0.07em;
+      }
+
+      .verdict.match { color: #a7f3d0; text-shadow: 0 0 28px rgba(52, 211, 153, 0.36); }
+      .verdict.mix { color: #f9a8d4; text-shadow: 0 0 28px rgba(244, 114, 182, 0.34); }
+
+      .score-number {
+        margin: 0;
+        background: linear-gradient(120deg, #67e8f9, #ddd6fe, #f9a8d4);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-size: clamp(3.8rem, 14vw, 8rem);
+        font-weight: 950;
+        letter-spacing: -0.09em;
+        line-height: 0.95;
+      }
+
+      .roast-copy {
+        max-width: 700px;
+        margin: 22px auto;
+        color: #e2e8f0;
+        font-size: clamp(1rem, 2.2vw, 1.24rem);
+        line-height: 1.65;
+      }
+
+      .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin: 22px 0;
+      }
+
+      .metric {
+        padding: 14px 10px;
+        border: 1px solid rgba(196, 181, 253, 0.2);
+        border-radius: 15px;
+        background: rgba(2, 6, 23, 0.34);
+      }
+
+      .metric span { display: block; color: #94a3b8; font-size: 0.76rem; }
+      .metric strong { display: block; margin-top: 5px; color: #cffafe; font-size: 1.22rem; }
+
+      .result-note { color: #94a3b8; font-size: 0.78rem; }
+
+      @media (max-width: 700px) {
+        .screen { padding: 16px; }
+        .capture-layout { grid-template-columns: 1fr; }
+        .camera-card,
+        #cameraVideo { min-height: 43vh; }
+        .level-grid,
+        .metric-grid { grid-template-columns: 1fr; }
+        .choice-grid { grid-template-columns: 1fr; }
+        .scan-readouts { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <main class="app-shell">
+      <section id="welcomeScreen" class="screen active">
+        <div class="panel landing-panel">
+          <p class="eyebrow">OPEN DAY · PLAYFUL COMPATIBILITY SCAN</p>
+          <h1><span class="gradient-text">VibeLink</span></h1>
+          <p class="lead">Two students. Three quick choices. One dramatically unnecessary vibe report.</p>
+          <div class="privacy-badge">🔒 Photos stay in this browser session only</div>
+          <div class="consent-list">
+            <label class="consent-row"><input id="consentOne" type="checkbox" /> <span><strong>Student 1 agrees:</strong> I am happy to take a temporary photo and receive a playful school-life result.</span></label>
+            <label class="consent-row"><input id="consentTwo" type="checkbox" /> <span><strong>Student 2 agrees:</strong> I am happy to take a temporary photo and receive a playful school-life result.</span></label>
+          </div>
+          <button id="consentButton" disabled>Begin Vibe Scan</button>
+          <p class="small-print">VibeLink does not judge appearance or relationships. Photos are used only for this on-screen experience and are cleared when the session restarts.</p>
+        </div>
+      </section>
+
+      <section id="captureScreen" class="screen">
+        <div class="panel step-panel">
+          <div class="top-line"><span>Step 1 · Temporary photos</span><span id="captureStep">Player 1</span></div>
+          <div class="capture-layout">
+            <div class="camera-card">
+              <video id="cameraVideo" autoplay playsinline></video>
+              <div class="camera-overlay"><div class="face-guide"></div></div>
+              <div class="camera-label">Camera ready</div>
+            </div>
+            <aside class="photo-summary">
+              <h2 id="captureHeading">Player 1, strike a vibe.</h2>
+              <p id="captureCopy">Stand in the guide, look at the camera, and take your temporary profile photo.</p>
+              <div class="photo-slots">
+                <div class="photo-slot"><div class="slot-image"><img id="photoOnePreview" alt="Player 1 preview" /></div><div><strong>Player 1</strong><span id="photoOneStatus">Waiting for photo</span></div></div>
+                <div class="photo-slot"><div class="slot-image"><img id="photoTwoPreview" alt="Player 2 preview" /></div><div><strong>Player 2</strong><span id="photoTwoStatus">Waiting for photo</span></div></div>
+              </div>
+              <div class="capture-actions">
+                <button id="captureButton">Take Player 1's Photo</button>
+                <button id="continueCaptureButton" class="secondary-button" disabled>Player 2 is next</button>
+              </div>
+              <p class="small-print">No image is uploaded or saved to a database.</p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="questionScreen" class="screen">
+        <div class="panel question-shell">
+          <div class="question-card">
+            <div id="questionPlayer" class="player-pill">Player 1 · Question 1 of 3</div>
+            <h2 id="questionPrompt"></h2>
+            <p>Choose the answer that feels closest. There are no serious answers here.</p>
+            <div id="choiceGrid" class="choice-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="roastScreen" class="screen">
+        <div class="panel level-shell">
+          <div class="level-card">
+            <p class="eyebrow">FINAL SETTING</p>
+            <h2>Choose the vibe level.</h2>
+            <p>Chaos makes the presentation bigger—not the roast meaner.</p>
+            <div class="level-grid">
+              <button class="level-button friendly" data-level="friendly"><strong>😊 Friendly</strong><span>Safe, positive, and school-approved.</span></button>
+              <button class="level-button spicy" data-level="spicy"><strong>🌶️ Spicy</strong><span>A little embarrassing, never personal.</span></button>
+              <button class="level-button chaos" data-level="chaos"><strong>⚡ Chaos</strong><span>Maximum drama. Same safety rules.</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="scanScreen" class="screen">
+        <div class="panel scan-panel">
+          <div class="scanner-icon">✦</div>
+          <p class="eyebrow">VIBELINK ENGINE · RUNNING</p>
+          <h2>Scanning the vibes...</h2>
+          <p id="scanMessage">Comparing Open Day energy levels.</p>
+          <div class="progress-track"><div id="scanProgress"></div></div>
+          <div class="scan-readouts">
+            <div class="scan-readout" id="readoutOne">Checking shared interests...</div>
+            <div class="scan-readout" id="readoutTwo">Measuring group-project survival...</div>
+            <div class="scan-readout" id="readoutThree">Calculating free-food motivation...</div>
+            <div class="scan-readout" id="readoutFour">Asking the universe for confirmation...</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="screen">
+        <div class="panel result-panel">
+          <p class="eyebrow">VIBELINK REPORT COMPLETE</p>
+          <div class="result-photos">
+            <div class="result-photo"><img id="resultPhotoOne" alt="Player 1 captured photo" /></div>
+            <div class="result-photo"><img id="resultPhotoTwo" alt="Player 2 captured photo" /></div>
+          </div>
+          <div id="verdict" class="verdict"></div>
+          <p id="scoreNumber" class="score-number"></p>
+          <p id="roastCopy" class="roast-copy"></p>
+          <div id="metricGrid" class="metric-grid"></div>
+          <button id="restartButton">Start a New Vibe Scan</button>
+          <p class="result-note">For entertainment only · Score is based on the choices made in this session, not appearance.</p>
+        </div>
+      </section>
+    </main>
+
+    <canvas id="captureCanvas" hidden></canvas>
+
+    <script>
+      const questions = [
+        {
+          id: 'mission',
+          prompt: 'What is your Open Day mission?',
+          options: [
+            ['future', 'Plan my future'],
+            ['explore', 'Explore everything'],
+            ['food', 'Find free food'],
+            ['friends', 'Support my friends'],
+          ],
+        },
+        {
+          id: 'path',
+          prompt: 'Which future zone sounds most like you?',
+          options: [
+            ['tech', 'Tech & innovation'],
+            ['creative', 'Creative design'],
+            ['health', 'Health & science'],
+            ['business', 'Business & leadership'],
+          ],
+        },
+        {
+          id: 'team',
+          prompt: 'In a group project, you are the...',
+          options: [
+            ['organiser', 'Organiser'],
+            ['ideas', 'Idea machine'],
+            ['lastminute', 'Last-minute legend'],
+            ['calm', 'Calm teammate'],
+          ],
+        },
+      ];
+
+      const roastTemplates = {
+        friendly: {
+          high: [
+            'Same mission, similar energy, and a suspiciously high chance that both of you have an unfinished assignment somewhere.',
+            'VibeLink found strong teamwork potential. Keep this pairing away from group projects unless you want the whole class to look organised.',
+          ],
+          mid: [
+            'Different routes, compatible energy. One of you brings the plan; the other makes sure the plan is not boring.',
+            'The connection is there. It may require snacks, a shared playlist, and at least one reminder about the deadline.',
+          ],
+          low: [
+            'Two very different Open Day strategies, one shared ability to make the experience more interesting.',
+            'The vibes took separate buses, but both still arrived at the same Open Day. That counts for something.',
+          ],
+        },
+        spicy: {
+          high: [
+            'Dangerous combination: matching energy, matching confidence, and probably matching excuses when the assignment is due.',
+            'VibeLink recommends adult supervision near group projects. This pairing may accidentally start a club before lunch.',
+          ],
+          mid: [
+            'Potential detected. One of you has the plan; the other has already asked where the free food is. Balanced teamwork.',
+            'Connection loading... communication update recommended, but the vibes are definitely trying their best.',
+          ],
+          low: [
+            'Connection failed successfully. One came to plan the future; the other appears to be running a snack-location algorithm.',
+            'Different uniforms, different strategies, same impressive confidence. The universe is confused but entertained.',
+          ],
+        },
+        chaos: {
+          high: [
+            'SYSTEM WARNING: Vibe levels are synchronised. Keep this duo away from a group project unless the deadline enjoys chaos.',
+            'Match confirmed. The confidence is loud, the plans are ambitious, and the unfinished assignments are already nervous.',
+          ],
+          mid: [
+            'VibeLink has detected a manageable amount of chaos. This alliance may work, provided someone remembers the deadline exists.',
+            'Compatibility stable. The friendship update is installing; please do not unplug the snack supply.',
+          ],
+          low: [
+            'VIBE SERVER REPORT: beautiful mismatch detected. One brings the schedule, one brings mystery. Somehow, it works.',
+            'Different frequencies, same Open Day. Connection may be chaotic, but at least nobody will be bored.',
+          ],
+        },
+      };
+
+      const screens = [...document.querySelectorAll('.screen')];
+      const consentOne = document.getElementById('consentOne');
+      const consentTwo = document.getElementById('consentTwo');
+      const consentButton = document.getElementById('consentButton');
+      const cameraVideo = document.getElementById('cameraVideo');
+      const captureCanvas = document.getElementById('captureCanvas');
+      const captureButton = document.getElementById('captureButton');
+      const continueCaptureButton = document.getElementById('continueCaptureButton');
+      const captureHeading = document.getElementById('captureHeading');
+      const captureCopy = document.getElementById('captureCopy');
+      const captureStep = document.getElementById('captureStep');
+      const photoOnePreview = document.getElementById('photoOnePreview');
+      const photoTwoPreview = document.getElementById('photoTwoPreview');
+      const photoOneStatus = document.getElementById('photoOneStatus');
+      const photoTwoStatus = document.getElementById('photoTwoStatus');
+      const questionPlayer = document.getElementById('questionPlayer');
+      const questionPrompt = document.getElementById('questionPrompt');
+      const choiceGrid = document.getElementById('choiceGrid');
+      const scanProgress = document.getElementById('scanProgress');
+      const scanMessage = document.getElementById('scanMessage');
+      const resultPhotoOne = document.getElementById('resultPhotoOne');
+      const resultPhotoTwo = document.getElementById('resultPhotoTwo');
+      const verdictEl = document.getElementById('verdict');
+      const scoreNumber = document.getElementById('scoreNumber');
+      const roastCopy = document.getElementById('roastCopy');
+      const metricGrid = document.getElementById('metricGrid');
+      const restartButton = document.getElementById('restartButton');
+
+      let stream = null;
+      let photoTurn = 0;
+      let questionPlayerIndex = 0;
+      let questionIndex = 0;
+      let photos = [null, null];
+      let answers = [{}, {}];
+      let roastLevel = 'friendly';
+      let scanTimer = null;
+
+      function showScreen(id) {
+        screens.forEach((screen) => screen.classList.toggle('active', screen.id === id));
+      }
+
+      function updateConsentButton() {
+        consentButton.disabled = !(consentOne.checked && consentTwo.checked);
+      }
+
+      async function startCamera() {
+        if (stream) return;
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+            audio: false,
+          });
+          cameraVideo.srcObject = stream;
+          await cameraVideo.play();
+        } catch (error) {
+          captureHeading.innerText = 'Camera access is needed for VibeLink.';
+          captureCopy.innerText = `Please allow camera access, then try again. (${error.message})`;
+          captureButton.disabled = true;
+        }
+      }
+
+      function stopCamera() {
+        if (stream) {
+          stream.getTracks().forEach((track) => track.stop());
+          stream = null;
+        }
+        cameraVideo.srcObject = null;
+      }
+
+      function updateCaptureUI() {
+        const player = photoTurn + 1;
+        captureStep.innerText = `Player ${player}`;
+        captureHeading.innerText = photos[photoTurn]
+          ? `Player ${player}, looking good.`
+          : `Player ${player}, strike a vibe.`;
+        captureCopy.innerText = photos[photoTurn]
+          ? 'Happy with this temporary photo? Continue when the next player is ready.'
+          : 'Stand in the guide, look at the camera, and take your temporary profile photo.';
+        captureButton.innerText = photos[photoTurn] ? `Retake Player ${player}'s Photo` : `Take Player ${player}'s Photo`;
+        continueCaptureButton.disabled = !photos[photoTurn];
+        continueCaptureButton.innerText = photoTurn === 0 ? 'Player 2 is next' : 'Continue to Questions';
+      }
+
+      function capturePhoto() {
+        if (!cameraVideo.videoWidth) return;
+        captureCanvas.width = cameraVideo.videoWidth;
+        captureCanvas.height = cameraVideo.videoHeight;
+        const context = captureCanvas.getContext('2d');
+        context.save();
+        context.translate(captureCanvas.width, 0);
+        context.scale(-1, 1);
+        context.drawImage(cameraVideo, 0, 0);
+        context.restore();
+        photos[photoTurn] = captureCanvas.toDataURL('image/jpeg', 0.86);
+
+        const preview = photoTurn === 0 ? photoOnePreview : photoTwoPreview;
+        const status = photoTurn === 0 ? photoOneStatus : photoTwoStatus;
+        preview.src = photos[photoTurn];
+        status.innerText = 'Photo captured ✓';
+        updateCaptureUI();
+      }
+
+      function renderQuestion() {
+        const question = questions[questionIndex];
+        questionPlayer.innerText = `Player ${questionPlayerIndex + 1} · Question ${questionIndex + 1} of ${questions.length}`;
+        questionPrompt.innerText = question.prompt;
+        choiceGrid.innerHTML = '';
+        question.options.forEach(([value, label]) => {
+          const button = document.createElement('button');
+          button.className = 'choice-button';
+          button.innerText = label;
+          button.addEventListener('click', () => chooseAnswer(question.id, value));
+          choiceGrid.appendChild(button);
+        });
+      }
+
+      function chooseAnswer(questionId, value) {
+        answers[questionPlayerIndex][questionId] = value;
+        questionIndex++;
+        if (questionIndex < questions.length) {
+          renderQuestion();
+          return;
+        }
+        if (questionPlayerIndex === 0) {
+          questionPlayerIndex = 1;
+          questionIndex = 0;
+          renderQuestion();
+          return;
+        }
+        showScreen('roastScreen');
+      }
+
+      function calculateResult() {
+        const first = answers[0];
+        const second = answers[1];
+        let matches = 0;
+        questions.forEach((question) => {
+          if (first[question.id] === second[question.id]) matches++;
+        });
+
+        let score = 36 + matches * 17 + Math.floor(Math.random() * 13);
+        if (first.team !== second.team) score += 5;
+        if (first.mission === 'food' && second.mission === 'food') score += 6;
+        score = Math.max(16, Math.min(96, score));
+
+        const band = score >= 75 ? 'high' : score >= 48 ? 'mid' : 'low';
+        const choices = roastTemplates[roastLevel][band];
+        const roast = choices[Math.floor(Math.random() * choices.length)];
+        const freeFood = (first.mission === 'food' ? 45 : 14) + (second.mission === 'food' ? 45 : 14);
+        return {
+          score,
+          roast,
+          isMatch: score >= 60,
+          metrics: [
+            ['Academic survival', `${Math.min(99, 53 + matches * 12 + Math.floor(Math.random() * 16))}%`],
+            ['Teamwork sync', `${Math.min(98, 44 + matches * 15 + (first.team !== second.team ? 12 : 0))}%`],
+            ['Free-food motivation', `${Math.min(99, freeFood)}%`],
+          ],
+        };
+      }
+
+      function runScan() {
+        const result = calculateResult();
+        showScreen('scanScreen');
+        scanProgress.style.width = '0%';
+        const messages = [
+          'Comparing Open Day energy levels.',
+          'Checking shared interests.',
+          'Running entirely unnecessary group-project maths.',
+          'Preparing a school-safe final verdict.',
+        ];
+        let progress = 0;
+        let messageIndex = 0;
+        clearInterval(scanTimer);
+        scanTimer = setInterval(() => {
+          progress = Math.min(100, progress + 4 + Math.random() * 5);
+          scanProgress.style.width = `${progress}%`;
+          if (progress > (messageIndex + 1) * 25 && messageIndex < messages.length - 1) {
+            messageIndex++;
+            scanMessage.innerText = messages[messageIndex];
+          }
+          if (progress >= 100) {
+            clearInterval(scanTimer);
+            window.setTimeout(() => revealResult(result), 400);
+          }
+        }, 140);
+      }
+
+      function revealResult(result) {
+        resultPhotoOne.src = photos[0];
+        resultPhotoTwo.src = photos[1];
+        verdictEl.innerText = result.isMatch ? 'VIBE MATCH' : 'VIBE MIX';
+        verdictEl.className = `verdict ${result.isMatch ? 'match' : 'mix'}`;
+        scoreNumber.innerText = `${result.score}%`;
+        roastCopy.innerText = result.roast;
+        metricGrid.innerHTML = result.metrics.map(([label, value]) => (
+          `<div class="metric"><span>${label}</span><strong>${value}</strong></div>`
+        )).join('');
+        showScreen('resultScreen');
+      }
+
+      function resetSession() {
+        clearInterval(scanTimer);
+        stopCamera();
+        photos = [null, null];
+        answers = [{}, {}];
+        photoTurn = 0;
+        questionPlayerIndex = 0;
+        questionIndex = 0;
+        consentOne.checked = false;
+        consentTwo.checked = false;
+        photoOnePreview.removeAttribute('src');
+        photoTwoPreview.removeAttribute('src');
+        photoOneStatus.innerText = 'Waiting for photo';
+        photoTwoStatus.innerText = 'Waiting for photo';
+        updateConsentButton();
+        showScreen('welcomeScreen');
+      }
+
+      consentOne.addEventListener('change', updateConsentButton);
+      consentTwo.addEventListener('change', updateConsentButton);
+      consentButton.addEventListener('click', async () => {
+        showScreen('captureScreen');
+        updateCaptureUI();
+        await startCamera();
+      });
+      captureButton.addEventListener('click', capturePhoto);
+      continueCaptureButton.addEventListener('click', () => {
+        if (!photos[photoTurn]) return;
+        if (photoTurn === 0) {
+          photoTurn = 1;
+          updateCaptureUI();
+          return;
+        }
+        stopCamera();
+        showScreen('questionScreen');
+        renderQuestion();
+      });
+      document.querySelectorAll('[data-level]').forEach((button) => {
+        button.addEventListener('click', () => {
+          roastLevel = button.dataset.level;
+          runScan();
+        });
+      });
+      restartButton.addEventListener('click', resetSession);
+      window.addEventListener('beforeunload', stopCamera);
+    </script>
+  </body>
+</html>
