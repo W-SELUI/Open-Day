@@ -261,6 +261,27 @@
         color: #a5f3fc;
       }
 
+      .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .result-actions .primary-button { margin: 0; }
+
+      .claim-stamp-button {
+        border: 1px solid rgba(103, 232, 249, 0.62);
+        border-radius: 10px;
+        padding: 12px 22px;
+        background: rgba(8, 47, 73, 0.86);
+        color: #e0f7ff;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
       @media (max-width: 560px) {
         .overlay-card {
           padding: 24px 18px;
@@ -314,7 +335,10 @@
         <p id="resultTime">00:00.0</p>
         <p id="resultScore">Score: 0</p>
         <p id="bestResult"></p>
-        <button id="playAgainBtn" class="primary-button">Play Again</button>
+        <div class="result-actions">
+          <button id="collectStampButton" class="claim-stamp-button">Collect QuestPass Stamp &amp; Return</button>
+          <button id="playAgainBtn" class="primary-button">Play Again</button>
+        </div>
       </div>
     </section>
 
@@ -342,6 +366,7 @@
     const resultTimeEl = document.getElementById('resultTime');
     const resultScoreEl = document.getElementById('resultScore');
     const bestResultEl = document.getElementById('bestResult');
+    const collectStampButton = document.getElementById('collectStampButton');
 
     const W = canvasElement.width;
     const H = canvasElement.height;
@@ -1245,6 +1270,12 @@
 
     resetBtn.addEventListener('click', resetPuzzle);
     playAgainBtn.addEventListener('click', resetPuzzle);
+    collectStampButton.addEventListener('click', () => {
+      window.parent.postMessage(
+        { type: 'questpass:completed', activity: 'hand_puzzle' },
+        '*'
+      );
+    });
 
     const camera = new Camera(videoElement, {
       onFrame: async () => {

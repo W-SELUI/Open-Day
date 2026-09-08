@@ -446,6 +446,7 @@
       .metric span { min-height: 30px; color: #9fb6d4; font-size: 0.74rem; line-height: 1.25; }
       .metric strong { margin-top: 5px; color: #e0f2fe; font-size: 1.08rem; }
       .result-note { max-width: 650px; margin: 16px auto 0; color: #93a9c6; font-size: 0.77rem; line-height: 1.52; }
+      .result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 
       @media (max-width: 720px) {
         .screen { padding: 18px; }
@@ -565,7 +566,10 @@
           <p id="prophecyTime" class="prophecy-time"></p>
           <p id="prophecyCopy" class="prophecy-copy"></p>
           <div id="metricGrid" class="metric-grid"></div>
-          <button id="restartButton">Ask Again with New Players</button>
+          <div class="result-actions">
+            <button id="collectStampButton" class="secondary-button">Collect QuestPass Stamp &amp; Return</button>
+            <button id="restartButton">Ask Again with New Players</button>
+          </div>
           <p class="result-note">Random entertainment only · The Oracle has zero qualifications, no memory, and absolutely no access to either player's future.</p>
         </div>
       </section>
@@ -676,6 +680,7 @@
       const prophecyTime = document.getElementById('prophecyTime');
       const prophecyCopy = document.getElementById('prophecyCopy');
       const metricGrid = document.getElementById('metricGrid');
+      const collectStampButton = document.getElementById('collectStampButton');
       const restartButton = document.getElementById('restartButton');
 
       let stream = null;
@@ -904,6 +909,13 @@
         showScreen('welcomeScreen');
       }
 
+      function collectQuestPassStamp() {
+        window.parent.postMessage(
+          { type: 'questpass:completed', activity: 'vibe_oracle' },
+          '*'
+        );
+      }
+
       consentOne.addEventListener('change', updateConsentButton);
       consentTwo.addEventListener('change', updateConsentButton);
       consentButton.addEventListener('click', async () => {
@@ -934,6 +946,7 @@
           runScan();
         });
       });
+      collectStampButton.addEventListener('click', collectQuestPassStamp);
       restartButton.addEventListener('click', resetSession);
       window.addEventListener('beforeunload', stopCamera);
     </script>

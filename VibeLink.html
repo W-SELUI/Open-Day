@@ -488,6 +488,7 @@
       .metric strong { display: block; margin-top: 5px; color: #cffafe; font-size: 1.22rem; }
 
       .result-note { color: #94a3b8; font-size: 0.78rem; }
+      .result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 
       @media (max-width: 700px) {
         .screen { padding: 16px; }
@@ -598,7 +599,10 @@
           <p id="scoreNumber" class="score-number"></p>
           <p id="roastCopy" class="roast-copy"></p>
           <div id="metricGrid" class="metric-grid"></div>
-          <button id="restartButton">Start a New Vibe Scan</button>
+          <div class="result-actions">
+            <button id="collectStampButton" class="secondary-button">Collect QuestPass Stamp &amp; Return</button>
+            <button id="restartButton">Start a New Vibe Scan</button>
+          </div>
           <p class="result-note">For entertainment only · Score is based on the choices made in this session, not appearance.</p>
         </div>
       </section>
@@ -711,6 +715,7 @@
       const scoreNumber = document.getElementById('scoreNumber');
       const roastCopy = document.getElementById('roastCopy');
       const metricGrid = document.getElementById('metricGrid');
+      const collectStampButton = document.getElementById('collectStampButton');
       const restartButton = document.getElementById('restartButton');
 
       let stream = null;
@@ -904,6 +909,13 @@
         showScreen('welcomeScreen');
       }
 
+      function collectQuestPassStamp() {
+        window.parent.postMessage(
+          { type: 'questpass:completed', activity: 'vibe_link' },
+          '*'
+        );
+      }
+
       consentOne.addEventListener('change', updateConsentButton);
       consentTwo.addEventListener('change', updateConsentButton);
       consentButton.addEventListener('click', async () => {
@@ -929,6 +941,7 @@
           runScan();
         });
       });
+      collectStampButton.addEventListener('click', collectQuestPassStamp);
       restartButton.addEventListener('click', resetSession);
       window.addEventListener('beforeunload', stopCamera);
     </script>

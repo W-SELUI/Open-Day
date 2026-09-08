@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      html,
+      body,
+      #gameFrame {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        border: 0;
+        background: #020617;
+      }
+
+      #gameFrame {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <iframe id="gameFrame" title="Open Day activity" allow="camera; fullscreen"></iframe>
+
+    <script>
+      // This is a small, plain-JavaScript Streamlit custom component. It
+      // receives the activity HTML from Python, hosts it in a nested frame,
+      // and sends one completion value back to Streamlit.
+      const SET_COMPONENT_VALUE = "streamlit:setComponentValue";
+      const RENDER = "streamlit:render";
+      const COMPONENT_READY = "streamlit:componentReady";
+      const SET_FRAME_HEIGHT = "streamlit:setFrameHeight";
+
+      const gameFrame = document.getElementById("gameFrame");
+      let activeActivity = "";
+      let renderedHtml = "";
+      let completionSent = false;
+
+      function sendToStreamlit(type, data) {
+        window.parent.postMessage(
+          Object.assign({ isStreamlitMessage: true, type }, data),
+          "*"
+        );
+      }
+
+      function setFrameHeight() {
+        sendToStreamlit(SET_FRAME_HEIGHT, { height: window.innerHeight });
+      }
+
+      function renderActivity(args) {
+        const nextHtml = args.game_html || "";
+        const nextActivity = args.activity || "";
+
+        activeActivity = nextActivity;
+
+        // Streamlit can re-render its Python script for unrelated reasons.
+        // Do not reset a game already in progress unless its HTML changed.
+        if (nextHtml && nextHtml !== renderedHtml) {
+          renderedHtml = nextHtml;
+          completionSent = false;
+          gameFrame.srcdoc = nextHtml;
+        }
+
+        setFrameHeight();
+      }
+
+      window.addEventListener("message", (event) => {
+        const message = event.data;
+
+        if (message && message.type === RENDER) {
+          renderActivity(message.args || {});
+          return;
+        }
+
+        // Only accept a completion event from our nested game frame, and only
+        // when it names the activity that Python asked us to host.
+        if (
+          event.source === gameFrame.contentWindow &&
+          message &&
+          message.type === "questpass:completed" &&
+          message.activity === activeActivity &&
+          !completionSent
+        ) {
+          completionSent = true;
+          sendToStreamlit(SET_COMPONENT_VALUE, {
+            value: activeActivity,
+            dataType: "json",
+          });
+        }
+      });
+
+      window.addEventListener("resize", setFrameHeight);
+      sendToStreamlit(COMPONENT_READY, { apiVersion: 1 });
+      setFrameHeight();
+    </script>
+  </body>
+</html>

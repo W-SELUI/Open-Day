@@ -221,6 +221,22 @@
         font-weight: 700;
       }
 
+      .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 18px;
+      }
+
+      .result-actions button { margin: 0; }
+
+      .claim-stamp-button {
+        border-color: rgba(103, 232, 249, 0.62);
+        background: rgba(8, 47, 73, 0.82);
+        box-shadow: none;
+      }
+
       @media (max-width: 560px) {
         #hud {
           top: 76px;
@@ -275,7 +291,10 @@
         <p id="finalScore">0</p>
         <p id="finalDetail">0 targets hit</p>
         <p id="bestMessage"></p>
-        <button id="playAgainButton">Play Again</button>
+        <div class="result-actions">
+          <button id="collectStampButton" class="claim-stamp-button">Collect QuestPass Stamp &amp; Return</button>
+          <button id="playAgainButton">Play Again</button>
+        </div>
       </div>
     </section>
 
@@ -299,6 +318,7 @@
       const finalScoreEl = document.getElementById('finalScore');
       const finalDetailEl = document.getElementById('finalDetail');
       const bestMessageEl = document.getElementById('bestMessage');
+      const collectStampButton = document.getElementById('collectStampButton');
 
       const W = canvasElement.width;
       const H = canvasElement.height;
@@ -595,6 +615,12 @@
       });
 
       playAgainButton.addEventListener('click', startRound);
+      collectStampButton.addEventListener('click', () => {
+        window.parent.postMessage(
+          { type: 'questpass:completed', activity: 'hand_rush' },
+          '*'
+        );
+      });
       renderBestScore();
     </script>
   </body>

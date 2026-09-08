@@ -4,6 +4,7 @@ import streamlit as st
 
 from career_model import predict_careers
 from ollama_explainer import generate_career_explanation
+from questpass_bridge import render_questpass_activity
 from UI_theme import apply_theme
 
 
@@ -11,12 +12,36 @@ st.set_page_config(page_title="Career Quest", page_icon="🎓")
 
 apply_theme()
 
+QUEST_STAMPS = {
+    "hand_puzzle": ("🧩", "Puzzle Solver"),
+    "hand_rush": ("⚡", "Quick Hands"),
+    "career": ("🎓", "Future Explorer"),
+    "vibe_link": ("✨", "Vibe Scanner"),
+    "vibe_oracle": ("🔮", "Cosmic Forecaster"),
+}
+
+
+def award_questpass_stamp(activity: str) -> None:
+    """Record one genuinely completed experience for this browser session."""
+    st.session_state.quest_stamps.add(activity)
+    st.session_state.quest_pass_notice = QUEST_STAMPS[activity][1]
+
 if "page" not in st.session_state:
     st.session_state.page = "home"
+
+if "quest_stamps" not in st.session_state:
+    st.session_state.quest_stamps = set()
 
 page = st.session_state.page
 
 if page == "home":
+    if "quest_pass_notice" in st.session_state:
+        st.toast(
+            f"QuestPass stamp collected: {st.session_state.quest_pass_notice}!",
+            icon="✅",
+        )
+        del st.session_state.quest_pass_notice
+
     st.markdown(
         """
         <section class="hero">
@@ -26,6 +51,50 @@ if page == "home":
                 Try a hands-on puzzle challenge or explore career paths
                 with a machine-learning model built for this project.
             </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # QuestPass is a visible progress board, not a sixth activity. Visitors
+    # can see their stamp hunt before choosing what to try next.
+    stamp_count = len(st.session_state.quest_stamps)
+    total_stamps = len(QUEST_STAMPS)
+    progress_percent = round((stamp_count / total_stamps) * 100)
+    stamp_markup = "".join(
+        (
+            f'<div class="quest-stamp collected"><span>{icon}</span>{title}</div>'
+            if activity in st.session_state.quest_stamps
+            else f'<div class="quest-stamp"><span>○</span>{title}</div>'
+        )
+        for activity, (icon, title) in QUEST_STAMPS.items()
+    )
+
+    if stamp_count >= 5:
+        quest_message = "Full collection unlocked: Master of Open Day Chaos."
+    elif stamp_count >= 3:
+        quest_message = "Explorer title unlocked: Certified Open Day Chaos Engineer."
+    else:
+        stamps_needed = 3 - stamp_count
+        quest_message = (
+            f"Collect {stamps_needed} more stamp{'s' if stamps_needed != 1 else ''} "
+            "to unlock your Explorer title."
+        )
+
+    st.markdown(
+        f"""
+        <section class="questpass-card">
+            <div class="questpass-copy">
+                <p class="questpass-eyebrow">OPEN DAY AI LAB PASSPORT</p>
+                <h2>QuestPass</h2>
+                <p>Try the experiences, collect stamps, and unlock a completely unnecessary title.</p>
+            </div>
+            <div class="questpass-progress-area">
+                <div class="questpass-count">{stamp_count} <span>/ {total_stamps} stamps</span></div>
+                <div class="questpass-track"><div style="width: {progress_percent}%"></div></div>
+                <p>{quest_message}</p>
+            </div>
+            <div class="quest-stamp-row">{stamp_markup}</div>
         </section>
         """,
         unsafe_allow_html=True,
@@ -197,6 +266,8 @@ elif page == "puzzle":
                Streamlit's normal content-column layout. */
             [data-testid="stIFrame"],
             [data-testid="stIFrame"] iframe,
+            [data-testid="stCustomComponentV1"],
+            [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
                 position: fixed !important;
                 inset: 0 !important;
@@ -222,11 +293,15 @@ elif page == "puzzle":
     if not puzzle_file.exists():
         st.error("The Hand Puzzle.html file could not be found.")
     else:
-        st.iframe(
+        completion = render_questpass_activity(
             puzzle_file,
-            height="stretch",
-            tab_index=0,
+            "hand_puzzle",
+            key="hand_puzzle_bridge",
         )
+        if completion == "hand_puzzle":
+            award_questpass_stamp("hand_puzzle")
+            st.session_state.page = "home"
+            st.rerun()
 
 elif page == "hand_rush":
     # Hand Rush is another kiosk-style camera game, so it gets the same
@@ -283,6 +358,8 @@ elif page == "hand_rush":
 
             [data-testid="stIFrame"],
             [data-testid="stIFrame"] iframe,
+            [data-testid="stCustomComponentV1"],
+            [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
                 position: fixed !important;
                 inset: 0 !important;
@@ -308,11 +385,15 @@ elif page == "hand_rush":
     if not hand_rush_file.exists():
         st.error("The Hand Rush.html file could not be found.")
     else:
-        st.iframe(
+        completion = render_questpass_activity(
             hand_rush_file,
-            height="stretch",
-            tab_index=0,
+            "hand_rush",
+            key="hand_rush_bridge",
         )
+        if completion == "hand_rush":
+            award_questpass_stamp("hand_rush")
+            st.session_state.page = "home"
+            st.rerun()
 
 elif page == "vibe_link":
     # VibeLink is a full-screen camera experience, just like the two games.
@@ -368,6 +449,8 @@ elif page == "vibe_link":
 
             [data-testid="stIFrame"],
             [data-testid="stIFrame"] iframe,
+            [data-testid="stCustomComponentV1"],
+            [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
                 position: fixed !important;
                 inset: 0 !important;
@@ -393,11 +476,15 @@ elif page == "vibe_link":
     if not vibe_link_file.exists():
         st.error("The VibeLink.html file could not be found.")
     else:
-        st.iframe(
+        completion = render_questpass_activity(
             vibe_link_file,
-            height="stretch",
-            tab_index=0,
+            "vibe_link",
+            key="vibe_link_bridge",
         )
+        if completion == "vibe_link":
+            award_questpass_stamp("vibe_link")
+            st.session_state.page = "home"
+            st.rerun()
 
 elif page == "vibe_oracle":
     # The Oracle is a standalone full-screen camera experience. Its temporary
@@ -454,6 +541,8 @@ elif page == "vibe_oracle":
 
             [data-testid="stIFrame"],
             [data-testid="stIFrame"] iframe,
+            [data-testid="stCustomComponentV1"],
+            [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
                 position: fixed !important;
                 inset: 0 !important;
@@ -479,11 +568,15 @@ elif page == "vibe_oracle":
     if not vibe_oracle_file.exists():
         st.error("The Vibe Oracle.html file could not be found.")
     else:
-        st.iframe(
+        completion = render_questpass_activity(
             vibe_oracle_file,
-            height="stretch",
-            tab_index=0,
+            "vibe_oracle",
+            key="vibe_oracle_bridge",
         )
+        if completion == "vibe_oracle":
+            award_questpass_stamp("vibe_oracle")
+            st.session_state.page = "home"
+            st.rerun()
 
 elif page == "career":
 
@@ -578,3 +671,7 @@ elif page == "career":
                         "Your model result is ready, but the local Ollama "
                         "explanation service is unavailable right now."
                     )
+
+                if "career" not in st.session_state.quest_stamps:
+                    award_questpass_stamp("career")
+                    st.toast("QuestPass stamp collected: Future Explorer!", icon="✅")
