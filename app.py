@@ -111,6 +111,27 @@ if page == "home":
             st.session_state.page = "vibe_link"
             st.rerun()
 
+    oracle_column, _ = st.columns(2, gap="large")
+
+    with oracle_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">🔮</div>
+                <h2>Vibe Oracle</h2>
+                <p>
+                    Take two temporary profile photos, choose the energy,
+                    then receive a wildly dramatic random relationship forecast.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Ask the Vibe Oracle", key="open_vibe_oracle"):
+            st.session_state.page = "vibe_oracle"
+            st.rerun()
+
     st.markdown(
         '<p class="small-note">Built for Open Day · Your answers stay in this session.</p>',
         unsafe_allow_html=True,
@@ -374,6 +395,92 @@ elif page == "vibe_link":
     else:
         st.iframe(
             vibe_link_file,
+            height="stretch",
+            tab_index=0,
+        )
+
+elif page == "vibe_oracle":
+    # The Oracle is a standalone full-screen camera experience. Its temporary
+    # profile photos and random forecast live only inside this iframe session.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                height: 100vh !important;
+                min-height: 100vh !important;
+                width: 100vw !important;
+                overflow: hidden !important;
+            }
+
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .st-key-back_from_vibe_oracle,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_vibe_oracle button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to AI Lab", key="back_from_vibe_oracle"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    vibe_oracle_file = Path(__file__).with_name("Vibe Oracle.html")
+
+    if not vibe_oracle_file.exists():
+        st.error("The Vibe Oracle.html file could not be found.")
+    else:
+        st.iframe(
+            vibe_oracle_file,
             height="stretch",
             tab_index=0,
         )
