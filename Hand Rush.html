@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Open Day AI Lab — Hand Rush</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #020617;
+        color: #e0f2fe;
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+
+      #cameraStage,
+      video,
+      canvas {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      video,
+      canvas {
+        object-fit: cover;
+        object-position: center;
+        transform: scaleX(-1);
+      }
+
+      #cameraStage::after {
+        position: fixed;
+        inset: 0;
+        content: "";
+        pointer-events: none;
+        background:
+          linear-gradient(180deg, rgba(2, 6, 23, 0.5), transparent 28%, transparent 70%, rgba(2, 6, 23, 0.58)),
+          radial-gradient(circle at center, transparent 46%, rgba(2, 6, 23, 0.38) 100%);
+      }
+
+      #hud {
+        position: fixed;
+        top: 18px;
+        left: 150px;
+        z-index: 10;
+        display: none;
+        gap: 9px;
+        flex-wrap: wrap;
+      }
+
+      .chip {
+        min-width: 90px;
+        padding: 9px 13px;
+        border: 1px solid rgba(125, 211, 252, 0.38);
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.72);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
+        backdrop-filter: blur(8px);
+        color: #dbeafe;
+        font-size: 0.88rem;
+      }
+
+      .chip strong {
+        margin-left: 4px;
+        color: #67e8f9;
+      }
+
+      #status {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        z-index: 10;
+        max-width: calc(100vw - 32px);
+        padding: 9px 15px;
+        border: 1px solid rgba(125, 211, 252, 0.34);
+        border-radius: 999px;
+        transform: translateX(-50%);
+        background: rgba(2, 6, 23, 0.72);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
+        backdrop-filter: blur(8px);
+        color: #dbeafe;
+        font-size: clamp(0.82rem, 2vw, 1rem);
+        text-align: center;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(2, 6, 23, 0.8);
+        backdrop-filter: blur(11px);
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+      }
+
+      .overlay.hidden {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .panel {
+        width: min(560px, 100%);
+        padding: clamp(24px, 5vw, 40px);
+        border: 1px solid rgba(103, 232, 249, 0.46);
+        border-radius: 26px;
+        background:
+          radial-gradient(circle at top, rgba(14, 165, 233, 0.2), transparent 55%),
+          linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.97));
+        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
+        text-align: center;
+      }
+
+      .eyebrow {
+        margin: 0 0 8px;
+        color: #67e8f9;
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.14rem;
+      }
+
+      h1 {
+        margin: 0;
+        color: #f0f9ff;
+        font-size: clamp(2.3rem, 7vw, 4.3rem);
+        line-height: 0.96;
+      }
+
+      .intro-copy,
+      .result-copy {
+        margin: 16px auto 0;
+        max-width: 440px;
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+
+      .how-to {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        margin: 24px 0;
+      }
+
+      .how-to div {
+        min-height: 112px;
+        padding: 13px 10px;
+        border: 1px solid rgba(125, 211, 252, 0.2);
+        border-radius: 15px;
+        background: rgba(15, 23, 42, 0.72);
+        color: #dbeafe;
+        font-size: 0.86rem;
+        line-height: 1.35;
+      }
+
+      .how-to span {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 1.7rem;
+      }
+
+      button {
+        border: 1px solid #67e8f9;
+        border-radius: 999px;
+        padding: 12px 23px;
+        background: linear-gradient(135deg, #0e7490, #2563eb);
+        box-shadow: 0 12px 25px rgba(14, 116, 144, 0.25);
+        color: #fff;
+        font: inherit;
+        font-weight: 800;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: #cffafe;
+        background: linear-gradient(135deg, #0891b2, #4f46e5);
+        transform: translateY(-1px);
+      }
+
+      button:disabled {
+        cursor: wait;
+        opacity: 0.7;
+      }
+
+      .camera-note {
+        margin: 14px 0 0;
+        color: #94a3b8;
+        font-size: 0.82rem;
+      }
+
+      #finalScore {
+        margin: 20px 0 4px;
+        color: #f0f9ff;
+        font-size: clamp(2.7rem, 9vw, 4.8rem);
+        font-weight: 900;
+        line-height: 1;
+      }
+
+      #finalDetail,
+      #bestMessage {
+        margin: 8px 0 0;
+        color: #bae6fd;
+      }
+
+      #bestMessage {
+        min-height: 24px;
+        color: #67e8f9;
+        font-weight: 700;
+      }
+
+      @media (max-width: 560px) {
+        #hud {
+          top: 76px;
+          left: 14px;
+        }
+
+        .how-to {
+          grid-template-columns: 1fr;
+        }
+
+        .how-to div {
+          min-height: auto;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="cameraStage">
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" width="640" height="480"></canvas>
+    </div>
+
+    <div id="hud" aria-live="polite">
+      <div class="chip">Score <strong id="score">0</strong></div>
+      <div class="chip">Combo <strong id="combo">×0</strong></div>
+      <div class="chip">Time <strong id="time">30.0</strong></div>
+      <div class="chip">Best <strong id="best">—</strong></div>
+    </div>
+
+    <div id="status">Press Start Camera to begin</div>
+
+    <section id="intro" class="overlay">
+      <div class="panel">
+        <p class="eyebrow">OPEN DAY AI LAB</p>
+        <h1>Hand Rush</h1>
+        <p class="intro-copy">A 30-second hand-tracking reaction challenge. Catch as many glowing targets as you can.</p>
+        <div class="how-to">
+          <div><span>🖐️</span>Keep one hand visible in the camera.</div>
+          <div><span>🎯</span>Move your fingers over a glowing target.</div>
+          <div><span>🤏</span>Pinch thumb and index to score.</div>
+        </div>
+        <button id="startButton">Start Camera</button>
+        <p class="camera-note">Good lighting helps the hand-tracking AI follow your movements.</p>
+      </div>
+    </section>
+
+    <section id="result" class="overlay hidden" aria-live="polite">
+      <div class="panel">
+        <p class="eyebrow">TIME UP</p>
+        <h1>Hand Rush Complete</h1>
+        <p id="finalScore">0</p>
+        <p id="finalDetail">0 targets hit</p>
+        <p id="bestMessage"></p>
+        <button id="playAgainButton">Play Again</button>
+      </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <script>
+      const videoElement = document.getElementById('video');
+      const canvasElement = document.getElementById('canvas');
+      const ctx = canvasElement.getContext('2d');
+      const startButton = document.getElementById('startButton');
+      const playAgainButton = document.getElementById('playAgainButton');
+      const introEl = document.getElementById('intro');
+      const resultEl = document.getElementById('result');
+      const hudEl = document.getElementById('hud');
+      const statusEl = document.getElementById('status');
+      const scoreEl = document.getElementById('score');
+      const comboEl = document.getElementById('combo');
+      const timeEl = document.getElementById('time');
+      const bestEl = document.getElementById('best');
+      const finalScoreEl = document.getElementById('finalScore');
+      const finalDetailEl = document.getElementById('finalDetail');
+      const bestMessageEl = document.getElementById('bestMessage');
+
+      const W = canvasElement.width;
+      const H = canvasElement.height;
+      const ROUND_LENGTH_MS = 30000;
+      const TARGET_RADIUS = 34;
+      const PINCH_CLOSE_RATIO = 0.35;
+      const PINCH_OPEN_RATIO = 0.55;
+      const CURSOR_SMOOTHING_ALPHA = 0.7;
+      const HIGH_SCORE_KEY = 'open-day-hand-rush-best-score';
+
+      let gameState = 'intro';
+      let cameraStarted = false;
+      let score = 0;
+      let combo = 0;
+      let hits = 0;
+      let roundEndsAt = 0;
+      let target = null;
+      let nextTargetAt = 0;
+      let flash = null;
+      let pinchActive = false;
+      let smoothedCursor = null;
+      let bestScore = loadBestScore();
+
+      const hands = new Hands({
+        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
+      });
+
+      hands.setOptions({
+        maxNumHands: 1,
+        modelComplexity: 0,
+        minDetectionConfidence: 0.7,
+        minTrackingConfidence: 0.5,
+      });
+
+      hands.onResults(onResults);
+
+      function loadBestScore() {
+        try {
+          const stored = Number(window.localStorage.getItem(HIGH_SCORE_KEY));
+          return Number.isFinite(stored) && stored > 0 ? stored : 0;
+        } catch (error) {
+          return 0;
+        }
+      }
+
+      function renderBestScore() {
+        bestEl.innerText = bestScore ? String(bestScore) : '—';
+      }
+
+      function startRound() {
+        score = 0;
+        combo = 0;
+        hits = 0;
+        target = null;
+        flash = null;
+        pinchActive = false;
+        smoothedCursor = null;
+        roundEndsAt = performance.now() + ROUND_LENGTH_MS;
+        nextTargetAt = performance.now() + 400;
+        gameState = 'playing';
+        resultEl.classList.add('hidden');
+        hudEl.style.display = 'flex';
+        renderHud(ROUND_LENGTH_MS);
+        statusEl.innerText = 'Aim with your hand, then pinch a glowing target.';
+      }
+
+      function renderHud(remainingMs) {
+        scoreEl.innerText = String(score);
+        comboEl.innerText = `×${combo}`;
+        timeEl.innerText = (Math.max(0, remainingMs) / 1000).toFixed(1);
+        renderBestScore();
+      }
+
+      function spawnTarget(now) {
+        // Keep targets in the middle region so they remain visible on a
+        // wide screen even when the 4:3 camera view is cropped to fill it.
+        target = {
+          x: 72 + Math.random() * (W - 144),
+          y: 102 + Math.random() * (H - 204),
+          bornAt: now,
+          expiresAt: now + Math.max(850, 1550 - hits * 22),
+        };
+      }
+
+      function updateGame(now, landmarks) {
+        const remainingMs = roundEndsAt - now;
+        if (remainingMs <= 0) {
+          endRound();
+          return;
+        }
+
+        if (!target && now >= nextTargetAt) {
+          spawnTarget(now);
+        }
+
+        if (target && now >= target.expiresAt) {
+          combo = 0;
+          target = null;
+          nextTargetAt = now + 180;
+          statusEl.innerText = 'Missed — find the next blue target!';
+        }
+
+        if (target) {
+          drawTarget(target, now);
+        }
+
+        if (landmarks) {
+          const cursor = smoothCursor(getPinchPoint(landmarks));
+          const isPinchingNow = isPinching(landmarks);
+          drawCursor(cursor, isPinchingNow);
+
+          if (isPinchingNow && !pinchActive && target) {
+            tryHitTarget(cursor, now);
+          }
+          pinchActive = isPinchingNow;
+        } else {
+          pinchActive = false;
+          smoothedCursor = null;
+        }
+
+        if (flash && now < flash.until) {
+          drawHitFlash(flash, now);
+        }
+
+        renderHud(remainingMs);
+      }
+
+      function tryHitTarget(cursor, now) {
+        const dx = cursor.x - target.x;
+        const dy = cursor.y - target.y;
+        const hitDistance = Math.sqrt(dx * dx + dy * dy);
+        if (hitDistance > TARGET_RADIUS + 18) return;
+
+        combo++;
+        hits++;
+        const points = 10 + Math.min(combo - 1, 5) * 2;
+        score += points;
+        flash = { x: target.x, y: target.y, points, until: now + 360 };
+        target = null;
+        nextTargetAt = now + 150;
+        statusEl.innerText = combo >= 3 ? `Nice! ×${combo} combo` : `Nice! +${points}`;
+      }
+
+      function endRound() {
+        if (gameState !== 'playing') return;
+        gameState = 'finished';
+        target = null;
+        hudEl.style.display = 'none';
+
+        const isNewBest = score > bestScore;
+        if (isNewBest) {
+          bestScore = score;
+          try {
+            window.localStorage.setItem(HIGH_SCORE_KEY, String(bestScore));
+          } catch (error) {
+            // The game still works if the browser blocks local storage.
+          }
+        }
+
+        finalScoreEl.innerText = String(score);
+        finalDetailEl.innerText = `${hits} target${hits === 1 ? '' : 's'} hit`;
+        bestMessageEl.innerText = isNewBest && score > 0
+          ? '🏆 New personal best!'
+          : (bestScore ? `Personal best: ${bestScore}` : 'Play again and set a best score!');
+        statusEl.innerText = 'Round complete.';
+        resultEl.classList.remove('hidden');
+      }
+
+      function getPinchPoint(landmarks) {
+        const thumb = landmarks[4];
+        const index = landmarks[8];
+        return {
+          x: ((thumb.x + index.x) / 2) * W,
+          y: ((thumb.y + index.y) / 2) * H,
+        };
+      }
+
+      function smoothCursor(point) {
+        if (!smoothedCursor) {
+          smoothedCursor = point;
+          return smoothedCursor;
+        }
+        smoothedCursor = {
+          x: smoothedCursor.x + (point.x - smoothedCursor.x) * CURSOR_SMOOTHING_ALPHA,
+          y: smoothedCursor.y + (point.y - smoothedCursor.y) * CURSOR_SMOOTHING_ALPHA,
+        };
+        return smoothedCursor;
+      }
+
+      function isPinching(landmarks) {
+        const thumb = landmarks[4];
+        const index = landmarks[8];
+        const wrist = landmarks[0];
+        const middleMcp = landmarks[9];
+        const pinchDistance = Math.hypot(thumb.x - index.x, thumb.y - index.y);
+        const palmSize = Math.max(
+          Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y),
+          0.0001,
+        );
+        const ratio = pinchDistance / palmSize;
+        return pinchActive ? ratio < PINCH_OPEN_RATIO : ratio < PINCH_CLOSE_RATIO;
+      }
+
+      function drawTarget(currentTarget, now) {
+        const life = (currentTarget.expiresAt - now) / (currentTarget.expiresAt - currentTarget.bornAt);
+        const pulse = 1 + Math.sin(now / 120) * 0.09;
+        const radius = TARGET_RADIUS * pulse;
+
+        ctx.save();
+        ctx.translate(currentTarget.x, currentTarget.y);
+        ctx.globalAlpha = Math.max(0.38, life);
+        ctx.fillStyle = 'rgba(14, 165, 233, 0.3)';
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 24;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#bae6fd';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(103, 232, 249, 0.84)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * life);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawCursor(cursor, isPinchingNow) {
+        ctx.save();
+        ctx.translate(cursor.x, cursor.y);
+        ctx.shadowColor = isPinchingNow ? '#67e8f9' : '#60a5fa';
+        ctx.shadowBlur = isPinchingNow ? 22 : 12;
+        ctx.fillStyle = isPinchingNow ? '#cffafe' : '#93c5fd';
+        ctx.beginPath();
+        ctx.arc(0, 0, isPinchingNow ? 10 : 7, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = isPinchingNow ? '#67e8f9' : 'rgba(191, 219, 254, 0.8)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, isPinchingNow ? 19 : 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawHitFlash(currentFlash, now) {
+        const progress = 1 - (currentFlash.until - now) / 360;
+        ctx.save();
+        ctx.translate(currentFlash.x, currentFlash.y);
+        ctx.globalAlpha = 1 - progress;
+        ctx.strokeStyle = '#e0f2fe';
+        ctx.shadowColor = '#67e8f9';
+        ctx.shadowBlur = 16;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, TARGET_RADIUS + progress * 38, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function onResults(results) {
+        ctx.clearRect(0, 0, W, H);
+        if (gameState !== 'playing') return;
+        const landmarks = results.multiHandLandmarks && results.multiHandLandmarks[0];
+        updateGame(performance.now(), landmarks);
+      }
+
+      const camera = new Camera(videoElement, {
+        onFrame: async () => {
+          await hands.send({ image: videoElement });
+        },
+        width: W,
+        height: H,
+      });
+
+      startButton.addEventListener('click', async () => {
+        if (cameraStarted) return;
+        startButton.disabled = true;
+        startButton.innerText = 'Starting camera...';
+        statusEl.innerText = 'Starting hand-tracking AI...';
+
+        try {
+          await camera.start();
+          cameraStarted = true;
+          introEl.classList.add('hidden');
+          startRound();
+        } catch (error) {
+          statusEl.innerText = `Camera error: ${error.message}`;
+          startButton.disabled = false;
+          startButton.innerText = 'Try Camera Again';
+        }
+      });
+
+      playAgainButton.addEventListener('click', startRound);
+      renderBestScore();
+    </script>
+  </body>
+</html>

@@ -31,7 +31,7 @@ if page == "home":
         unsafe_allow_html=True,
     )
 
-    puzzle_column, career_column = st.columns(2, gap="large")
+    puzzle_column, rush_column, career_column = st.columns(3, gap="large")
 
     with puzzle_column:
         st.markdown(
@@ -50,6 +50,25 @@ if page == "home":
 
         if st.button("Play the Hand Puzzle", key="open_puzzle"):
             st.session_state.page = "puzzle"
+            st.rerun()
+
+    with rush_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">⚡</div>
+                <h2>Hand Rush</h2>
+                <p>
+                    Pinch glowing targets as quickly as you can before the
+                    30-second timer ends.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Play Hand Rush", key="open_hand_rush"):
+            st.session_state.page = "hand_rush"
             st.rerun()
 
     with career_column:
@@ -163,6 +182,92 @@ elif page == "puzzle":
     else:
         st.iframe(
             puzzle_file,
+            height="stretch",
+            tab_index=0,
+        )
+
+elif page == "hand_rush":
+    # Hand Rush is another kiosk-style camera game, so it gets the same
+    # full-screen treatment as the Hand Puzzle.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                height: 100vh !important;
+                min-height: 100vh !important;
+                width: 100vw !important;
+                overflow: hidden !important;
+            }
+
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .st-key-back_from_hand_rush,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_hand_rush button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: fixed !important;
+                inset: 0 !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to AI Lab", key="back_from_hand_rush"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    hand_rush_file = Path(__file__).with_name("Hand Rush.html")
+
+    if not hand_rush_file.exists():
+        st.error("The Hand Rush.html file could not be found.")
+    else:
+        st.iframe(
+            hand_rush_file,
             height="stretch",
             tab_index=0,
         )

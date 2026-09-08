@@ -47,6 +47,13 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
+        max-width: calc(100vw - 32px);
+        padding: 9px 15px;
+        border: 1px solid rgba(125, 211, 252, 0.34);
+        border-radius: 999px;
+        background: rgba(2, 6, 23, 0.72);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
+        backdrop-filter: blur(8px);
         font-size: 18px;
         min-height: 24px;
         text-align: center;
@@ -76,17 +83,19 @@
         z-index: 10;
         display: none;
 
-        background: #1e293b;
-        color: #3B82F6;
-        border: 1px solid #3B82F6;
-        padding: 8px 20px;
-        border-radius: 6px;
+        background: rgba(15, 23, 42, 0.9);
+        color: #dbeafe;
+        border: 1px solid rgba(96, 165, 250, 0.72);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.32);
+        padding: 9px 20px;
+        border-radius: 999px;
         cursor: pointer;
       }
 
       #resetBtn:hover {
-        background: #3B82F6;
-        color: #111;
+        background: #2563eb;
+        border-color: #7dd3fc;
+        color: #fff;
       }
 
       #progress {
@@ -231,7 +240,7 @@
       }
 
       #resultOverlay .overlay-card {
-        border-color: rgba(34, 197, 94, 0.62);
+        border-color: rgba(34, 211, 238, 0.62);
       }
 
       #resultTime {
@@ -249,7 +258,7 @@
 
       #bestResult {
         min-height: 22px;
-        color: #86efac;
+        color: #a5f3fc;
       }
 
       @media (max-width: 560px) {
@@ -269,7 +278,6 @@
   </head>
 
   <body>
-    <h2>Day 12: Green correct-cell hint, green border + full-screen pulse on solve</h2>
     <div id="container">
       <video id="video" autoplay playsinline></video>
       <canvas id="canvas" width="640" height="480"></canvas>
@@ -393,7 +401,7 @@
     const PROXIMITY_RANGE = 160;
 
     // Drag hint (Day 10): while holding a piece, the cell it's nearest to
-    // glows RED if that's the piece's actual home, or the old neutral BLUE
+    // glows CYAN if that's the piece's actual home, or the calm board BLUE
     // otherwise -- see drawPiece() for the actual color logic.
 
     const snapshotCanvas = document.createElement('canvas');
@@ -428,7 +436,9 @@
 
     hands.setOptions({
       maxNumHands: 2,
-      modelComplexity: 1,
+      // The lite model is more than accurate enough for a pinch game and
+      // keeps the interaction snappy on the Open Day laptops.
+      modelComplexity: 0,
       minDetectionConfidence: MIN_DETECTION_CONFIDENCE,
       minTrackingConfidence: MIN_TRACKING_CONFIDENCE
     });
@@ -506,7 +516,7 @@
       canvasCtx.restore();
     }
 
-    // Full-canvas green wash that breathes in and out while the puzzle is
+    // Full-canvas cyan wash that breathes in and out while the puzzle is
     // solved -- meant to be noticeable from a few steps away at a booth, not
     // just a border you have to be looking straight at. Timed off Date.now()
     // (not a frame counter) so the pulse speed stays constant no matter how
@@ -523,7 +533,7 @@
       const alpha = eased * WIN_PULSE_MAX_ALPHA;
 
       canvasCtx.save();
-      canvasCtx.fillStyle = `rgba(34, 197, 94, ${alpha})`;
+      canvasCtx.fillStyle = `rgba(14, 165, 233, ${alpha})`;
       canvasCtx.fillRect(0, 0, W, H);
       canvasCtx.restore();
     }
@@ -603,12 +613,10 @@
       if (!lockedSquare) return;
       const { size, left, top } = lockedSquare;
 
-      // Outer border: blue while still solving, switches to a green glow the
-      // moment every piece is locked -- matches the green "correct cell" hint
-      // color used during dragging, so green consistently means "right/good"
-      // everywhere in the puzzle instead of introducing a second color.
+      // The whole puzzle uses a blue/cyan visual language: a calm blue board
+      // while solving, then a brighter cyan border when it is complete.
       const solved = state === 'won';
-      const borderColor = solved ? '#22C55E' : '#3B82F6';
+      const borderColor = solved ? '#22D3EE' : '#3B82F6';
 
       canvasCtx.save();
       canvasCtx.strokeStyle = borderColor;
@@ -620,9 +628,13 @@
       canvasCtx.restore();
 
       canvasCtx.save();
-      canvasCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-      canvasCtx.lineWidth = 1;
-      canvasCtx.setLineDash([3, 3]);
+      // Soft solid cyan lines are easier to see over any webcam image than
+      // the old black dotted grid, without hiding the student's photo.
+      canvasCtx.strokeStyle = 'rgba(186, 230, 253, 0.56)';
+      canvasCtx.shadowColor = 'rgba(14, 165, 233, 0.5)';
+      canvasCtx.shadowBlur = 5;
+      canvasCtx.lineWidth = 1.25;
+      canvasCtx.setLineDash([]);
       const step = size / GRID;
       for (let i = 1; i < GRID; i++) {
         const x = left + step * i;
@@ -656,9 +668,11 @@
       canvasCtx.restore();
 
       canvasCtx.save();
-      canvasCtx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-      canvasCtx.lineWidth = 1;
-      canvasCtx.setLineDash([3, 3]);
+      canvasCtx.strokeStyle = 'rgba(186, 230, 253, 0.56)';
+      canvasCtx.shadowColor = 'rgba(14, 165, 233, 0.5)';
+      canvasCtx.shadowBlur = 5;
+      canvasCtx.lineWidth = 1.25;
+      canvasCtx.setLineDash([]);
       const step = sq.size / GRID;
       for (let i = 1; i < GRID; i++) {
         const x = left + step * i;
@@ -721,6 +735,9 @@
       handPinchState = { Left: false, Right: false };
       handMissingFrames = { Left: 0, Right: 0 };
       state = 'solving';
+      // Measuring needs two hands; once the board is locked, tracking just
+      // one hand lowers the work MediaPipe does every frame.
+      hands.setOptions({ maxNumHands: 1 });
       startTimer();
       resetBtn.style.display = 'inline-block';
       resetBtn.innerText = 'Measure Again';
@@ -987,7 +1004,9 @@
         if (p.locked) return;
         const dx = pinchPoint.x - p.x;
         const dy = pinchPoint.y - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Square hit testing means a student can grab any visible part of
+        // a tile, including its corners, instead of only its centre circle.
+        const dist = Math.max(Math.abs(dx), Math.abs(dy));
         if (dist < p.tileSize * 0.5 && dist < closestDist) 
         {
           closest = idx;
@@ -1071,8 +1090,8 @@
       // closest to -- that's where release will swap it. Skip the cell it came
       // from (heldOriginCell) since swapping with itself is a no-op.
       //
-      // NEW (Day 10): if that nearest cell happens to be this piece's own home
-      // cell (row*GRID+col), glow it RED instead of the usual blue -- a clear
+      // If that nearest cell happens to be this piece's own home cell
+      // (row*GRID+col), glow it cyan instead of the usual blue -- a clear
       // "yes, drop it here" hint for younger/first-time players who don't want
       // to reason about grid coordinates, just watch the color change.
       if (p.isHeld && activeDragPoint) {
@@ -1099,15 +1118,15 @@
 
           // Day 11: only show a hint at all when the nearest cell is the
           // CORRECT one. No more neutral blue "you're near something" glow --
-          // that was extra noise. Silence == not the right spot; green ==
+          // that was extra noise. Silence == not the right spot; cyan ==
           // right spot, ramping brighter as you approach.
           if (isCorrectCell) {
             const proximity = Math.max(0, 1 - nearestDist / PROXIMITY_RANGE);
             if (proximity > 0.05) {
               const c = cells[nearestCell];
               canvasCtx.save();
-              canvasCtx.fillStyle = `rgba(34, 197, 94, ${0.18 + proximity * 0.4})`;
-              canvasCtx.shadowColor = '#22C55E';
+              canvasCtx.fillStyle = `rgba(34, 211, 238, ${0.18 + proximity * 0.4})`;
+              canvasCtx.shadowColor = '#22D3EE';
               canvasCtx.shadowBlur = 8 + proximity * 20;
               canvasCtx.fillRect(c.x - half, c.y - half, p.tileSize, p.tileSize);
               canvasCtx.restore();
@@ -1178,6 +1197,7 @@
       handPinchState = { Left: false, Right: false };
       handMissingFrames = { Left: 0, Right: 0 };
       smoothedLandmarks = { Left: null, Right: null };
+      hands.setOptions({ maxNumHands: 2 });
       resetBtn.style.display = 'none';
       timerEl.innerText = '00:00.0';
       resultOverlayEl.classList.add('hidden');
