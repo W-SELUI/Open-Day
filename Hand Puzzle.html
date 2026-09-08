@@ -326,7 +326,9 @@
     <script>
     const videoElement = document.getElementById('video');
     const canvasElement = document.getElementById('canvas');
-    const canvasCtx = canvasElement.getContext('2d');
+    // Ask Chrome for a low-latency canvas. This is useful for a game that
+    // redraws from live camera results rather than a static illustration.
+    const canvasCtx = canvasElement.getContext('2d', { alpha: true, desynchronized: true });
     const statusEl = document.getElementById('status');
     const resetBtn = document.getElementById('resetBtn');
     const progressEl = document.getElementById('progress');
@@ -343,6 +345,10 @@
 
     const W = canvasElement.width;
     const H = canvasElement.height;
+    // The game canvas stays 640×480 so the puzzle still looks sharp, but the
+    // AI reads a smaller camera feed. Fewer input pixels = faster tracking.
+    const CAMERA_WIDTH = 480;
+    const CAMERA_HEIGHT = 360;
     const BEST_TIME_STORAGE_KEY = 'open-day-hand-puzzle-best-time-ms';
 
     const THUMB_TIP = 4;
@@ -429,6 +435,20 @@
     let solvedTimeMs = null;
     let timerInterval = null;
     let bestTimeMs = loadBestTime();
+    let displayedStatusText = '';
+    let displayedStatusClass = '';
+
+    function setGameStatus(text, className = '') {
+      // Avoid forcing a DOM repaint every camera frame when nothing changed.
+      if (text !== displayedStatusText) {
+        statusEl.innerText = text;
+        displayedStatusText = text;
+      }
+      if (className !== displayedStatusClass) {
+        statusEl.className = className;
+        displayedStatusClass = className;
+      }
+    }
 
     const hands = new Hands({
       locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -892,11 +912,15 @@
 
       pieces.forEach(drawPiece);
 
-      landmarksList.forEach((landmarks, i) => 
-      {
-        drawGlowingHand(landmarks, handPinchState[labels[i]] || false);
-      }
-    );
+      // During play, render only the precise pinch cursor. Drawing every
+      // finger joint and connection each frame looks cool, but costs more than
+      // the game needs and was a noticeable source of lag in the iframe.
+      landmarksList.forEach((landmarks, i) => {
+        drawPinchCursor(
+          getPinchPoint(landmarks),
+          handPinchState[labels[i]] || false,
+        );
+      });
 
       if (pieces.every(p => p.locked) && state !== 'won')
       {
@@ -907,26 +931,22 @@
 
       if (state === 'won') 
       {
-        statusEl.innerText = "🎉 Puzzle solved!";
-        statusEl.className = 'win';
+        setGameStatus("🎉 Puzzle solved!", 'win');
       } 
       
       else if (heldPieceLabel) 
       {
-        statusEl.innerText = `Swapping piece [${heldPieceLabel}] — release near another tile`;
-        statusEl.className = 'grabbing';
+        setGameStatus(`Swapping piece [${heldPieceLabel}] — release near another tile`, 'grabbing');
       } 
       
       else if (anyPinching) 
       {
-        statusEl.innerText = "Pinching (nothing grabbed)";
-        statusEl.className = 'grabbing';
+        setGameStatus("Pinching (nothing grabbed)", 'grabbing');
       } 
       
       else 
       {
-        statusEl.innerText = "Pinch an unlocked tile and drag it onto another to swap";
-        statusEl.className = '';
+        setGameStatus("Pinch an unlocked tile and drag it onto another to swap");
       }
     }
 
@@ -1081,6 +1101,23 @@
       canvasCtx.shadowBlur = 0;
     }
 
+    function drawPinchCursor(point, pinching) {
+      canvasCtx.save();
+      canvasCtx.translate(point.x, point.y);
+      canvasCtx.shadowColor = pinching ? '#67E8F9' : '#60A5FA';
+      canvasCtx.shadowBlur = pinching ? 16 : 9;
+      canvasCtx.fillStyle = pinching ? '#CFFAFE' : '#BFDBFE';
+      canvasCtx.beginPath();
+      canvasCtx.arc(0, 0, pinching ? 8 : 5.5, 0, Math.PI * 2);
+      canvasCtx.fill();
+      canvasCtx.strokeStyle = pinching ? '#67E8F9' : 'rgba(191, 219, 254, 0.8)';
+      canvasCtx.lineWidth = 1.5;
+      canvasCtx.beginPath();
+      canvasCtx.arc(0, 0, pinching ? 16 : 11, 0, Math.PI * 2);
+      canvasCtx.stroke();
+      canvasCtx.restore();
+    }
+
     const SNAP_PULSE_FRAMES = 12;
 
     function drawPiece(p) {
@@ -1154,13 +1191,13 @@
       if (p.isHeld) 
       {
         canvasCtx.shadowColor = '#93C5FD';
-        canvasCtx.shadowBlur = 20;
+        canvasCtx.shadowBlur = 14;
       } 
       
       else if (p.locked) 
       {
         canvasCtx.shadowColor = '#22D3EE';
-        canvasCtx.shadowBlur = p.snapFrame <= SNAP_PULSE_FRAMES ? 26 : 12;
+        canvasCtx.shadowBlur = p.snapFrame <= SNAP_PULSE_FRAMES ? 18 : 7;
       }
 
       const drawSize = p.tileSize * pulseScale;
@@ -1213,8 +1250,8 @@
       onFrame: async () => {
         await hands.send({ image: videoElement });
       },
-      width: W,
-      height: H
+      width: CAMERA_WIDTH,
+      height: CAMERA_HEIGHT
     });
 
     startBtn.addEventListener('click', async () => {
