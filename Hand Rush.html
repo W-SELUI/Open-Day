@@ -172,6 +172,76 @@
         font-size: 1.7rem;
       }
 
+      .difficulty-heading {
+        margin: 0 0 10px;
+        color: #e0f2fe;
+        font-size: 0.92rem;
+        font-weight: 800;
+      }
+
+      .difficulty-picker {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 9px;
+        margin: 0 0 11px;
+      }
+
+      .difficulty-option {
+        min-height: 112px;
+        padding: 13px 9px;
+        border: 1px solid rgba(125, 211, 252, 0.24);
+        border-radius: 15px;
+        background: rgba(15, 23, 42, 0.72);
+        box-shadow: none;
+        color: #dbeafe;
+        font-size: 0.78rem;
+        font-weight: 600;
+        line-height: 1.32;
+        text-align: left;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+      }
+
+      .difficulty-option:hover {
+        border-color: rgba(103, 232, 249, 0.72);
+        background: rgba(8, 47, 73, 0.84);
+        transform: translateY(-2px);
+      }
+
+      .difficulty-option.selected {
+        border-color: #67e8f9;
+        background:
+          radial-gradient(circle at top right, rgba(34, 211, 238, 0.22), transparent 55%),
+          rgba(8, 47, 73, 0.9);
+        box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.14);
+      }
+
+      .difficulty-name,
+      .difficulty-multiplier {
+        display: block;
+      }
+
+      .difficulty-name {
+        margin-bottom: 5px;
+        color: #f0f9ff;
+        font-size: 0.98rem;
+        font-weight: 900;
+      }
+
+      .difficulty-multiplier {
+        margin-top: 7px;
+        color: #67e8f9;
+        font-size: 0.72rem;
+        font-weight: 800;
+      }
+
+      .difficulty-note {
+        min-height: 19px;
+        margin: 0 0 18px;
+        color: #94a3b8;
+        font-size: 0.79rem;
+        line-height: 1.4;
+      }
+
       button {
         border: 1px solid #67e8f9;
         border-radius: 999px;
@@ -237,6 +307,12 @@
         box-shadow: none;
       }
 
+      .secondary-button {
+        border-color: rgba(125, 211, 252, 0.36);
+        background: rgba(15, 23, 42, 0.84);
+        box-shadow: none;
+      }
+
       @media (max-width: 560px) {
         #hud {
           top: 76px;
@@ -248,6 +324,14 @@
         }
 
         .how-to div {
+          min-height: auto;
+        }
+
+        .difficulty-picker {
+          grid-template-columns: 1fr;
+        }
+
+        .difficulty-option {
           min-height: auto;
         }
       }
@@ -264,6 +348,7 @@
       <div class="chip">Score <strong id="score">0</strong></div>
       <div class="chip">Combo <strong id="combo">×0</strong></div>
       <div class="chip">Time <strong id="time">30.0</strong></div>
+      <div class="chip">Mode <strong id="difficulty">Rush</strong></div>
       <div class="chip">Best <strong id="best">—</strong></div>
     </div>
 
@@ -279,6 +364,25 @@
           <div><span>🎯</span>Move your fingers over a glowing target.</div>
           <div><span>🤏</span>Pinch thumb and index to score.</div>
         </div>
+        <p class="difficulty-heading">Choose your challenge</p>
+        <div id="difficultyPicker" class="difficulty-picker" role="radiogroup" aria-label="Hand Rush difficulty">
+          <button class="difficulty-option" type="button" data-difficulty="chill" role="radio" aria-checked="false">
+            <span class="difficulty-name">Chill</span>
+            Targets stay longer — ideal for a warm-up.
+            <span class="difficulty-multiplier">1× points</span>
+          </button>
+          <button class="difficulty-option selected" type="button" data-difficulty="rush" role="radio" aria-checked="true">
+            <span class="difficulty-name">Rush</span>
+            The balanced Open Day challenge.
+            <span class="difficulty-multiplier">1.25× points</span>
+          </button>
+          <button class="difficulty-option" type="button" data-difficulty="chaos" role="radio" aria-checked="false">
+            <span class="difficulty-name">Chaos</span>
+            Targets vanish fast. Bring your best reflexes.
+            <span class="difficulty-multiplier">1.5× points</span>
+          </button>
+        </div>
+        <p id="difficultyNote" class="difficulty-note">Rush is selected: a balanced pace with a 1.25× score multiplier.</p>
         <button id="startButton">Start Camera</button>
         <p class="camera-note">Good lighting helps the hand-tracking AI follow your movements.</p>
       </div>
@@ -294,6 +398,7 @@
         <div class="result-actions">
           <button id="collectStampButton" class="claim-stamp-button">Collect QuestPass Stamp &amp; Return</button>
           <button id="playAgainButton">Play Again</button>
+          <button id="changeDifficultyButton" class="secondary-button">Change Difficulty</button>
         </div>
       </div>
     </section>
@@ -314,11 +419,15 @@
       const scoreEl = document.getElementById('score');
       const comboEl = document.getElementById('combo');
       const timeEl = document.getElementById('time');
+      const difficultyEl = document.getElementById('difficulty');
       const bestEl = document.getElementById('best');
       const finalScoreEl = document.getElementById('finalScore');
       const finalDetailEl = document.getElementById('finalDetail');
       const bestMessageEl = document.getElementById('bestMessage');
       const collectStampButton = document.getElementById('collectStampButton');
+      const changeDifficultyButton = document.getElementById('changeDifficultyButton');
+      const difficultyNoteEl = document.getElementById('difficultyNote');
+      const difficultyButtons = Array.from(document.querySelectorAll('.difficulty-option'));
 
       const W = canvasElement.width;
       const H = canvasElement.height;
@@ -327,7 +436,37 @@
       const PINCH_CLOSE_RATIO = 0.35;
       const PINCH_OPEN_RATIO = 0.55;
       const CURSOR_SMOOTHING_ALPHA = 0.7;
-      const HIGH_SCORE_KEY = 'open-day-hand-rush-best-score';
+      const BEST_SCORES_KEY = 'open-day-hand-rush-best-scores-v2';
+      const LEGACY_HIGH_SCORE_KEY = 'open-day-hand-rush-best-score';
+      const DIFFICULTIES = {
+        chill: {
+          label: 'Chill',
+          scoreMultiplier: 1,
+          initialTargetLifeMs: 900,
+          minimumTargetLifeMs: 500,
+          lifeReductionPerHit: 24,
+          respawnDelayMs: 60,
+          note: 'Chill is selected: targets stay visible longer and scores use the standard multiplier.',
+        },
+        rush: {
+          label: 'Rush',
+          scoreMultiplier: 1.25,
+          initialTargetLifeMs: 1550,
+          minimumTargetLifeMs: 850,
+          lifeReductionPerHit: 22,
+          respawnDelayMs: 150,
+          note: 'Rush is selected: a balanced pace with a 1.25× score multiplier.',
+        },
+        chaos: {
+          label: 'Chaos',
+          scoreMultiplier: 1.5,
+          initialTargetLifeMs: 1100,
+          minimumTargetLifeMs: 620,
+          lifeReductionPerHit: 18,
+          respawnDelayMs: 90,
+          note: 'Chaos is selected: targets disappear fast, but every hit earns 1.5× points.',
+        },
+      };
 
       let gameState = 'intro';
       let cameraStarted = false;
@@ -340,7 +479,8 @@
       let flash = null;
       let pinchActive = false;
       let smoothedCursor = null;
-      let bestScore = loadBestScore();
+      let selectedDifficulty = 'rush';
+      let bestScores = loadBestScores();
 
       const hands = new Hands({
         locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
@@ -355,17 +495,70 @@
 
       hands.onResults(onResults);
 
-      function loadBestScore() {
+      function loadBestScores() {
         try {
-          const stored = Number(window.localStorage.getItem(HIGH_SCORE_KEY));
-          return Number.isFinite(stored) && stored > 0 ? stored : 0;
+          const stored = JSON.parse(window.localStorage.getItem(BEST_SCORES_KEY));
+          if (stored && typeof stored === 'object') {
+            return Object.fromEntries(
+              Object.keys(DIFFICULTIES).map((difficulty) => [
+                difficulty,
+                Number.isFinite(Number(stored[difficulty])) && Number(stored[difficulty]) > 0
+                  ? Number(stored[difficulty])
+                  : 0,
+              ]),
+            );
+          }
+
+          // Keep an existing score from the older single-mode version as the Rush record.
+          const legacyScore = Number(window.localStorage.getItem(LEGACY_HIGH_SCORE_KEY));
+          return {
+            chill: 0,
+            rush: Number.isFinite(legacyScore) && legacyScore > 0 ? legacyScore : 0,
+            chaos: 0,
+          };
         } catch (error) {
-          return 0;
+          return { chill: 0, rush: 0, chaos: 0 };
         }
       }
 
+      function saveBestScores() {
+        try {
+          window.localStorage.setItem(BEST_SCORES_KEY, JSON.stringify(bestScores));
+        } catch (error) {
+          // The game still works if the browser blocks local storage.
+        }
+      }
+
+      function currentDifficulty() {
+        return DIFFICULTIES[selectedDifficulty];
+      }
+
+      function currentBestScore() {
+        return bestScores[selectedDifficulty] || 0;
+      }
+
       function renderBestScore() {
+        const bestScore = currentBestScore();
         bestEl.innerText = bestScore ? String(bestScore) : '—';
+      }
+
+      function updateDifficultyUi() {
+        const difficulty = currentDifficulty();
+        difficultyEl.innerText = difficulty.label;
+        difficultyNoteEl.innerText = difficulty.note;
+        startButton.innerText = cameraStarted ? `Start ${difficulty.label} Round` : 'Start Camera';
+        difficultyButtons.forEach((button) => {
+          const isSelected = button.dataset.difficulty === selectedDifficulty;
+          button.classList.toggle('selected', isSelected);
+          button.setAttribute('aria-checked', String(isSelected));
+        });
+        renderBestScore();
+      }
+
+      function selectDifficulty(difficulty) {
+        if (!DIFFICULTIES[difficulty] || gameState === 'playing') return;
+        selectedDifficulty = difficulty;
+        updateDifficultyUi();
       }
 
       function startRound() {
@@ -382,24 +575,29 @@
         resultEl.classList.add('hidden');
         hudEl.style.display = 'flex';
         renderHud(ROUND_LENGTH_MS);
-        statusEl.innerText = 'Aim with your hand, then pinch a glowing target.';
+        statusEl.innerText = `${currentDifficulty().label} mode — aim with your hand, then pinch a glowing target.`;
       }
 
       function renderHud(remainingMs) {
         scoreEl.innerText = String(score);
         comboEl.innerText = `×${combo}`;
         timeEl.innerText = (Math.max(0, remainingMs) / 1000).toFixed(1);
+        difficultyEl.innerText = currentDifficulty().label;
         renderBestScore();
       }
 
       function spawnTarget(now) {
+        const difficulty = currentDifficulty();
         // Keep targets in the middle region so they remain visible on a
         // wide screen even when the 4:3 camera view is cropped to fill it.
         target = {
           x: 72 + Math.random() * (W - 144),
           y: 102 + Math.random() * (H - 204),
           bornAt: now,
-          expiresAt: now + Math.max(850, 1550 - hits * 22),
+          expiresAt: now + Math.max(
+            difficulty.minimumTargetLifeMs,
+            difficulty.initialTargetLifeMs - hits * difficulty.lifeReductionPerHit,
+          ),
         };
       }
 
@@ -417,7 +615,7 @@
         if (target && now >= target.expiresAt) {
           combo = 0;
           target = null;
-          nextTargetAt = now + 180;
+          nextTargetAt = now + currentDifficulty().respawnDelayMs;
           statusEl.innerText = 'Missed — find the next blue target!';
         }
 
@@ -454,11 +652,12 @@
 
         combo++;
         hits++;
-        const points = 10 + Math.min(combo - 1, 5) * 2;
+        const basePoints = 10 + Math.min(combo - 1, 5) * 2;
+        const points = Math.round(basePoints * currentDifficulty().scoreMultiplier);
         score += points;
         flash = { x: target.x, y: target.y, points, until: now + 360 };
         target = null;
-        nextTargetAt = now + 150;
+        nextTargetAt = now + currentDifficulty().respawnDelayMs;
         statusEl.innerText = combo >= 3 ? `Nice! ×${combo} combo` : `Nice! +${points}`;
       }
 
@@ -468,21 +667,20 @@
         target = null;
         hudEl.style.display = 'none';
 
-        const isNewBest = score > bestScore;
+        const previousBest = currentBestScore();
+        const isNewBest = score > previousBest;
         if (isNewBest) {
-          bestScore = score;
-          try {
-            window.localStorage.setItem(HIGH_SCORE_KEY, String(bestScore));
-          } catch (error) {
-            // The game still works if the browser blocks local storage.
-          }
+          bestScores[selectedDifficulty] = score;
+          saveBestScores();
         }
 
         finalScoreEl.innerText = String(score);
-        finalDetailEl.innerText = `${hits} target${hits === 1 ? '' : 's'} hit`;
+        finalDetailEl.innerText = `${currentDifficulty().label} mode · ${hits} target${hits === 1 ? '' : 's'} hit`;
         bestMessageEl.innerText = isNewBest && score > 0
-          ? '🏆 New personal best!'
-          : (bestScore ? `Personal best: ${bestScore}` : 'Play again and set a best score!');
+          ? `🏆 New ${currentDifficulty().label} personal best!`
+          : (currentBestScore()
+            ? `${currentDifficulty().label} personal best: ${currentBestScore()}`
+            : 'Play again and set a best score!');
         statusEl.innerText = 'Round complete.';
         resultEl.classList.remove('hidden');
       }
@@ -596,8 +794,25 @@
         height: H,
       });
 
+      function openDifficultyPicker() {
+        if (gameState === 'playing') return;
+        gameState = 'intro';
+        target = null;
+        flash = null;
+        hudEl.style.display = 'none';
+        resultEl.classList.add('hidden');
+        introEl.classList.remove('hidden');
+        updateDifficultyUi();
+        statusEl.innerText = 'Choose a difficulty, then start your next round.';
+      }
+
       startButton.addEventListener('click', async () => {
-        if (cameraStarted) return;
+        if (cameraStarted) {
+          introEl.classList.add('hidden');
+          startRound();
+          return;
+        }
+
         startButton.disabled = true;
         startButton.innerText = 'Starting camera...';
         statusEl.innerText = 'Starting hand-tracking AI...';
@@ -615,13 +830,17 @@
       });
 
       playAgainButton.addEventListener('click', startRound);
+      changeDifficultyButton.addEventListener('click', openDifficultyPicker);
+      difficultyButtons.forEach((button) => {
+        button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty));
+      });
       collectStampButton.addEventListener('click', () => {
         window.parent.postMessage(
           { type: 'questpass:completed', activity: 'hand_rush' },
           '*'
         );
       });
-      renderBestScore();
+      updateDifficultyUi();
     </script>
   </body>
 </html>
