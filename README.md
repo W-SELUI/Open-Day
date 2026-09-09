@@ -301,6 +301,6 @@ source .venv/bin/activate
 <h2>Author</h2>
 
 <p>
-  Created by <strong>YOUR NAME</strong> for an interactive Open Day
+  Created by <strong>Root | Knox | Juls</strong> for an interactive Open Day
   software-development project.
 </p>
