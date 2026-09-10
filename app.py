@@ -4,7 +4,7 @@ import streamlit as st
 
 from career_model import predict_careers
 from ollama_explainer import generate_career_explanation
-from questpass_bridge import render_questpass_activity
+from questpass_bridge import render_hand_puzzle_activity, render_questpass_activity
 from UI_theme import apply_theme
 
 
@@ -14,7 +14,7 @@ apply_theme()
 
 QUEST_STAMPS = {
     "hand_puzzle": ("🧩", "Puzzle Solver"),
-    "hand_rush": ("⚡", "Quick Hands"),
+    "hand_rush": ("⚡", "Vault Runner"),
     "career": ("🎓", "Future Explorer"),
     "vibe_link": ("✨", "Vibe Scanner"),
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
@@ -126,17 +126,17 @@ if page == "home":
             """
             <div class="mode-card">
                 <div class="mode-icon">⚡</div>
-                <h2>Hand Rush</h2>
+                <h2>Gesture Heist</h2>
                 <p>
-                    Pinch glowing targets as quickly as you can before the
-                    30-second timer ends.
+                    Steal glowing energy cores, dodge laser traps, and return
+                    each core to its matching vault.
                 </p>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        if st.button("Play Hand Rush", key="open_hand_rush"):
+        if st.button("Start Gesture Heist", key="open_hand_rush"):
             st.session_state.page = "hand_rush"
             st.rerun()
 
@@ -288,16 +288,12 @@ elif page == "puzzle":
         st.session_state.page = "home"
         st.rerun()
 
-    puzzle_file = Path(__file__).with_name("Hand Puzzle.html")
+    puzzle_build = Path(__file__).with_name("questpass_bridge") / "hand-puzzle" / "index.html"
 
-    if not puzzle_file.exists():
-        st.error("The Hand Puzzle.html file could not be found.")
+    if not puzzle_build.exists():
+        st.error("The Hand Puzzle game build could not be found.")
     else:
-        completion = render_questpass_activity(
-            puzzle_file,
-            "hand_puzzle",
-            key="hand_puzzle_bridge",
-        )
+        completion = render_hand_puzzle_activity(key="hand_puzzle_component")
         if completion == "hand_puzzle":
             award_questpass_stamp("hand_puzzle")
             st.session_state.page = "home"

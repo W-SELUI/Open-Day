@@ -16,9 +16,43 @@ _bridge = components.declare_component(
     path=str(Path(__file__).with_name("questpass_bridge")),
 )
 
+# Hand Puzzle is a complete web build, rather than one self-contained HTML
+# file.  Give it its own Streamlit component so it has a single iframe and
+# can load its JavaScript modules, MediaPipe files, and model directly.
+_hand_puzzle = components.declare_component(
+    "hand_puzzle_activity",
+    path=str(Path(__file__).with_name("questpass_bridge") / "hand-puzzle"),
+)
 
-def render_questpass_activity(html_file: Path, activity: str, *, key: str):
-    """Render one trusted local activity and return its completion ID, if any."""
+
+def render_hand_puzzle_activity(*, key: str):
+    """Render Hand Puzzle and return its completion ID, if it is completed."""
+    return _hand_puzzle(default=None, key=key)
+
+
+def render_questpass_activity(
+    html_file: Path | None,
+    activity: str,
+    *,
+    key: str,
+    game_url: str | None = None,
+):
+    """Render a trusted activity and return its completion ID, if any.
+
+    The remaining activities are self-contained HTML files, so the bridge
+    safely places their HTML inside one nested game frame.
+    """
+    if game_url:
+        return _bridge(
+            activity=activity,
+            game_url=game_url,
+            default=None,
+            key=key,
+        )
+
+    if html_file is None:
+        raise ValueError("html_file is required when game_url is not provided")
+
     return _bridge(
         activity=activity,
         game_html=html_file.read_text(encoding="utf-8"),

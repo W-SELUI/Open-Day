@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111817">
+  <meta name="description" content="Frame your camera view with your hands, capture a moment, and piece it back together. A camera-powered hand puzzle.">
+  <title>Hand Puzzle — Your world, piece by piece</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="wordmark" href="./" aria-label="Hand Puzzle home"><span class="brand-icon" aria-hidden="true">✳</span> HAND PUZZLE <span class="edition">PLAY LAB / 01</span></a>
+      <div class="toolbar">
+        <button id="helpButton" class="text-button" aria-haspopup="dialog"><span aria-hidden="true">?</span> How to play</button>
+        <button id="soundButton" class="icon-button" aria-label="Turn sound off" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 3a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/></svg></button>
+        <button id="fullscreenButton" class="icon-button" aria-label="Enter fullscreen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/></svg></button>
+      </div>
+    </header>
+
+    <main>
+      <div class="game-heading"><div><p class="eyebrow">A LITTLE HANDS-ON MAGIC</p><h1>Your world, piece by piece.</h1></div><p class="heading-note">Your camera. Your hands.<br>Your puzzle.</p></div>
+      <section id="gameStage" class="game-stage" aria-label="Camera puzzle play area">
+        <video id="camera" autoplay playsinline muted aria-hidden="true"></video>
+        <canvas id="gameCanvas" aria-label="Puzzle canvas. You can also use the keyboard controls below." tabindex="0"></canvas>
+        <div class="stage-top">
+          <div class="phase-tabs" aria-label="Game steps"><span id="framePhase" class="phase active"><b>01</b> FRAME IT</span><i aria-hidden="true">/</i><span id="solvePhase" class="phase"><b>02</b> SOLVE IT</span></div>
+          <span id="cameraBadge" class="live-badge"><i></i><span>CAMERA OFF</span></span>
+        </div>
+        <div id="welcome" class="welcome">
+          <div class="capture-symbol" aria-hidden="true"><i></i><i></i><i></i><i></i><svg viewBox="0 0 48 48"><path d="M17 17V9a3 3 0 0 1 6 0v15l3-3a3 3 0 0 1 5 3l-4 9c-2 4-4 6-9 6h-1c-4 0-6-2-8-5l-5-8a3 3 0 0 1 5-3l4 4V14a3 3 0 0 1 4-3"/></svg></div>
+          <p class="eyebrow">READY WHEN YOU ARE</p>
+          <h2>Make a puzzle<br>out of your moment.</h2>
+          <p>Frame your camera view with your hands.<br>Then put the picture back together.</p>
+          <button id="startButton" class="primary-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h4l2-3h4l2 3h4v13H4V7Z"/><circle cx="12" cy="13" r="4"/></svg><span>Enable camera & play</span><span aria-hidden="true">↗</span></button>
+          <p class="privacy-note"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Your camera stays on your device.</p>
+          <p id="startError" class="error-message" role="alert" hidden></p>
+        </div>
+        <div id="targetCard" class="target-card" hidden><div class="target-label">YOUR SNAPSHOT <span>↗</span></div><canvas id="targetCanvas" width="240" height="240" aria-label="Original captured photo to reconstruct"></canvas><p>Put this moment back together.</p></div>
+        <div id="scoreboard" class="scoreboard" hidden><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 4v16M4 12h16"/></svg><strong id="progressValue">0 / 9</strong></span><span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/></svg><strong id="timeValue">00:00</strong></span></div>
+        <div id="statusPill" class="status-pill" hidden><span id="gestureIndicator" class="gesture-indicator" aria-hidden="true">✳</span><span id="statusText" role="status" aria-live="polite">Show both hands to begin</span></div>
+        <div id="trackingBadge" class="tracking-badge" hidden><span class="tracking-dot"></span><span id="trackingText">Looking for hands</span></div>
+        <div id="winOverlay" class="win-overlay" hidden>
+          <div class="win-card"><div class="win-mark" aria-hidden="true">✳</div><p class="eyebrow">ALL THE PIECES, IN PLACE</p><h2>Nicely done.</h2><p>You put your moment back together.</p><div class="win-stats"><div><strong id="finalTime">00:00</strong><span>YOUR TIME</span></div><div><strong id="finalMoves">0</strong><span>MOVES</span></div></div><p id="bestResult" class="best-result"></p><button id="collectStampButton" class="primary-button" hidden>Collect QuestPass Stamp &amp; Return</button><button id="playAgainButton" class="primary-button">Capture another moment <span aria-hidden="true">↗</span></button><button id="finishButton" class="text-button">Finish & turn camera off</button></div>
+        </div>
+      </section>
+      <div class="game-controls"><div class="control-start"><span id="controlLabel">GOOD LIGHT. BOTH HANDS. LET’S GO.</span><span id="movesLabel" hidden>0 moves</span></div><div class="control-buttons"><button id="inputButton" class="text-button" hidden>Use mouse / touch</button><button id="captureButton" class="small-button" hidden>Capture frame</button><button id="resetButton" class="text-button" hidden>↻ New snapshot</button><button id="stopButton" class="text-button" hidden>Camera off</button></div></div>
+      <div id="keyboardControls" class="keyboard-controls" hidden><span>Frame size</span><input id="sizeControl" aria-label="Frame size" type="range" min="0.18" max="0.68" step="0.01" value="0.48"><span>Drag to position, or use arrow keys.</span></div>
+      <div id="accessibleBoard" class="accessible-board" aria-label="Puzzle tiles: select one tile, then another to swap" hidden></div>
+      <div class="how-strip"><div><span class="step-number">01</span><p><strong>Frame your moment</strong><span>Pinch both hands. Spread them apart.</span></p></div><div><span class="step-number">02</span><p><strong>Let it go</strong><span>Release to capture what’s inside.</span></p></div><div><span class="step-number">03</span><p><strong>Piece it together</strong><span>Pinch, move, and release to swap.</span></p></div></div>
+    </main>
+    <footer><span>A little puzzle. A new perspective.</span><span><span class="footer-dot"></span> MADE FOR YOUR HANDS</span></footer>
+  </div>
+  <dialog id="helpDialog" aria-labelledby="helpTitle"><button id="closeHelp" class="icon-button dialog-close" aria-label="Close instructions">×</button><p class="eyebrow">HERE’S THE HANDY PART</p><h2 id="helpTitle">Your hands are the controls.</h2><ol><li><strong>Make two pinches.</strong> Touch your thumb and index finger on each hand. Keep both hands in the camera view.</li><li><strong>Frame a moment.</strong> Move your pinches apart diagonally. The glowing square shows the exact area that will become your puzzle.</li><li><strong>Release to capture.</strong> Open either pinch. Your camera photo freezes inside the square and shuffles into nine pieces.</li><li><strong>Put it back together.</strong> Pinch over a tile, carry it over another, and release to swap. Correct pieces glow and stay in place.</li></ol><p>Keep the room bright and your hands about an arm’s length from the camera. You can also choose mouse / touch controls.</p><button id="gotItButton" class="primary-button">Got it. Let’s play.</button></dialog>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

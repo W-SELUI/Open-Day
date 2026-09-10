@@ -34,7 +34,7 @@
 
       const gameFrame = document.getElementById("gameFrame");
       let activeActivity = "";
-      let renderedHtml = "";
+      let renderedSource = "";
       let completionSent = false;
 
       function sendToStreamlit(type, data) {
@@ -50,16 +50,24 @@
 
       function renderActivity(args) {
         const nextHtml = args.game_html || "";
+        const nextUrl = args.game_url || "";
         const nextActivity = args.activity || "";
+        const nextSource = nextUrl ? `url:${nextUrl}` : `html:${nextHtml}`;
 
         activeActivity = nextActivity;
 
         // Streamlit can re-render its Python script for unrelated reasons.
-        // Do not reset a game already in progress unless its HTML changed.
-        if (nextHtml && nextHtml !== renderedHtml) {
-          renderedHtml = nextHtml;
+        // Do not reset a game already in progress unless its source changed.
+        if (nextSource && nextSource !== renderedSource) {
+          renderedSource = nextSource;
           completionSent = false;
-          gameFrame.srcdoc = nextHtml;
+          if (nextUrl) {
+            gameFrame.srcdoc = "";
+            gameFrame.src = new URL(nextUrl, window.location.href).href;
+          } else {
+            gameFrame.removeAttribute("src");
+            gameFrame.srcdoc = nextHtml;
+          }
         }
 
         setFrameHeight();

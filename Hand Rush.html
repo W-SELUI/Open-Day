@@ -3,844 +3,105 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Open Day AI Lab — Hand Rush</title>
+    <title>Open Day AI Lab — Gesture Heist</title>
     <style>
-      :root {
-        color-scheme: dark;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      html,
-      body {
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        overflow: hidden;
-        background: #020617;
-        color: #e0f2fe;
-        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      }
-
-      #cameraStage,
-      video,
-      canvas {
-        position: fixed;
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-      }
-
-      video,
-      canvas {
-        object-fit: cover;
-        object-position: center;
-        transform: scaleX(-1);
-      }
-
-      #cameraStage::after {
-        position: fixed;
-        inset: 0;
-        content: "";
-        pointer-events: none;
-        background:
-          linear-gradient(180deg, rgba(2, 6, 23, 0.5), transparent 28%, transparent 70%, rgba(2, 6, 23, 0.58)),
-          radial-gradient(circle at center, transparent 46%, rgba(2, 6, 23, 0.38) 100%);
-      }
-
-      #hud {
-        position: fixed;
-        top: 18px;
-        left: 150px;
-        z-index: 10;
-        display: none;
-        gap: 9px;
-        flex-wrap: wrap;
-      }
-
-      .chip {
-        min-width: 90px;
-        padding: 9px 13px;
-        border: 1px solid rgba(125, 211, 252, 0.38);
-        border-radius: 999px;
-        background: rgba(2, 6, 23, 0.72);
-        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
-        backdrop-filter: blur(8px);
-        color: #dbeafe;
-        font-size: 0.88rem;
-      }
-
-      .chip strong {
-        margin-left: 4px;
-        color: #67e8f9;
-      }
-
-      #status {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        z-index: 10;
-        max-width: calc(100vw - 32px);
-        padding: 9px 15px;
-        border: 1px solid rgba(125, 211, 252, 0.34);
-        border-radius: 999px;
-        transform: translateX(-50%);
-        background: rgba(2, 6, 23, 0.72);
-        box-shadow: 0 10px 24px rgba(2, 6, 23, 0.28);
-        backdrop-filter: blur(8px);
-        color: #dbeafe;
-        font-size: clamp(0.82rem, 2vw, 1rem);
-        text-align: center;
-      }
-
-      .overlay {
-        position: fixed;
-        inset: 0;
-        z-index: 20;
-        display: grid;
-        place-items: center;
-        padding: 20px;
-        background: rgba(2, 6, 23, 0.8);
-        backdrop-filter: blur(11px);
-        transition: opacity 0.25s ease, visibility 0.25s ease;
-      }
-
-      .overlay.hidden {
-        visibility: hidden;
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .panel {
-        width: min(560px, 100%);
-        padding: clamp(24px, 5vw, 40px);
-        border: 1px solid rgba(103, 232, 249, 0.46);
-        border-radius: 26px;
-        background:
-          radial-gradient(circle at top, rgba(14, 165, 233, 0.2), transparent 55%),
-          linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(2, 6, 23, 0.97));
-        box-shadow: 0 28px 90px rgba(0, 0, 0, 0.52);
-        text-align: center;
-      }
-
-      .eyebrow {
-        margin: 0 0 8px;
-        color: #67e8f9;
-        font-size: 0.78rem;
-        font-weight: 800;
-        letter-spacing: 0.14rem;
-      }
-
-      h1 {
-        margin: 0;
-        color: #f0f9ff;
-        font-size: clamp(2.3rem, 7vw, 4.3rem);
-        line-height: 0.96;
-      }
-
-      .intro-copy,
-      .result-copy {
-        margin: 16px auto 0;
-        max-width: 440px;
-        color: #cbd5e1;
-        line-height: 1.6;
-      }
-
-      .how-to {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 9px;
-        margin: 24px 0;
-      }
-
-      .how-to div {
-        min-height: 112px;
-        padding: 13px 10px;
-        border: 1px solid rgba(125, 211, 252, 0.2);
-        border-radius: 15px;
-        background: rgba(15, 23, 42, 0.72);
-        color: #dbeafe;
-        font-size: 0.86rem;
-        line-height: 1.35;
-      }
-
-      .how-to span {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 1.7rem;
-      }
-
-      .difficulty-heading {
-        margin: 0 0 10px;
-        color: #e0f2fe;
-        font-size: 0.92rem;
-        font-weight: 800;
-      }
-
-      .difficulty-picker {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 9px;
-        margin: 0 0 11px;
-      }
-
-      .difficulty-option {
-        min-height: 112px;
-        padding: 13px 9px;
-        border: 1px solid rgba(125, 211, 252, 0.24);
-        border-radius: 15px;
-        background: rgba(15, 23, 42, 0.72);
-        box-shadow: none;
-        color: #dbeafe;
-        font-size: 0.78rem;
-        font-weight: 600;
-        line-height: 1.32;
-        text-align: left;
-        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-      }
-
-      .difficulty-option:hover {
-        border-color: rgba(103, 232, 249, 0.72);
-        background: rgba(8, 47, 73, 0.84);
-        transform: translateY(-2px);
-      }
-
-      .difficulty-option.selected {
-        border-color: #67e8f9;
-        background:
-          radial-gradient(circle at top right, rgba(34, 211, 238, 0.22), transparent 55%),
-          rgba(8, 47, 73, 0.9);
-        box-shadow: 0 0 0 2px rgba(103, 232, 249, 0.14);
-      }
-
-      .difficulty-name,
-      .difficulty-multiplier {
-        display: block;
-      }
-
-      .difficulty-name {
-        margin-bottom: 5px;
-        color: #f0f9ff;
-        font-size: 0.98rem;
-        font-weight: 900;
-      }
-
-      .difficulty-multiplier {
-        margin-top: 7px;
-        color: #67e8f9;
-        font-size: 0.72rem;
-        font-weight: 800;
-      }
-
-      .difficulty-note {
-        min-height: 19px;
-        margin: 0 0 18px;
-        color: #94a3b8;
-        font-size: 0.79rem;
-        line-height: 1.4;
-      }
-
-      button {
-        border: 1px solid #67e8f9;
-        border-radius: 999px;
-        padding: 12px 23px;
-        background: linear-gradient(135deg, #0e7490, #2563eb);
-        box-shadow: 0 12px 25px rgba(14, 116, 144, 0.25);
-        color: #fff;
-        font: inherit;
-        font-weight: 800;
-        cursor: pointer;
-      }
-
-      button:hover {
-        border-color: #cffafe;
-        background: linear-gradient(135deg, #0891b2, #4f46e5);
-        transform: translateY(-1px);
-      }
-
-      button:disabled {
-        cursor: wait;
-        opacity: 0.7;
-      }
-
-      .camera-note {
-        margin: 14px 0 0;
-        color: #94a3b8;
-        font-size: 0.82rem;
-      }
-
-      #finalScore {
-        margin: 20px 0 4px;
-        color: #f0f9ff;
-        font-size: clamp(2.7rem, 9vw, 4.8rem);
-        font-weight: 900;
-        line-height: 1;
-      }
-
-      #finalDetail,
-      #bestMessage {
-        margin: 8px 0 0;
-        color: #bae6fd;
-      }
-
-      #bestMessage {
-        min-height: 24px;
-        color: #67e8f9;
-        font-weight: 700;
-      }
-
-      .result-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        margin-top: 18px;
-      }
-
-      .result-actions button { margin: 0; }
-
-      .claim-stamp-button {
-        border-color: rgba(103, 232, 249, 0.62);
-        background: rgba(8, 47, 73, 0.82);
-        box-shadow: none;
-      }
-
-      .secondary-button {
-        border-color: rgba(125, 211, 252, 0.36);
-        background: rgba(15, 23, 42, 0.84);
-        box-shadow: none;
-      }
-
-      @media (max-width: 560px) {
-        #hud {
-          top: 76px;
-          left: 14px;
-        }
-
-        .how-to {
-          grid-template-columns: 1fr;
-        }
-
-        .how-to div {
-          min-height: auto;
-        }
-
-        .difficulty-picker {
-          grid-template-columns: 1fr;
-        }
-
-        .difficulty-option {
-          min-height: auto;
-        }
-      }
+      :root { color-scheme: dark; --ink:#030616; --panel:rgba(7,13,35,.78); --line:rgba(117,202,255,.26); --cyan:#63e8ff; --ice:#e8f8ff; --muted:#9aaec7; --danger:#ff5e78; }
+      * { box-sizing:border-box; }
+      html,body { width:100%; height:100%; margin:0; overflow:hidden; background:var(--ink); color:var(--ice); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+      #cameraStage,video,canvas { position:fixed; inset:0; width:100vw; height:100vh; }
+      video,canvas { object-fit:cover; object-position:center; transform:scaleX(-1); }
+      #cameraStage { background:radial-gradient(circle at 50% 35%,#173a6955,transparent 43%),linear-gradient(135deg,#071633,#030616 68%); }
+      #cameraStage::before,#cameraStage::after { position:fixed; inset:0; content:""; pointer-events:none; }
+      #cameraStage::before { opacity:.34; background:linear-gradient(90deg,transparent 0 49.84%,rgba(119,225,255,.15) 50%,transparent 50.16%),linear-gradient(transparent 0 49.84%,rgba(119,225,255,.15) 50%,transparent 50.16%); background-size:12.5% 12.5%; mask-image:radial-gradient(ellipse at center,black 22%,transparent 82%); }
+      #cameraStage::after { background:linear-gradient(180deg,rgba(3,6,22,.76),transparent 24%,transparent 72%,rgba(3,6,22,.78)),radial-gradient(circle at center,transparent 38%,rgba(1,4,14,.42) 100%); }
+      #hud { position:fixed; top:16px; left:148px; right:18px; z-index:10; display:none; align-items:flex-start; justify-content:space-between; gap:16px; pointer-events:none; }
+      .mission-tag,.chip,#status { border:1px solid var(--line); background:rgba(3,8,25,.72); box-shadow:0 12px 34px rgba(0,0,0,.28); backdrop-filter:blur(14px); }
+      .mission-tag { min-width:176px; padding:11px 14px; border-radius:13px; }
+      .mission-tag span,.chip-label { display:block; color:#89a2c5; font-size:.62rem; font-weight:800; letter-spacing:.15rem; text-transform:uppercase; }
+      .mission-tag strong { display:block; margin-top:4px; color:var(--cyan); font-size:.88rem; letter-spacing:.06rem; }
+      .hud-cluster { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+      .chip { min-width:90px; padding:9px 11px; border-radius:12px; }
+      .chip strong { display:block; margin-top:3px; color:var(--ice); font-size:1.05rem; line-height:1; }
+      .chip.security strong { color:#ff94a6; } .chip.combo strong { color:#f2aeff; }
+      #status { position:fixed; bottom:19px; left:50%; z-index:10; width:min(540px,calc(100vw - 34px)); padding:11px 17px; border-radius:999px; transform:translateX(-50%); color:#dceeff; font-size:clamp(.8rem,1.8vw,.96rem); text-align:center; }
+      .overlay { position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:20px; background:rgba(2,5,18,.76); backdrop-filter:blur(13px); transition:opacity .25s ease,visibility .25s ease; }
+      .overlay.hidden { visibility:hidden; opacity:0; pointer-events:none; }
+      .panel { position:relative; width:min(660px,100%); overflow:hidden; padding:clamp(24px,4.4vw,42px); border:1px solid rgba(99,232,255,.42); border-radius:28px; background:radial-gradient(circle at 86% 0%,rgba(146,75,255,.26),transparent 33%),radial-gradient(circle at 3% 100%,rgba(0,199,255,.15),transparent 37%),linear-gradient(145deg,rgba(11,22,54,.98),rgba(3,6,21,.99)); box-shadow:0 30px 100px rgba(0,0,0,.58),inset 0 1px 0 rgba(255,255,255,.08); text-align:center; }
+      .panel::before { position:absolute; inset:0; content:""; pointer-events:none; background:linear-gradient(110deg,transparent 32%,rgba(131,225,255,.06) 50%,transparent 68%); }
+      .panel > * { position:relative; }
+      .eyebrow { margin:0 0 9px; color:var(--cyan); font-size:.72rem; font-weight:900; letter-spacing:.2rem; }
+      h1 { margin:0; color:#f3fbff; font-size:clamp(2.7rem,7vw,5.2rem); line-height:.9; letter-spacing:-.07rem; }
+      .intro-copy,.result-copy { max-width:500px; margin:17px auto 0; color:#b8cae2; font-size:.98rem; line-height:1.62; }
+      .how-to { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:26px 0 22px; }
+      .how-to div { min-height:114px; padding:14px 11px; border:1px solid rgba(143,205,255,.17); border-radius:16px; background:rgba(5,13,37,.56); color:#d7e7fb; font-size:.8rem; line-height:1.42; }
+      .step-number { display:block; margin-bottom:9px; color:#7aeaff; font-size:.72rem; font-weight:900; letter-spacing:.12rem; }
+      .difficulty-heading { margin:0 0 10px; color:#e3f4ff; font-size:.82rem; font-weight:800; letter-spacing:.1rem; text-transform:uppercase; }
+      .difficulty-picker { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:11px; }
+      .difficulty-option { min-height:105px; padding:13px 11px; border:1px solid rgba(143,205,255,.2); border-radius:15px; background:rgba(5,13,37,.62); color:#b8cae2; font:inherit; font-size:.76rem; line-height:1.33; text-align:left; cursor:pointer; transition:transform .18s ease,border-color .18s ease,background .18s ease; }
+      .difficulty-option:hover,.difficulty-option.selected { border-color:rgba(99,232,255,.82); background:radial-gradient(circle at 100% 0%,rgba(82,205,255,.2),transparent 58%),rgba(6,29,64,.86); }
+      .difficulty-option:hover { transform:translateY(-2px); }
+      .difficulty-name,.difficulty-multiplier { display:block; } .difficulty-name { margin-bottom:5px; color:#f2fbff; font-size:.96rem; font-weight:900; } .difficulty-multiplier { margin-top:8px; color:var(--cyan); font-size:.68rem; font-weight:900; letter-spacing:.06rem; }
+      .difficulty-note,.camera-note { min-height:19px; margin:0 0 18px; color:var(--muted); font-size:.79rem; line-height:1.45; }
+      button.action-button { border:1px solid #91f1ff; border-radius:999px; padding:13px 25px; background:linear-gradient(125deg,#0ab7d9,#345eff 75%); box-shadow:0 14px 30px rgba(12,160,243,.28); color:#fff; font:inherit; font-weight:900; cursor:pointer; transition:transform .18s ease,filter .18s ease; }
+      button.action-button:hover { transform:translateY(-2px); filter:brightness(1.13); } button.action-button:disabled { cursor:wait; opacity:.7; }
+      #finalScore { margin:21px 0 4px; color:#f5fbff; font-size:clamp(3.2rem,9vw,5.6rem); font-weight:950; line-height:.9; letter-spacing:-.08rem; }
+      #finalDetail,#rankMessage { margin:9px 0 0; color:#b9cbe4; } #rankMessage { min-height:24px; color:var(--cyan); font-weight:800; }
+      .result-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:21px; }
+      .claim-stamp-button,.secondary-button { border-radius:999px; padding:12px 19px; color:#dff8ff; font:inherit; font-weight:800; cursor:pointer; }
+      .claim-stamp-button { border:1px solid rgba(99,232,255,.72); background:rgba(7,63,101,.76); } .secondary-button { border:1px solid rgba(154,174,199,.37); background:rgba(12,22,49,.82); }
+      @media(max-width:700px){#hud{top:75px;left:13px;right:13px}.mission-tag{display:none}.hud-cluster{justify-content:flex-start}.chip{min-width:72px;padding:8px 9px}.chip-label{font-size:.54rem}.chip strong{font-size:.9rem}}
+      @media(max-width:560px){.how-to,.difficulty-picker{grid-template-columns:1fr}.how-to div,.difficulty-option{min-height:auto}.panel{max-height:calc(100vh - 30px);overflow-y:auto}}
     </style>
   </head>
-
   <body>
-    <div id="cameraStage">
-      <video id="video" autoplay playsinline></video>
-      <canvas id="canvas" width="640" height="480"></canvas>
-    </div>
-
-    <div id="hud" aria-live="polite">
-      <div class="chip">Score <strong id="score">0</strong></div>
-      <div class="chip">Combo <strong id="combo">×0</strong></div>
-      <div class="chip">Time <strong id="time">30.0</strong></div>
-      <div class="chip">Mode <strong id="difficulty">Rush</strong></div>
-      <div class="chip">Best <strong id="best">—</strong></div>
-    </div>
-
-    <div id="status">Press Start Camera to begin</div>
-
-    <section id="intro" class="overlay">
-      <div class="panel">
-        <p class="eyebrow">OPEN DAY AI LAB</p>
-        <h1>Hand Rush</h1>
-        <p class="intro-copy">A 30-second hand-tracking reaction challenge. Catch as many glowing targets as you can.</p>
-        <div class="how-to">
-          <div><span>🖐️</span>Keep one hand visible in the camera.</div>
-          <div><span>🎯</span>Move your fingers over a glowing target.</div>
-          <div><span>🤏</span>Pinch thumb and index to score.</div>
-        </div>
-        <p class="difficulty-heading">Choose your challenge</p>
-        <div id="difficultyPicker" class="difficulty-picker" role="radiogroup" aria-label="Hand Rush difficulty">
-          <button class="difficulty-option" type="button" data-difficulty="chill" role="radio" aria-checked="false">
-            <span class="difficulty-name">Chill</span>
-            Targets stay longer — ideal for a warm-up.
-            <span class="difficulty-multiplier">1× points</span>
-          </button>
-          <button class="difficulty-option selected" type="button" data-difficulty="rush" role="radio" aria-checked="true">
-            <span class="difficulty-name">Rush</span>
-            The balanced Open Day challenge.
-            <span class="difficulty-multiplier">1.25× points</span>
-          </button>
-          <button class="difficulty-option" type="button" data-difficulty="chaos" role="radio" aria-checked="false">
-            <span class="difficulty-name">Chaos</span>
-            Targets vanish fast. Bring your best reflexes.
-            <span class="difficulty-multiplier">1.5× points</span>
-          </button>
-        </div>
-        <p id="difficultyNote" class="difficulty-note">Rush is selected: a balanced pace with a 1.25× score multiplier.</p>
-        <button id="startButton">Start Camera</button>
-        <p class="camera-note">Good lighting helps the hand-tracking AI follow your movements.</p>
-      </div>
-    </section>
-
-    <section id="result" class="overlay hidden" aria-live="polite">
-      <div class="panel">
-        <p class="eyebrow">TIME UP</p>
-        <h1>Hand Rush Complete</h1>
-        <p id="finalScore">0</p>
-        <p id="finalDetail">0 targets hit</p>
-        <p id="bestMessage"></p>
-        <div class="result-actions">
-          <button id="collectStampButton" class="claim-stamp-button">Collect QuestPass Stamp &amp; Return</button>
-          <button id="playAgainButton">Play Again</button>
-          <button id="changeDifficultyButton" class="secondary-button">Change Difficulty</button>
-        </div>
-      </div>
-    </section>
-
+    <div id="cameraStage"><video id="video" autoplay playsinline></video><canvas id="canvas" width="640" height="480"></canvas></div>
+    <div id="hud" aria-live="polite"><div class="mission-tag"><span>Operation</span><strong id="missionLabel">VAULT ACCESS</strong></div><div class="hud-cluster"><div class="chip"><span class="chip-label">Extracted</span><strong id="score">0</strong></div><div class="chip combo"><span class="chip-label">Combo</span><strong id="combo">×0</strong></div><div class="chip security"><span class="chip-label">Security</span><strong id="security">12%</strong></div><div class="chip"><span class="chip-label">Time</span><strong id="time">35.0</strong></div></div></div>
+    <div id="status">Choose an operation, then start the camera.</div>
+    <section id="intro" class="overlay"><div class="panel"><p class="eyebrow">OPEN DAY AI LAB · OPERATION 02</p><h1>Gesture<br />Heist</h1><p class="intro-copy">A laser-grid hand-tracking challenge. Steal energy cores, dodge security beams, and drop each core into its matching vault.</p><div class="how-to"><div><span class="step-number">01 · PINCH</span>Pinch thumb + index over a floating core to grab it.</div><div><span class="step-number">02 · DODGE</span>Carry it through the moving laser grid without a security hit.</div><div><span class="step-number">03 · DROP</span>Release it inside the vault with the matching colour.</div></div><p class="difficulty-heading">Choose your operation</p><div id="difficultyPicker" class="difficulty-picker" role="radiogroup" aria-label="Gesture Heist operation difficulty"><button class="difficulty-option" type="button" data-difficulty="recruit" role="radio" aria-checked="false"><span class="difficulty-name">Recruit</span>One slow laser. Learn the vault route.<span class="difficulty-multiplier">1× haul</span></button><button class="difficulty-option selected" type="button" data-difficulty="infiltrator" role="radio" aria-checked="true"><span class="difficulty-name">Infiltrator</span>Two beams. The balanced Open Day run.<span class="difficulty-multiplier">1.25× haul</span></button><button class="difficulty-option" type="button" data-difficulty="phantom" role="radio" aria-checked="false"><span class="difficulty-name">Phantom</span>Fast laser grid. Maximum bragging rights.<span class="difficulty-multiplier">1.5× haul</span></button></div><p id="difficultyNote" class="difficulty-note">Infiltrator is selected: two moving lasers and a 1.25× score multiplier.</p><button id="startButton" class="action-button">Start Camera &amp; Infiltrate</button><p class="camera-note">Your camera feed stays on this device. Good lighting helps MediaPipe track your hand.</p></div></section>
+    <section id="result" class="overlay hidden" aria-live="polite"><div class="panel"><p class="eyebrow">EXTRACTION COMPLETE</p><h1 id="resultTitle">Vault Breached</h1><p id="finalScore">0</p><p id="finalDetail">0 cores extracted</p><p id="rankMessage"></p><div class="result-actions"><button id="collectStampButton" class="claim-stamp-button">Collect QuestPass Stamp &amp; Return</button><button id="playAgainButton" class="action-button">Run It Back</button><button id="changeDifficultyButton" class="secondary-button">Change Operation</button></div></div></section>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
     <script>
-      const videoElement = document.getElementById('video');
-      const canvasElement = document.getElementById('canvas');
-      const ctx = canvasElement.getContext('2d');
-      const startButton = document.getElementById('startButton');
-      const playAgainButton = document.getElementById('playAgainButton');
-      const introEl = document.getElementById('intro');
-      const resultEl = document.getElementById('result');
-      const hudEl = document.getElementById('hud');
-      const statusEl = document.getElementById('status');
-      const scoreEl = document.getElementById('score');
-      const comboEl = document.getElementById('combo');
-      const timeEl = document.getElementById('time');
-      const difficultyEl = document.getElementById('difficulty');
-      const bestEl = document.getElementById('best');
-      const finalScoreEl = document.getElementById('finalScore');
-      const finalDetailEl = document.getElementById('finalDetail');
-      const bestMessageEl = document.getElementById('bestMessage');
-      const collectStampButton = document.getElementById('collectStampButton');
-      const changeDifficultyButton = document.getElementById('changeDifficultyButton');
-      const difficultyNoteEl = document.getElementById('difficultyNote');
-      const difficultyButtons = Array.from(document.querySelectorAll('.difficulty-option'));
-
-      const W = canvasElement.width;
-      const H = canvasElement.height;
-      const ROUND_LENGTH_MS = 30000;
-      const TARGET_RADIUS = 34;
-      const PINCH_CLOSE_RATIO = 0.35;
-      const PINCH_OPEN_RATIO = 0.55;
-      const CURSOR_SMOOTHING_ALPHA = 0.7;
-      const BEST_SCORES_KEY = 'open-day-hand-rush-best-scores-v2';
-      const LEGACY_HIGH_SCORE_KEY = 'open-day-hand-rush-best-score';
-      const DIFFICULTIES = {
-        chill: {
-          label: 'Chill',
-          scoreMultiplier: 1,
-          initialTargetLifeMs: 900,
-          minimumTargetLifeMs: 500,
-          lifeReductionPerHit: 24,
-          respawnDelayMs: 60,
-          note: 'Chill is selected: targets stay visible longer and scores use the standard multiplier.',
-        },
-        rush: {
-          label: 'Rush',
-          scoreMultiplier: 1.25,
-          initialTargetLifeMs: 1550,
-          minimumTargetLifeMs: 850,
-          lifeReductionPerHit: 22,
-          respawnDelayMs: 150,
-          note: 'Rush is selected: a balanced pace with a 1.25× score multiplier.',
-        },
-        chaos: {
-          label: 'Chaos',
-          scoreMultiplier: 1.5,
-          initialTargetLifeMs: 1100,
-          minimumTargetLifeMs: 620,
-          lifeReductionPerHit: 18,
-          respawnDelayMs: 90,
-          note: 'Chaos is selected: targets disappear fast, but every hit earns 1.5× points.',
-        },
-      };
-
-      let gameState = 'intro';
-      let cameraStarted = false;
-      let score = 0;
-      let combo = 0;
-      let hits = 0;
-      let roundEndsAt = 0;
-      let target = null;
-      let nextTargetAt = 0;
-      let flash = null;
-      let pinchActive = false;
-      let smoothedCursor = null;
-      let selectedDifficulty = 'rush';
-      let bestScores = loadBestScores();
-
-      const hands = new Hands({
-        locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
-      });
-
-      hands.setOptions({
-        maxNumHands: 1,
-        modelComplexity: 0,
-        minDetectionConfidence: 0.7,
-        minTrackingConfidence: 0.5,
-      });
-
-      hands.onResults(onResults);
-
-      function loadBestScores() {
-        try {
-          const stored = JSON.parse(window.localStorage.getItem(BEST_SCORES_KEY));
-          if (stored && typeof stored === 'object') {
-            return Object.fromEntries(
-              Object.keys(DIFFICULTIES).map((difficulty) => [
-                difficulty,
-                Number.isFinite(Number(stored[difficulty])) && Number(stored[difficulty]) > 0
-                  ? Number(stored[difficulty])
-                  : 0,
-              ]),
-            );
-          }
-
-          // Keep an existing score from the older single-mode version as the Rush record.
-          const legacyScore = Number(window.localStorage.getItem(LEGACY_HIGH_SCORE_KEY));
-          return {
-            chill: 0,
-            rush: Number.isFinite(legacyScore) && legacyScore > 0 ? legacyScore : 0,
-            chaos: 0,
-          };
-        } catch (error) {
-          return { chill: 0, rush: 0, chaos: 0 };
-        }
-      }
-
-      function saveBestScores() {
-        try {
-          window.localStorage.setItem(BEST_SCORES_KEY, JSON.stringify(bestScores));
-        } catch (error) {
-          // The game still works if the browser blocks local storage.
-        }
-      }
-
-      function currentDifficulty() {
-        return DIFFICULTIES[selectedDifficulty];
-      }
-
-      function currentBestScore() {
-        return bestScores[selectedDifficulty] || 0;
-      }
-
-      function renderBestScore() {
-        const bestScore = currentBestScore();
-        bestEl.innerText = bestScore ? String(bestScore) : '—';
-      }
-
-      function updateDifficultyUi() {
-        const difficulty = currentDifficulty();
-        difficultyEl.innerText = difficulty.label;
-        difficultyNoteEl.innerText = difficulty.note;
-        startButton.innerText = cameraStarted ? `Start ${difficulty.label} Round` : 'Start Camera';
-        difficultyButtons.forEach((button) => {
-          const isSelected = button.dataset.difficulty === selectedDifficulty;
-          button.classList.toggle('selected', isSelected);
-          button.setAttribute('aria-checked', String(isSelected));
-        });
-        renderBestScore();
-      }
-
-      function selectDifficulty(difficulty) {
-        if (!DIFFICULTIES[difficulty] || gameState === 'playing') return;
-        selectedDifficulty = difficulty;
-        updateDifficultyUi();
-      }
-
-      function startRound() {
-        score = 0;
-        combo = 0;
-        hits = 0;
-        target = null;
-        flash = null;
-        pinchActive = false;
-        smoothedCursor = null;
-        roundEndsAt = performance.now() + ROUND_LENGTH_MS;
-        nextTargetAt = performance.now() + 400;
-        gameState = 'playing';
-        resultEl.classList.add('hidden');
-        hudEl.style.display = 'flex';
-        renderHud(ROUND_LENGTH_MS);
-        statusEl.innerText = `${currentDifficulty().label} mode — aim with your hand, then pinch a glowing target.`;
-      }
-
-      function renderHud(remainingMs) {
-        scoreEl.innerText = String(score);
-        comboEl.innerText = `×${combo}`;
-        timeEl.innerText = (Math.max(0, remainingMs) / 1000).toFixed(1);
-        difficultyEl.innerText = currentDifficulty().label;
-        renderBestScore();
-      }
-
-      function spawnTarget(now) {
-        const difficulty = currentDifficulty();
-        // Keep targets in the middle region so they remain visible on a
-        // wide screen even when the 4:3 camera view is cropped to fill it.
-        target = {
-          x: 72 + Math.random() * (W - 144),
-          y: 102 + Math.random() * (H - 204),
-          bornAt: now,
-          expiresAt: now + Math.max(
-            difficulty.minimumTargetLifeMs,
-            difficulty.initialTargetLifeMs - hits * difficulty.lifeReductionPerHit,
-          ),
-        };
-      }
-
-      function updateGame(now, landmarks) {
-        const remainingMs = roundEndsAt - now;
-        if (remainingMs <= 0) {
-          endRound();
-          return;
-        }
-
-        if (!target && now >= nextTargetAt) {
-          spawnTarget(now);
-        }
-
-        if (target && now >= target.expiresAt) {
-          combo = 0;
-          target = null;
-          nextTargetAt = now + currentDifficulty().respawnDelayMs;
-          statusEl.innerText = 'Missed — find the next blue target!';
-        }
-
-        if (target) {
-          drawTarget(target, now);
-        }
-
-        if (landmarks) {
-          const cursor = smoothCursor(getPinchPoint(landmarks));
-          const isPinchingNow = isPinching(landmarks);
-          drawCursor(cursor, isPinchingNow);
-
-          if (isPinchingNow && !pinchActive && target) {
-            tryHitTarget(cursor, now);
-          }
-          pinchActive = isPinchingNow;
-        } else {
-          pinchActive = false;
-          smoothedCursor = null;
-        }
-
-        if (flash && now < flash.until) {
-          drawHitFlash(flash, now);
-        }
-
-        renderHud(remainingMs);
-      }
-
-      function tryHitTarget(cursor, now) {
-        const dx = cursor.x - target.x;
-        const dy = cursor.y - target.y;
-        const hitDistance = Math.sqrt(dx * dx + dy * dy);
-        if (hitDistance > TARGET_RADIUS + 18) return;
-
-        combo++;
-        hits++;
-        const basePoints = 10 + Math.min(combo - 1, 5) * 2;
-        const points = Math.round(basePoints * currentDifficulty().scoreMultiplier);
-        score += points;
-        flash = { x: target.x, y: target.y, points, until: now + 360 };
-        target = null;
-        nextTargetAt = now + currentDifficulty().respawnDelayMs;
-        statusEl.innerText = combo >= 3 ? `Nice! ×${combo} combo` : `Nice! +${points}`;
-      }
-
-      function endRound() {
-        if (gameState !== 'playing') return;
-        gameState = 'finished';
-        target = null;
-        hudEl.style.display = 'none';
-
-        const previousBest = currentBestScore();
-        const isNewBest = score > previousBest;
-        if (isNewBest) {
-          bestScores[selectedDifficulty] = score;
-          saveBestScores();
-        }
-
-        finalScoreEl.innerText = String(score);
-        finalDetailEl.innerText = `${currentDifficulty().label} mode · ${hits} target${hits === 1 ? '' : 's'} hit`;
-        bestMessageEl.innerText = isNewBest && score > 0
-          ? `🏆 New ${currentDifficulty().label} personal best!`
-          : (currentBestScore()
-            ? `${currentDifficulty().label} personal best: ${currentBestScore()}`
-            : 'Play again and set a best score!');
-        statusEl.innerText = 'Round complete.';
-        resultEl.classList.remove('hidden');
-      }
-
-      function getPinchPoint(landmarks) {
-        const thumb = landmarks[4];
-        const index = landmarks[8];
-        return {
-          x: ((thumb.x + index.x) / 2) * W,
-          y: ((thumb.y + index.y) / 2) * H,
-        };
-      }
-
-      function smoothCursor(point) {
-        if (!smoothedCursor) {
-          smoothedCursor = point;
-          return smoothedCursor;
-        }
-        smoothedCursor = {
-          x: smoothedCursor.x + (point.x - smoothedCursor.x) * CURSOR_SMOOTHING_ALPHA,
-          y: smoothedCursor.y + (point.y - smoothedCursor.y) * CURSOR_SMOOTHING_ALPHA,
-        };
-        return smoothedCursor;
-      }
-
-      function isPinching(landmarks) {
-        const thumb = landmarks[4];
-        const index = landmarks[8];
-        const wrist = landmarks[0];
-        const middleMcp = landmarks[9];
-        const pinchDistance = Math.hypot(thumb.x - index.x, thumb.y - index.y);
-        const palmSize = Math.max(
-          Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y),
-          0.0001,
-        );
-        const ratio = pinchDistance / palmSize;
-        return pinchActive ? ratio < PINCH_OPEN_RATIO : ratio < PINCH_CLOSE_RATIO;
-      }
-
-      function drawTarget(currentTarget, now) {
-        const life = (currentTarget.expiresAt - now) / (currentTarget.expiresAt - currentTarget.bornAt);
-        const pulse = 1 + Math.sin(now / 120) * 0.09;
-        const radius = TARGET_RADIUS * pulse;
-
-        ctx.save();
-        ctx.translate(currentTarget.x, currentTarget.y);
-        ctx.globalAlpha = Math.max(0.38, life);
-        ctx.fillStyle = 'rgba(14, 165, 233, 0.3)';
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 24;
-        ctx.beginPath();
-        ctx.arc(0, 0, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#bae6fd';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(0, 0, radius, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.strokeStyle = 'rgba(103, 232, 249, 0.84)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(0, 0, radius + 9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * life);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      function drawCursor(cursor, isPinchingNow) {
-        ctx.save();
-        ctx.translate(cursor.x, cursor.y);
-        ctx.shadowColor = isPinchingNow ? '#67e8f9' : '#60a5fa';
-        ctx.shadowBlur = isPinchingNow ? 22 : 12;
-        ctx.fillStyle = isPinchingNow ? '#cffafe' : '#93c5fd';
-        ctx.beginPath();
-        ctx.arc(0, 0, isPinchingNow ? 10 : 7, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = isPinchingNow ? '#67e8f9' : 'rgba(191, 219, 254, 0.8)';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(0, 0, isPinchingNow ? 19 : 14, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      function drawHitFlash(currentFlash, now) {
-        const progress = 1 - (currentFlash.until - now) / 360;
-        ctx.save();
-        ctx.translate(currentFlash.x, currentFlash.y);
-        ctx.globalAlpha = 1 - progress;
-        ctx.strokeStyle = '#e0f2fe';
-        ctx.shadowColor = '#67e8f9';
-        ctx.shadowBlur = 16;
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(0, 0, TARGET_RADIUS + progress * 38, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      function onResults(results) {
-        ctx.clearRect(0, 0, W, H);
-        if (gameState !== 'playing') return;
-        const landmarks = results.multiHandLandmarks && results.multiHandLandmarks[0];
-        updateGame(performance.now(), landmarks);
-      }
-
-      const camera = new Camera(videoElement, {
-        onFrame: async () => {
-          await hands.send({ image: videoElement });
-        },
-        width: W,
-        height: H,
-      });
-
-      function openDifficultyPicker() {
-        if (gameState === 'playing') return;
-        gameState = 'intro';
-        target = null;
-        flash = null;
-        hudEl.style.display = 'none';
-        resultEl.classList.add('hidden');
-        introEl.classList.remove('hidden');
-        updateDifficultyUi();
-        statusEl.innerText = 'Choose a difficulty, then start your next round.';
-      }
-
-      startButton.addEventListener('click', async () => {
-        if (cameraStarted) {
-          introEl.classList.add('hidden');
-          startRound();
-          return;
-        }
-
-        startButton.disabled = true;
-        startButton.innerText = 'Starting camera...';
-        statusEl.innerText = 'Starting hand-tracking AI...';
-
-        try {
-          await camera.start();
-          cameraStarted = true;
-          introEl.classList.add('hidden');
-          startRound();
-        } catch (error) {
-          statusEl.innerText = `Camera error: ${error.message}`;
-          startButton.disabled = false;
-          startButton.innerText = 'Try Camera Again';
-        }
-      });
-
-      playAgainButton.addEventListener('click', startRound);
-      changeDifficultyButton.addEventListener('click', openDifficultyPicker);
-      difficultyButtons.forEach((button) => {
-        button.addEventListener('click', () => selectDifficulty(button.dataset.difficulty));
-      });
-      collectStampButton.addEventListener('click', () => {
-        window.parent.postMessage(
-          { type: 'questpass:completed', activity: 'hand_rush' },
-          '*'
-        );
-      });
-      updateDifficultyUi();
+      const videoElement=document.getElementById('video'),canvasElement=document.getElementById('canvas'),ctx=canvasElement.getContext('2d');
+      const startButton=document.getElementById('startButton'),playAgainButton=document.getElementById('playAgainButton'),changeDifficultyButton=document.getElementById('changeDifficultyButton'),collectStampButton=document.getElementById('collectStampButton'),introEl=document.getElementById('intro'),resultEl=document.getElementById('result'),hudEl=document.getElementById('hud'),statusEl=document.getElementById('status'),scoreEl=document.getElementById('score'),comboEl=document.getElementById('combo'),securityEl=document.getElementById('security'),timeEl=document.getElementById('time'),missionLabelEl=document.getElementById('missionLabel'),finalScoreEl=document.getElementById('finalScore'),finalDetailEl=document.getElementById('finalDetail'),rankMessageEl=document.getElementById('rankMessage'),resultTitleEl=document.getElementById('resultTitle'),difficultyNoteEl=document.getElementById('difficultyNote'),difficultyButtons=Array.from(document.querySelectorAll('.difficulty-option'));
+      const W=canvasElement.width,H=canvasElement.height,ROUND_LENGTH_MS=35000,CORE_RADIUS=24,SLOT_RADIUS=43,PINCH_CLOSE_RATIO=.34,PINCH_OPEN_RATIO=.54,CURSOR_SMOOTHING_ALPHA=.68,BEST_SCORES_KEY='open-day-gesture-heist-best-scores-v1';
+      const VAULTS=[{id:'cyan',label:'CYAN',x:82,y:86,color:'#5de8ff',glow:'rgba(93,232,255,.55)'},{id:'violet',label:'VIOLET',x:558,y:96,color:'#bd8cff',glow:'rgba(189,140,255,.55)'},{id:'gold',label:'GOLD',x:91,y:385,color:'#ffd670',glow:'rgba(255,214,112,.55)'},{id:'coral',label:'CORAL',x:550,y:374,color:'#ff8ba9',glow:'rgba(255,139,169,.55)'}];
+      const DIFFICULTIES={recruit:{label:'Recruit',scoreMultiplier:1,laserCount:1,laserSpeed:.00023,note:'Recruit is selected: one slow laser and a standard score multiplier.'},infiltrator:{label:'Infiltrator',scoreMultiplier:1.25,laserCount:2,laserSpeed:.00038,note:'Infiltrator is selected: two moving lasers and a 1.25× score multiplier.'},phantom:{label:'Phantom',scoreMultiplier:1.5,laserCount:3,laserSpeed:.00057,note:'Phantom is selected: a fast three-laser grid and a 1.5× score multiplier.'}};
+      let gameState='intro',cameraStarted=false,selectedDifficulty='infiltrator',score=0,combo=0,extracted=0,security=12,roundEndsAt=0,activeCore=null,nextCoreAt=0,lastVaultId=null,pinchActive=false,smoothedCursor=null,feedback=null,zapCooldownUntil=0,bestScores=loadBestScores();
+      const hands=new Hands({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+      hands.setOptions({maxNumHands:1,modelComplexity:0,minDetectionConfidence:.7,minTrackingConfidence:.56}); hands.onResults(onResults);
+      function loadBestScores(){try{const stored=JSON.parse(window.localStorage.getItem(BEST_SCORES_KEY));if(!stored||typeof stored!=='object')throw new Error('No score cache');return Object.fromEntries(Object.keys(DIFFICULTIES).map((mode)=>[mode,Number.isFinite(Number(stored[mode]))?Math.max(0,Number(stored[mode])):0]));}catch(error){return{recruit:0,infiltrator:0,phantom:0};}}
+      function saveBestScores(){try{window.localStorage.setItem(BEST_SCORES_KEY,JSON.stringify(bestScores));}catch(error){/* Optional score memory. */}}
+      function currentDifficulty(){return DIFFICULTIES[selectedDifficulty];}
+      function updateDifficultyUi(){const difficulty=currentDifficulty();difficultyNoteEl.textContent=difficulty.note;startButton.textContent=cameraStarted?`Begin ${difficulty.label} Run`:'Start Camera & Infiltrate';difficultyButtons.forEach((button)=>{const selected=button.dataset.difficulty===selectedDifficulty;button.classList.toggle('selected',selected);button.setAttribute('aria-checked',String(selected));});}
+      function selectDifficulty(difficulty){if(!DIFFICULTIES[difficulty]||gameState==='playing')return;selectedDifficulty=difficulty;updateDifficultyUi();}
+      function startRound(){score=0;combo=0;extracted=0;security=12;activeCore=null;lastVaultId=null;feedback=null;pinchActive=false;smoothedCursor=null;zapCooldownUntil=0;roundEndsAt=performance.now()+ROUND_LENGTH_MS;nextCoreAt=performance.now()+550;gameState='playing';introEl.classList.add('hidden');resultEl.classList.add('hidden');hudEl.style.display='flex';statusEl.textContent='Find a glowing core, pinch to take it, then release inside its matching vault.';renderHud(ROUND_LENGTH_MS);}
+      function renderHud(remainingMs){scoreEl.textContent=String(score);comboEl.textContent=`×${combo}`;securityEl.textContent=`${Math.round(security)}%`;timeEl.textContent=(Math.max(0,remainingMs)/1000).toFixed(1);missionLabelEl.textContent=`${currentDifficulty().label.toUpperCase()} RUN`;}
+      function pickVault(){const choices=VAULTS.filter((vault)=>vault.id!==lastVaultId);return choices[Math.floor(Math.random()*choices.length)];}
+      function pointIsSafe(x,y){return VAULTS.every((vault)=>Math.hypot(x-vault.x,y-vault.y)>105);}
+      function spawnCore(now){const vault=pickVault();let x=W/2,y=H/2;for(let attempt=0;attempt<16;attempt+=1){const candidateX=155+Math.random()*(W-310),candidateY=105+Math.random()*(H-210);if(pointIsSafe(candidateX,candidateY)){x=candidateX;y=candidateY;break;}}activeCore={vault,x,y,homeX:x,homeY:y,carried:false,bornAt:now};lastVaultId=vault.id;statusEl.textContent=`New ${vault.label.toLowerCase()} core located — deliver it to the ${vault.label.toLowerCase()} vault.`;}
+      function getLasers(now){const difficulty=currentDifficulty(),definitions=[{axis:'y',offset:.7,min:145,max:335},{axis:'x',offset:2.3,min:190,max:450},{axis:'y',offset:4.1,min:130,max:355}];return definitions.slice(0,difficulty.laserCount).map((laser)=>{const movement=(Math.sin(now*difficulty.laserSpeed+laser.offset)+1)/2;return{...laser,position:laser.min+(laser.max-laser.min)*movement};});}
+      function updateGame(now,landmarks){const remainingMs=roundEndsAt-now;if(remainingMs<=0){endRound();return;}if(!activeCore&&now>=nextCoreAt)spawnCore(now);const lasers=getLasers(now);drawGrid(now);drawLasers(lasers,now);drawVaults(now);if(landmarks){const cursor=smoothCursor(getPinchPoint(landmarks)),pinching=isPinching(landmarks);updateCoreInteraction(cursor,pinching,lasers,now);drawCursor(cursor,pinching);pinchActive=pinching;}else{if(activeCore&&activeCore.carried)returnCoreToHome('Hand lost — core returned to its spawn point.');pinchActive=false;smoothedCursor=null;}if(activeCore)drawCore(activeCore,now);if(feedback&&now<feedback.until)drawFeedback(feedback,now);if(feedback&&now>=feedback.until)feedback=null;renderHud(remainingMs);}
+      function updateCoreInteraction(cursor,pinching,lasers,now){if(!activeCore)return;const closedPinch=pinching&&!pinchActive,releasedPinch=!pinching&&pinchActive;if(closedPinch&&!activeCore.carried&&Math.hypot(cursor.x-activeCore.x,cursor.y-activeCore.y)<=CORE_RADIUS+18){activeCore.carried=true;activeCore.grabbedAt=now;statusEl.textContent=`Core secured. Thread it to the ${activeCore.vault.label.toLowerCase()} vault.`;feedback={x:activeCore.x,y:activeCore.y,text:'CORE SECURED',color:activeCore.vault.color,until:now+680};}if(!activeCore.carried)return;activeCore.x=Math.max(CORE_RADIUS,Math.min(W-CORE_RADIUS,cursor.x));activeCore.y=Math.max(CORE_RADIUS,Math.min(H-CORE_RADIUS,cursor.y));if(now>=Math.max(zapCooldownUntil,(activeCore.grabbedAt||0)+280)&&touchesLaser(activeCore,lasers)){securityHit(now);return;}if(releasedPinch)dropCore(now);}
+      function touchesLaser(core,lasers){return lasers.some((laser)=>Math.abs((laser.axis==='x'?core.x:core.y)-laser.position)<CORE_RADIUS+8);}
+      function dropCore(now){if(!activeCore)return;const vault=activeCore.vault,inside=Math.hypot(activeCore.x-vault.x,activeCore.y-vault.y)<SLOT_RADIUS;if(!inside){returnCoreToHome('Wrong drop — the vault only accepts its matching core.');return;}extracted+=1;combo+=1;const points=Math.round((80+Math.min(combo-1,6)*18)*currentDifficulty().scoreMultiplier);score+=points;security=Math.max(0,security-7);feedback={x:vault.x,y:vault.y,text:`+${points} HAUL`,color:vault.color,until:now+760};statusEl.textContent=combo>=3?`Clean extraction. ×${combo} combo is live!`:'Core extracted. Keep moving.';activeCore=null;nextCoreAt=now+420;}
+      function returnCoreToHome(message){if(!activeCore)return;activeCore.carried=false;activeCore.x=activeCore.homeX;activeCore.y=activeCore.homeY;combo=0;statusEl.textContent=message;}
+      function securityHit(now){if(!activeCore)return;security=Math.min(100,security+20);combo=0;feedback={x:activeCore.x,y:activeCore.y,text:'SECURITY HIT',color:'#ff5e78',until:now+850};activeCore.carried=false;activeCore.x=activeCore.homeX;activeCore.y=activeCore.homeY;zapCooldownUntil=now+700;statusEl.textContent=security>=80?'Security is critical — take a cleaner route!':'Laser contact. Core reset; try another route.';}
+      function endRound(){if(gameState!=='playing')return;gameState='finished';activeCore=null;hudEl.style.display='none';const previousBest=bestScores[selectedDifficulty]||0,isNewBest=score>previousBest;if(isNewBest){bestScores[selectedDifficulty]=score;saveBestScores();}const rank=score>=1200?'Campus Phantom':score>=650?'Vault Specialist':score>=240?'Cipher Runner':'Rookie Infiltrator';resultTitleEl.textContent=score>=650?'Vault Breached':'Extraction Logged';finalScoreEl.textContent=String(score);finalDetailEl.textContent=`${extracted} core${extracted===1?'':'s'} extracted · ${Math.round(security)}% final security level`;rankMessageEl.textContent=isNewBest&&score>0?`✦ New ${currentDifficulty().label} record — rank: ${rank}`:`Rank: ${rank}${previousBest?` · Best: ${previousBest}`:''}`;statusEl.textContent='Operation complete.';resultEl.classList.remove('hidden');}
+      function getPinchPoint(landmarks){const thumb=landmarks[4],index=landmarks[8];return{x:((thumb.x+index.x)/2)*W,y:((thumb.y+index.y)/2)*H};}
+      function smoothCursor(point){if(!smoothedCursor){smoothedCursor=point;return smoothedCursor;}smoothedCursor={x:smoothedCursor.x+(point.x-smoothedCursor.x)*CURSOR_SMOOTHING_ALPHA,y:smoothedCursor.y+(point.y-smoothedCursor.y)*CURSOR_SMOOTHING_ALPHA};return smoothedCursor;}
+      function isPinching(landmarks){const thumb=landmarks[4],index=landmarks[8],wrist=landmarks[0],middleMcp=landmarks[9],pinchDistance=Math.hypot(thumb.x-index.x,thumb.y-index.y),palmSize=Math.max(Math.hypot(wrist.x-middleMcp.x,wrist.y-middleMcp.y),.0001),ratio=pinchDistance/palmSize;return pinchActive?ratio<PINCH_OPEN_RATIO:ratio<PINCH_CLOSE_RATIO;}
+      function drawGrid(now){ctx.save();ctx.globalAlpha=.14;ctx.strokeStyle='#77dfff';ctx.lineWidth=.65;const drift=(now/42)%32;for(let x=-32+drift;x<W+32;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x-55,H);ctx.stroke();}for(let y=14;y<H;y+=34){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}ctx.restore();}
+      function drawLasers(lasers,now){lasers.forEach((laser,index)=>{const glow=13+Math.sin(now/75+index)*3;ctx.save();ctx.strokeStyle='rgba(255,86,117,.82)';ctx.shadowColor='#ff3c61';ctx.shadowBlur=glow;ctx.lineWidth=2;ctx.setLineDash([12,7]);ctx.lineDashOffset=-(now/13);ctx.beginPath();if(laser.axis==='x'){ctx.moveTo(laser.position,50);ctx.lineTo(laser.position,H-50);}else{ctx.moveTo(50,laser.position);ctx.lineTo(W-50,laser.position);}ctx.stroke();ctx.restore();});}
+      function drawVaults(now){VAULTS.forEach((vault)=>{const pulse=1+Math.sin(now/280+vault.x)*.04;ctx.save();ctx.translate(vault.x,vault.y);ctx.scale(pulse,pulse);ctx.fillStyle='rgba(3,9,27,.72)';ctx.strokeStyle=vault.color;ctx.lineWidth=2;ctx.shadowColor=vault.glow;ctx.shadowBlur=17;ctx.beginPath();ctx.arc(0,0,SLOT_RADIUS,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.globalAlpha=.6;ctx.lineWidth=1;ctx.beginPath();ctx.arc(0,0,SLOT_RADIUS-9,0,Math.PI*2);ctx.stroke();ctx.restore();});}
+      function drawCore(core,now){const bob=core.carried?0:Math.sin(now/190+core.bornAt)*3,radius=core.carried?CORE_RADIUS+2:CORE_RADIUS;ctx.save();ctx.translate(core.x,core.y+bob);ctx.rotate(now/750+core.bornAt/1000);ctx.fillStyle=core.vault.color;ctx.shadowColor=core.vault.glow;ctx.shadowBlur=core.carried?30:22;ctx.beginPath();for(let point=0;point<6;point+=1){const angle=Math.PI/3*point+Math.PI/6,x=Math.cos(angle)*radius,y=Math.sin(angle)*radius;if(point===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.closePath();ctx.fill();ctx.fillStyle='rgba(255,255,255,.72)';ctx.beginPath();ctx.arc(-radius*.22,-radius*.2,radius*.25,0,Math.PI*2);ctx.fill();ctx.restore();}
+      function drawCursor(cursor,pinching){ctx.save();ctx.translate(cursor.x,cursor.y);ctx.shadowColor=pinching?'#f5fbff':'#61eaff';ctx.shadowBlur=pinching?25:13;ctx.strokeStyle=pinching?'#fff':'#80edff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,pinching?17:12,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,pinching?26:20,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      function drawFeedback(item,now){const duration=item.text==='SECURITY HIT'?850:760,progress=1-(item.until-now)/duration;ctx.save();ctx.globalAlpha=Math.max(0,1-progress);ctx.translate(item.x,item.y-28-progress*20);ctx.strokeStyle=item.color;ctx.shadowColor=item.color;ctx.shadowBlur=14;ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,36+progress*30,0,Math.PI*2);ctx.stroke();ctx.restore();}
+      function onResults(results){ctx.clearRect(0,0,W,H);if(gameState!=='playing')return;const landmarks=results.multiHandLandmarks&&results.multiHandLandmarks[0];updateGame(performance.now(),landmarks);}
+      const camera=new Camera(videoElement,{onFrame:async()=>{await hands.send({image:videoElement});},width:W,height:H});
+      function openDifficultyPicker(){if(gameState==='playing')return;gameState='intro';activeCore=null;feedback=null;hudEl.style.display='none';resultEl.classList.add('hidden');introEl.classList.remove('hidden');updateDifficultyUi();statusEl.textContent='Choose an operation, then begin your next run.';}
+      startButton.addEventListener('click',async()=>{if(cameraStarted){startRound();return;}startButton.disabled=true;startButton.textContent='Opening camera...';statusEl.textContent='Starting the hand-tracking system...';try{await camera.start();cameraStarted=true;startRound();}catch(error){statusEl.textContent=`Camera error: ${error.message}`;startButton.disabled=false;startButton.textContent='Try Camera Again';}});
+      playAgainButton.addEventListener('click',startRound);changeDifficultyButton.addEventListener('click',openDifficultyPicker);difficultyButtons.forEach((button)=>button.addEventListener('click',()=>selectDifficulty(button.dataset.difficulty)));collectStampButton.addEventListener('click',()=>{window.parent.postMessage({type:'questpass:completed',activity:'hand_rush'},'*');});updateDifficultyUi();
     </script>
   </body>
 </html>
