@@ -4,7 +4,11 @@ import streamlit as st
 
 from career_model import predict_careers
 from ollama_explainer import generate_career_explanation
-from questpass_bridge import render_hand_puzzle_activity, render_questpass_activity
+from questpass_bridge import (
+    render_gravity_thief_activity,
+    render_hand_puzzle_activity,
+    render_questpass_activity,
+)
 from UI_theme import apply_theme
 
 
@@ -14,7 +18,7 @@ apply_theme()
 
 QUEST_STAMPS = {
     "hand_puzzle": ("🧩", "Puzzle Solver"),
-    "hand_rush": ("⚡", "Vault Runner"),
+    "hand_rush": ("⚡", "Gravity Bender"),
     "career": ("🎓", "Future Explorer"),
     "vibe_link": ("✨", "Vibe Scanner"),
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
@@ -126,17 +130,17 @@ if page == "home":
             """
             <div class="mode-card">
                 <div class="mode-icon">⚡</div>
-                <h2>Gesture Heist</h2>
+                <h2>Gravity Thief</h2>
                 <p>
-                    Steal glowing energy cores, dodge laser traps, and return
-                    each core to its matching vault.
+                    Use a hand-controlled gravity field to guide a stolen core
+                    past security lasers and into the portal.
                 </p>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-        if st.button("Start Gesture Heist", key="open_hand_rush"):
+        if st.button("Play Gravity Thief", key="open_hand_rush"):
             st.session_state.page = "hand_rush"
             st.rerun()
 
@@ -189,8 +193,8 @@ if page == "home":
                 <div class="mode-icon">🔮</div>
                 <h2>Vibe Oracle</h2>
                 <p>
-                    Take two temporary profile photos, choose the energy,
-                    then receive a wildly dramatic random relationship forecast.
+                    Your future just texted. Create two profile cards,
+                    watch a fictional chat unfold, and choose how it ends.
                 </p>
             </div>
             """,
@@ -300,7 +304,7 @@ elif page == "puzzle":
             st.rerun()
 
 elif page == "hand_rush":
-    # Hand Rush is another kiosk-style camera game, so it gets the same
+    # Gravity Thief is a kiosk-style camera game, so it gets the same
     # full-screen treatment as the Hand Puzzle.
     st.markdown(
         """
@@ -376,18 +380,17 @@ elif page == "hand_rush":
         st.session_state.page = "home"
         st.rerun()
 
-    hand_rush_file = Path(__file__).with_name("Hand Rush.html")
+    gravity_thief_build = Path(__file__).with_name("questpass_bridge") / "gravity-thief" / "index.html"
 
-    if not hand_rush_file.exists():
-        st.error("The Hand Rush.html file could not be found.")
+    if not gravity_thief_build.exists():
+        st.error("The Gravity Thief game build could not be found.")
     else:
-        completion = render_questpass_activity(
-            hand_rush_file,
-            "hand_rush",
-            key="hand_rush_bridge",
-        )
-        if completion == "hand_rush":
+        completion = render_gravity_thief_activity(key="gravity_thief_component")
+        if completion == {"action": "completed"}:
             award_questpass_stamp("hand_rush")
+            st.session_state.page = "home"
+            st.rerun()
+        if completion == {"action": "back"}:
             st.session_state.page = "home"
             st.rerun()
 

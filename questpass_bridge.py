@@ -24,10 +24,20 @@ _hand_puzzle = components.declare_component(
     path=str(Path(__file__).with_name("questpass_bridge") / "hand-puzzle"),
 )
 
+_gravity_thief = components.declare_component(
+    "gravity_thief_activity",
+    path=str(Path(__file__).with_name("questpass_bridge") / "gravity-thief"),
+)
+
 
 def render_hand_puzzle_activity(*, key: str):
     """Render Hand Puzzle and return its completion ID, if it is completed."""
     return _hand_puzzle(default=None, key=key)
+
+
+def render_gravity_thief_activity(*, key: str):
+    """Render Gravity Thief and return its back/completion event."""
+    return _gravity_thief(default=None, key=key)
 
 
 def render_questpass_activity(

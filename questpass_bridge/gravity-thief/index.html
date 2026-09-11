@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070d17">
+  <meta name="description" content="Bend gravity with your hands. Guide a stolen energy core past lasers in this camera-controlled browser game.">
+  <title>Gravity Thief · Game Hub</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <svg class="symbols" aria-hidden="true"><defs>
+    <symbol id="i-game" viewBox="0 0 24 24"><path d="M7 5h10c3 0 5 10 4 13-1 2-3 0-5-2H8c-2 2-4 4-5 2C2 15 4 5 7 5Z"/><path d="M6 10h5M8.5 7.5v5M15 9h.01M18 12h.01"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M9 3H3v6M15 3h6v6M3 15v6h6M21 15v6h-6"/></symbol>
+    <symbol id="i-restart" viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="3"/><path d="m15 10 6-3v10l-6-3"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="m12 4-6 5H3v6h3l6 5ZM16 8a6 6 0 0 1 0 8M19 5a10 10 0 0 1 0 14"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 1v6M12 17v6M1 12h6M17 12h6"/></symbol>
+  </defs></svg>
+  <header class="topbar"><div class="topbar-inner"><div class="brand"><svg><use href="#i-game"/></svg><span>GAME HUB</span></div><div id="cameraStatus" class="camera-status"><span class="status-dot"></span><span id="cameraStatusText">Camera off</span></div></div></header>
+  <main class="shell">
+    <div class="back-row"><button id="backButton" class="text-button" hidden>← Back to games</button><span class="edition">A GAME OF MOMENTUM</span></div>
+    <section class="game-heading" aria-label="Game status">
+      <div><h1>GRAVITY <span>THIEF</span></h1><p>Steal the core. Bend its path. Escape.</p></div>
+      <div class="hud"><div class="level-info"><span id="levelNumber">LEVEL 01 / 06</span><strong id="levelName">First contact</strong></div><div class="timer"><span class="sr-only">Elapsed time</span><span id="timer">00:00</span><small id="attempts">ATTEMPT 01</small></div><button id="pauseButton" class="icon-button" aria-label="Pause game" title="Pause (Esc)" disabled><svg><use href="#i-pause"/></svg></button></div>
+    </section>
+    <section id="stage" class="stage" aria-label="Gravity Thief play area">
+      <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
+      <canvas id="gameCanvas" tabindex="0" aria-label="Gravity field. Hold mouse or touch to pull. Arrow keys move the field; hold Space to pull. Escape pauses."></canvas>
+      <div class="mission"><svg><use href="#i-target"/></svg><span id="missionText">Guide the core into the portal</span></div>
+      <div class="stage-corner"><span id="inputBadge">READY WHEN YOU ARE</span><span id="trackingDot" class="status-dot"></span></div>
+      <div id="hintPill" class="hint-pill" hidden>Make a fist to pull</div>
+      <div id="overlay" class="overlay">
+        <div class="dialog-card" role="region" aria-labelledby="overlayTitle">
+          <div id="overlayOrb" class="orb-symbol" aria-hidden="true"><span></span></div>
+          <p id="overlayKicker" class="eyebrow">YOUR HANDS. YOUR GRAVITY.</p>
+          <h2 id="overlayTitle">Make your getaway.</h2>
+          <p id="overlayBody">Pull a stolen energy core past security lasers. One hand is all you need.</p>
+          <div id="resultStats" class="result-stats" hidden><div><strong id="resultTime">00:00</strong><span>TIME</span></div><div><strong id="resultAttempts">1</strong><span>ATTEMPTS</span></div><div><strong id="resultStars">★★★</strong><span>RATING</span></div></div>
+          <button id="primaryButton" class="primary-button"><svg><use href="#i-camera"/></svg><span>Enable camera & play</span><span aria-hidden="true">↗</span></button>
+          <button id="secondaryButton" class="secondary-button">Play with mouse / touch</button>
+          <p id="privacyNote" class="privacy-note">Camera processing stays on your device.</p>
+          <p id="errorText" class="error-message" role="alert" hidden></p>
+        </div>
+      </div>
+      <div id="handNotice" class="hand-notice" hidden>Hand out of view · game paused</div>
+    </section>
+    <div class="control-bar"><p id="levelHint">Pull gently around the wall. Release to let the core coast.</p><div class="control-actions"><button id="modeButton" class="text-button" hidden>Use mouse / touch</button><button id="soundButton" class="icon-button subtle" aria-label="Turn sound on" aria-pressed="false" title="Sound"><svg><use href="#i-sound"/></svg></button><button id="fullscreenButton" class="icon-button subtle" aria-label="Enter fullscreen" title="Fullscreen"><svg><use href="#i-expand"/></svg></button><button id="restartButton" class="restart-button" disabled><svg><use href="#i-restart"/></svg><span>Restart level</span></button></div></div>
+    <section class="instructions" aria-label="How to play">
+      <div class="instruction"><span class="instruction-visual pull-visual" aria-hidden="true"><i></i><b></b></span><div><h3><span>01</span> FIST TO PULL</h3><p>Close your hand to steer the gravity field.</p></div></div>
+      <div class="instruction"><span class="instruction-visual coast-visual" aria-hidden="true"><i></i><b></b></span><div><h3><span>02</span> RELEASE TO COAST</h3><p>Let momentum carry the core forward.</p></div></div>
+      <div class="instruction"><span class="instruction-visual portal-visual" aria-hidden="true"><i></i></span><div><h3><span>03</span> REACH THE PORTAL</h3><p>Walls give a gentle bump; avoid pink lasers.</p></div></div>
+    </section>
+    <footer><span>Small movements. Big escapes.</span><button id="helpButton" class="text-button">Controls & tips <span aria-hidden="true">?</span></button></footer>
+  </main>
+  <dialog id="helpDialog"><button id="closeHelp" class="dialog-close icon-button" aria-label="Close controls">×</button><p class="eyebrow">A LITTLE FIELD GUIDE</p><h2>Get a feel for gravity.</h2><p><strong>Camera:</strong> keep one hand visible. Close your hand into a fist to pull. Move your fist to steer; open your hand to release.</p><p><strong>Mouse / touch:</strong> hold anywhere in the play area to pull toward that spot. Release to coast.</p><p><strong>Keyboard:</strong> arrow keys move the field. Hold Space to pull. Esc pauses; R restarts.</p><p>To brake, hold the field near the core. To turn, guide it in small steps. Walls and screen edges give a gentle bump so you can recover. A dark, dashed laser is safe to cross. Every level can be retried.</p><p class="help-note">Bright, even light helps tracking. A larger play area or landscape view gives you more room. Camera mode pauses when your hand leaves view.</p><button id="gotItButton" class="primary-button">Got it</button></dialog>
+  <div id="announcer" class="sr-only" aria-live="polite"></div>
+  <noscript>This game needs JavaScript enabled in your browser.</noscript>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
