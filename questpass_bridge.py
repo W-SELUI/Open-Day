@@ -8,12 +8,45 @@ only when the page's final result button sends one.
 
 from pathlib import Path
 
+import streamlit as st
 import streamlit.components.v1 as components
 
 
-_bridge = components.declare_component(
-    "questpass_activity_bridge",
-    path=str(Path(__file__).with_name("questpass_bridge")),
+_completion_listener = st.components.v2.component(
+    "questpass_completion_listener",
+    js="""
+const instances = new WeakMap();
+
+export default function(component) {
+  const { data, parentElement, setTriggerValue } = component;
+  const activity = data?.activity || "";
+  const previous = instances.get(parentElement);
+
+  if (previous) {
+    window.removeEventListener("message", previous);
+  }
+
+  const onMessage = (event) => {
+    const message = event.data;
+
+    if (
+      message &&
+      message.type === "questpass:completed" &&
+      message.activity === activity
+    ) {
+      setTriggerValue("completed", activity);
+    }
+  };
+
+  instances.set(parentElement, onMessage);
+  window.addEventListener("message", onMessage);
+
+  return () => {
+    window.removeEventListener("message", onMessage);
+    instances.delete(parentElement);
+  };
+}
+""",
 )
 
 # Hand Puzzle is a complete web build, rather than one self-contained HTML
@@ -49,23 +82,24 @@ def render_questpass_activity(
 ):
     """Render a trusted activity and return its completion ID, if any.
 
-    The remaining activities are self-contained HTML files, so the bridge
-    safely places their HTML inside one nested game frame.
+    Self-contained HTML activities display through Streamlit's built-in
+    iframe renderer. A tiny component only listens for the final completion
+    message, so a display issue in the listener cannot blank the activity.
     """
     if game_url:
-        return _bridge(
-            activity=activity,
-            game_url=game_url,
-            default=None,
-            key=key,
-        )
+        st.iframe(game_url, height=760, width="stretch")
+    else:
+        if html_file is None:
+            raise ValueError("html_file is required when game_url is not provided")
 
-    if html_file is None:
-        raise ValueError("html_file is required when game_url is not provided")
+        st.iframe(html_file, height=760, width="stretch")
 
-    return _bridge(
-        activity=activity,
-        game_html=html_file.read_text(encoding="utf-8"),
+    result = _completion_listener(
+        data={"activity": activity},
         default=None,
-        key=key,
+        height=1,
+        key=f"{key}_completion_listener",
+        on_completed_change=lambda: None,
     )
+
+    return result.completed

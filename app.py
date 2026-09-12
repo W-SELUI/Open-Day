@@ -16,6 +16,43 @@ st.set_page_config(page_title="Career Quest", page_icon="🎓")
 
 apply_theme()
 
+_vibe_oracle_completion_listener = st.components.v2.component(
+    "vibe_oracle_completion_listener",
+    js="""
+const listeners = new WeakMap();
+
+export default function(component) {
+  const { data, parentElement, setTriggerValue } = component;
+  const activity = data?.activity || "";
+  const previous = listeners.get(parentElement);
+
+  if (previous) {
+    window.removeEventListener("message", previous);
+  }
+
+  const onMessage = (event) => {
+    const message = event.data;
+
+    if (
+      message &&
+      message.type === "questpass:completed" &&
+      message.activity === activity
+    ) {
+      setTriggerValue("completed", activity);
+    }
+  };
+
+  listeners.set(parentElement, onMessage);
+  window.addEventListener("message", onMessage);
+
+  return () => {
+    window.removeEventListener("message", onMessage);
+    listeners.delete(parentElement);
+  };
+}
+""",
+)
+
 QUEST_STAMPS = {
     "hand_puzzle": ("🧩", "Puzzle Solver"),
     "hand_rush": ("⚡", "Gravity Bender"),
@@ -228,10 +265,11 @@ elif page == "puzzle":
             .stMain,
             [data-testid="stAppViewContainer"] .main,
             section.main {
-                height: 100vh !important;
                 min-height: 100vh !important;
                 width: 100vw !important;
-                overflow: hidden !important;
+                height: auto !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
             }
 
             /* Overrides the 1100px max-width used by the normal app theme. */
@@ -243,10 +281,10 @@ elif page == "puzzle":
                 width: 100vw !important;
                 min-width: 100vw !important;
                 min-height: 100vh !important;
-                height: 100vh !important;
+                height: auto !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
             }
 
             /* The only Streamlit button on this route floats over the game. */
@@ -273,13 +311,13 @@ elif page == "puzzle":
             [data-testid="stCustomComponentV1"],
             [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
-                position: fixed !important;
-                inset: 0 !important;
+                position: relative !important;
+                inset: auto !important;
                 z-index: 0 !important;
                 display: block !important;
                 width: 100vw !important;
                 min-width: 100vw !important;
-                height: 100vh !important;
+                min-height: 100vh !important;
                 margin: 0 !important;
                 border: 0 !important;
             }
@@ -320,10 +358,11 @@ elif page == "hand_rush":
             .stMain,
             [data-testid="stAppViewContainer"] .main,
             section.main {
-                height: 100vh !important;
                 min-height: 100vh !important;
                 width: 100vw !important;
-                overflow: hidden !important;
+                height: auto !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
             }
 
             [data-testid="stMainBlockContainer"],
@@ -334,10 +373,10 @@ elif page == "hand_rush":
                 width: 100vw !important;
                 min-width: 100vw !important;
                 min-height: 100vh !important;
-                height: 100vh !important;
+                height: auto !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden !important;
+                overflow: visible !important;
             }
 
             .st-key-back_from_hand_rush,
@@ -361,13 +400,13 @@ elif page == "hand_rush":
             [data-testid="stCustomComponentV1"],
             [data-testid="stCustomComponentV1"] iframe,
             iframe[title="st.iframe"] {
-                position: fixed !important;
-                inset: 0 !important;
+                position: relative !important;
+                inset: auto !important;
                 z-index: 0 !important;
                 display: block !important;
                 width: 100vw !important;
                 min-width: 100vw !important;
-                height: 100vh !important;
+                min-height: 100vh !important;
                 margin: 0 !important;
                 border: 0 !important;
             }
@@ -567,12 +606,15 @@ elif page == "vibe_oracle":
     if not vibe_oracle_file.exists():
         st.error("The Vibe Oracle.html file could not be found.")
     else:
-        completion = render_questpass_activity(
-            vibe_oracle_file,
-            "vibe_oracle",
-            key="vibe_oracle_bridge",
+        st.iframe(vibe_oracle_file, height=760, width="stretch")
+        completion = _vibe_oracle_completion_listener(
+            data={"activity": "vibe_oracle"},
+            default=None,
+            height=1,
+            key="vibe_oracle_completion_listener",
+            on_completed_change=lambda: None,
         )
-        if completion == "vibe_oracle":
+        if completion.completed == "vibe_oracle":
             award_questpass_stamp("vibe_oracle")
             st.session_state.page = "home"
             st.rerun()

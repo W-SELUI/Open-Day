@@ -66,7 +66,11 @@
             gameFrame.src = new URL(nextUrl, window.location.href).href;
           } else {
             gameFrame.removeAttribute("src");
-            gameFrame.srcdoc = nextHtml;
+            // Clear first so a changed inline document always gets a fresh load.
+            gameFrame.srcdoc = "";
+            requestAnimationFrame(() => {
+              if (renderedSource === nextSource) gameFrame.srcdoc = nextHtml;
+            });
           }
         }
 

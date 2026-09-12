@@ -14,7 +14,7 @@ const sample = [{ name:'Kai', style:'fast', interest:'food' }, { name:'Moon', st
 const seed = n => () => ((n = (Math.imul(1664525, n) + 1013904223) >>> 0) / 4294967296);
 
 test('Every story has a complete, distinct pair of endings in all three tones', () => {
-  assert.equal(SCENES.length, 24);
+  assert.equal(SCENES.length, 28);
   assert.equal(new Set(SCENES.map(s=>s.id)).size, SCENES.length);
   const endings = new Set();
   for (const scene of SCENES) {
@@ -31,10 +31,10 @@ test('Every story has a complete, distinct pair of endings in all three tones', 
       for (const verdict of branch.verdict) { assert.ok(!endings.has(verdict), `Repeated verdict: ${verdict}`); endings.add(verdict); }
     }
   }
-  assert.equal(endings.size, 144);
+  assert.equal(endings.size, 168);
 });
 
-test('All 4,608 story/style/tone/role/ending combinations have coherent timestamps and speaker roles', () => {
+test('All 5,376 story/style/tone/role/ending combinations have coherent timestamps and speaker roles', () => {
   let checked = 0;
   for (const scene of SCENES) for (const a of Object.keys(STYLES)) for (const b of Object.keys(STYLES)) for (const tone of Object.keys(TONES)) for (const lead of [0,1]) for (const choice of [0,1]) {
     const input = [{ ...sample[0], style:a }, { ...sample[1], style:b }];
@@ -53,7 +53,7 @@ test('All 4,608 story/style/tone/role/ending combinations have coherent timestam
     });
     checked++;
   }
-  assert.equal(checked, 4608);
+  assert.equal(checked, 5376);
 });
 
 test('Night scenes use night times, and midnight rolls over clearly', () => {
@@ -83,7 +83,7 @@ test('100 full decks have no repeated scenarios within a deck or across the deck
       assert.ok(!seen.has(story.id), `Repeated in deck ${deck}: ${story.id}`);
       assert.notEqual(story.id,last,'Repeated consecutive story at deck boundary');
       seen.add(story.id);history=engine.remember(history,story.id);last=story.id;
-      assert.ok(history.length<=24);
+      assert.ok(history.length<=28);
     }
   }
 });

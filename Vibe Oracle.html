@@ -6,11 +6,11 @@
   <meta name="color-scheme" content="dark">
   <title>Vibe Oracle · Your future just texted</title>
   <style>
-    :root { --bg:#07111f; --panel:#101f34; --line:#293d58; --text:#f4f7ff; --muted:#a5b8d1; --blue:#587dff; --ice:#bed4ff; --lime:#d6f9a0; --pink:#ffc3d6; }
+    :root { --bg:#060b1a; --panel:#101a35; --line:#2b3a62; --text:#f7f8ff; --muted:#a8b6d7; --blue:#5e7dff; --ice:#c6d5ff; --lime:#d8ff9d; --pink:#ffc5dc; --violet:#a783ff; --cyan:#7ce8ff; --gold:#ffd77c; }
     * { box-sizing:border-box; }
     [hidden] { display:none !important; }
     html { background:var(--bg); }
-    body { margin:0; color:var(--text); font:16px/1.5 "Segoe UI",system-ui,sans-serif; background:radial-gradient(ellipse at 85% 8%,#162d54 0,transparent 50%),var(--bg); }
+    body { margin:0; color:var(--text); font:16px/1.5 "Segoe UI",system-ui,sans-serif; background:radial-gradient(ellipse at 84% 4%,#1f2a67 0,transparent 43%),radial-gradient(ellipse at 4% 80%,#172a4d 0,transparent 37%),var(--bg); }
     button,input { font:inherit; }
     button { cursor:pointer; color:inherit; }
     button:disabled { cursor:not-allowed; opacity:.45; }
@@ -79,12 +79,41 @@
     .tones .pick input:checked+span { color:var(--lime); background:#233329; border-color:#7a9e66; }
     .form-bottom { display:flex; justify-content:space-between; gap:20px; align-items:center; }
     .form-bottom p { font-size:12px; max-width:510px; }
-    .scan-screen { min-height:480px; display:grid; align-content:center; justify-items:center; text-align:center; gap:22px; }
-    .orbit { position:relative; width:150px; height:150px; display:grid; place-items:center; border:1px solid #547baf; border-radius:50%; font-size:52px; color:var(--lime); box-shadow:0 0 80px #3c60a938; }
-    .orbit::before { content:""; position:absolute; inset:-14px; border:1px dashed #547baf; border-radius:50%; animation:orbit 20s linear infinite; }
-    @keyframes orbit { to { transform:rotate(360deg); } }
-    .scan-track { width:min(330px,90%); height:3px; background:#314363; overflow:hidden; border-radius:4px; }
-    .scan-track span { display:block; width:0; height:100%; background:var(--lime); transition:width .5s; }
+    .scan-screen { position:relative; min-height:620px; overflow:hidden; display:grid; align-content:center; justify-items:center; text-align:center; gap:16px; padding:50px 18px 44px; background:radial-gradient(circle at 50% 35%,#293b7d4f,transparent 35%),linear-gradient(180deg,#071022,#111a3a 58%,#071022); }
+    .scan-screen::before { content:""; position:absolute; inset:0; pointer-events:none; opacity:.36; background-image:linear-gradient(90deg,#d7e4ff17 1px,transparent 1px),linear-gradient(#d7e4ff12 1px,transparent 1px); background-size:38px 38px; mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 82%,transparent); }
+    .scan-screen::after { content:""; position:absolute; left:-10%; right:-10%; top:18%; height:90px; border-top:1px solid #7ce8ff42; border-bottom:1px solid #d8ff9d29; background:linear-gradient(180deg,transparent,#7ce8ff13,transparent); animation:scan-band 2.4s ease-in-out infinite; pointer-events:none; }
+    .oracle-stage { position:relative; z-index:1; width:min(360px,92vw); display:grid; place-items:center; }
+    .orb-label { position:absolute; top:-13px; right:16px; z-index:4; padding:5px 9px; border:1px solid #8097de66; border-radius:999px; background:#101a35dd; color:var(--cyan); font:10px ui-monospace,monospace; letter-spacing:.12em; }
+    .orb-wrap { position:relative; width:250px; height:250px; display:grid; place-items:center; filter:drop-shadow(0 26px 46px #020615cc); }
+    .orb-ring { position:absolute; border:1px solid #7cdfff8c; border-radius:50%; transform:rotate(-22deg); }
+    .orb-ring.ring-a { width:212px; height:212px; border-left-color:transparent; border-right-color:var(--violet); animation:spin 8s linear infinite; }
+    .orb-ring.ring-b { width:244px; height:132px; border-color:#d8ff9d88; transform:rotate(26deg); animation:spin-reverse 11s linear infinite; }
+    .orb-ring.ring-c { width:176px; height:250px; border-color:#a783ff70; transform:rotate(62deg); animation:spin 14s linear infinite; }
+    .oracle-orb { position:relative; width:154px; height:154px; display:grid; place-items:center; border:1px solid #d9f5ffcc; border-radius:50%; background:radial-gradient(circle at 34% 27%,#ffffffee 0 2%,#b8e8ff 4%,#6c88ff 23%,#4e43b4 49%,#171942 78%); box-shadow:0 0 18px #9befff,0 0 60px #6d6bffb5,0 0 125px #775aff70,inset -17px -19px 33px #080b2e99; animation:orb-pulse 2.8s ease-in-out infinite; }
+    .oracle-orb::before { content:""; position:absolute; inset:11px; border:1px solid #ffffff69; border-radius:50%; opacity:.8; }
+    .oracle-orb::after { content:""; position:absolute; top:20px; left:36px; width:29px; height:13px; border-radius:50%; background:#fff; filter:blur(5px); opacity:.78; transform:rotate(-24deg); }
+    .orb-core { width:37px; height:37px; border:1px solid #eaffc5; border-radius:50%; background:radial-gradient(circle,#f7ffc8 0 8%,#d8ff9d 20%,#79b8ff 52%,transparent 70%); box-shadow:0 0 28px #d8ff9d,0 0 60px #8b7bff; animation:core-breathe 1.9s ease-in-out infinite; }
+    .orb-glyph { position:absolute; z-index:3; color:#ecf7ff; text-shadow:0 0 13px currentColor; font-size:16px; animation:glyph-float 2.5s ease-in-out infinite; }
+    .glyph-a { top:23px; left:39px; color:var(--gold); } .glyph-b { top:54px; right:18px; color:var(--cyan); animation-delay:-.6s; } .glyph-c { bottom:28px; right:47px; color:var(--lime); animation-delay:-1.3s; } .glyph-d { bottom:49px; left:17px; color:var(--pink); animation-delay:-1.9s; }
+    .signal-line { width:260px; height:1px; margin-top:4px; background:linear-gradient(90deg,transparent,var(--cyan),transparent); box-shadow:0 0 16px var(--cyan); animation:signal-scan 1.8s ease-in-out infinite; }
+    @keyframes spin { to { transform:rotate(338deg); } }
+    @keyframes spin-reverse { to { transform:rotate(-334deg); } }
+    @keyframes orb-pulse { 0%,100% { transform:scale(.96); } 50% { transform:scale(1.04); } }
+    @keyframes core-breathe { 0%,100% { transform:scale(.76); opacity:.72; } 50% { transform:scale(1.1); opacity:1; } }
+    @keyframes glyph-float { 0%,100% { transform:translateY(2px) rotate(0); opacity:.64; } 50% { transform:translateY(-7px) rotate(12deg); opacity:1; } }
+    @keyframes signal-scan { 0%,100% { transform:scaleX(.35); opacity:.35; } 50% { transform:scaleX(1); opacity:1; } }
+    @keyframes scan-band { 0%,100% { transform:translateY(-105px); opacity:.28; } 50% { transform:translateY(170px); opacity:.75; } }
+    .scan-screen h2 { position:relative; z-index:1; font-size:clamp(30px,5vw,48px); }
+    .scan-screen > .muted { position:relative; z-index:1; min-height:24px; }
+    .scan-count { position:relative; z-index:1; margin-top:-7px; color:var(--lime); font:700 42px/1 ui-monospace,Consolas,monospace; text-shadow:0 0 22px #d8ff9d66; }
+    .scan-readout { position:relative; z-index:1; width:min(520px,94vw); display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:4px 0 4px; }
+    .scan-readout span { padding:8px 5px; border:1px solid #5369a055; border-radius:9px; background:#121d3ad9; color:#9eaed1; font:9px ui-monospace,monospace; letter-spacing:.08em; }
+    .scan-readout b { display:block; margin-top:3px; color:var(--lime); font-size:10px; letter-spacing:0; }
+    .scan-feed { position:relative; z-index:1; width:min(560px,94vw); display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; text-align:left; }
+    .scan-feed p { min-height:39px; margin:0; padding:10px 12px; border:1px solid #526aa35c; border-radius:10px; background:#081426d9; color:#c7d6f4; font:10px/1.35 ui-monospace,Consolas,monospace; letter-spacing:.05em; text-transform:uppercase; overflow-wrap:anywhere; }
+    .scan-feed b { color:var(--cyan); font-weight:800; }
+    .scan-track { position:relative; z-index:1; width:min(380px,90%); height:7px; padding:1px; border:1px solid #5d76a8; background:#121c35; overflow:hidden; border-radius:999px; box-shadow:0 0 17px #4b75ff33; }
+    .scan-track span { display:block; width:0; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--violet),var(--cyan),var(--lime)); transition:width .5s; box-shadow:0 0 12px var(--cyan); }
     .reading-grid { display:grid; grid-template-columns:280px minmax(0,1fr); gap:36px; align-items:start; }
     .chapter { position:sticky; top:106px; }
     .chapter-number { font:80px/.95 ui-monospace,Consolas,monospace; color:#536e99; letter-spacing:-.08em; margin:15px 0 20px; }
@@ -116,10 +145,17 @@
     .reveal-steps li.active { color:var(--lime); border-color:var(--lime); }
     .plot-break { align-self:center; margin:7px 0; color:var(--lime); font-size:10px; letter-spacing:.16em; text-transform:uppercase; }
     .forecast-status { padding:3px 22px 14px; min-height:33px; color:var(--muted); font-size:11px; }
-    .ending { margin-top:18px; border:1px solid #81966f; border-radius:18px; padding:25px; background:linear-gradient(125deg,#202f2e,#101e31); animation:arrive .3s ease; }
-    .ending h3 { font-size:30px; color:var(--lime); margin:10px 0 12px; }
-    .ending-copy { font-size:17px; line-height:1.5; }
-    .receipt { margin:17px 0; padding:12px 0; display:flex; gap:10px; border-top:1px solid #50615b; border-bottom:1px solid #50615b; color:#c0d5c6; font:12px/1.5 ui-monospace,monospace; }
+    .ending { position:relative; overflow:hidden; margin-top:18px; border:1px solid #899eec; border-radius:24px; padding:29px; background:radial-gradient(circle at 87% 16%,#354798 0,transparent 32%),linear-gradient(140deg,#171f4a,#0e182d 72%); box-shadow:0 25px 70px #0206158c, inset 0 1px #ffffff18; animation:arrive .3s ease; }
+    .ending::before { content:""; position:absolute; width:210px; height:210px; right:-80px; top:-80px; border:1px solid #b7c6ff35; border-radius:50%; box-shadow:0 0 0 14px #b7c6ff0c,0 0 0 29px #b7c6ff08; pointer-events:none; }
+    .ending-topline { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .signal-chip { padding:5px 9px; border:1px solid #d8ff9d77; border-radius:999px; color:var(--lime); background:#18283b; font:10px ui-monospace,monospace; white-space:nowrap; }
+    .verdict-emblem { position:relative; z-index:1; width:66px; height:66px; display:grid; place-items:center; margin:20px auto 14px; border:1px solid #d8ff9d99; border-radius:50%; color:var(--lime); font-size:35px; background:radial-gradient(circle,#d8ff9d33,transparent 67%); box-shadow:0 0 35px #d8ff9d55; animation:orb-pulse 2.3s ease-in-out infinite; }
+    .ending h3 { position:relative; z-index:1; font-size:clamp(30px,5vw,46px); text-align:center; color:var(--lime); margin:10px 0 12px; }
+    .ending-copy { position:relative; z-index:1; max-width:620px; margin:auto; text-align:center; font-size:17px; line-height:1.5; }
+    .forecast-pills { position:relative; z-index:1; display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin:21px 0 3px; }
+    .forecast-pills span { padding:9px 6px; border:1px solid #6175af66; border-radius:9px; text-align:center; color:#a8b9df; font:9px ui-monospace,monospace; letter-spacing:.06em; }
+    .forecast-pills b { display:block; margin-top:3px; color:var(--cyan); font-size:10px; letter-spacing:0; }
+    .receipt { position:relative; z-index:1; margin:17px 0; padding:12px 0; display:flex; gap:10px; border-top:1px solid #596b9a; border-bottom:1px solid #596b9a; color:#c7d5f1; font:12px/1.5 ui-monospace,monospace; }
     .reactions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin:14px 0; }
     .reactions button[aria-pressed=true] { background:#354833; border-color:var(--lime); }
     #reactionNote { color:var(--muted); min-height:22px; font-size:12px; }
@@ -148,7 +184,8 @@
       .reading-grid { grid-template-columns:1fr; gap:20px; } .chapter { position:static; } .chapter-number { display:none; } .chapter h2 { margin:9px 0; font-size:34px; }
       .duo { margin:15px 0 7px; } .cast-notes { padding:8px 0 0; margin-top:8px; display:flex; flex-wrap:wrap; gap:0 16px; } .fiction-label { margin-top:8px; }
       .messages { padding:17px 15px 8px; } .chat-header { padding:14px 15px; } .reveal-steps { padding:13px 15px; } .bubble { font-size:14px; }
-      .ending { padding:21px; } .ending h3 { font-size:27px; } .ending-copy { font-size:16px; } .footer { flex-direction:column; gap:5px; }
+      .scan-screen { min-height:560px; padding-top:42px; } .orb-wrap { transform:scale(.82); margin:-22px 0; } .scan-count { font-size:34px; } .scan-feed { grid-template-columns:1fr; gap:5px; } .scan-feed p { min-height:0; padding:8px 10px; } .scan-readout { gap:4px; } .scan-readout span { font-size:8px; padding-left:2px; padding-right:2px; }
+      .ending { padding:21px; } .ending h3 { font-size:27px; } .ending-copy { font-size:16px; } .forecast-pills { gap:4px; } .forecast-pills span { font-size:8px; } .footer { flex-direction:column; gap:5px; }
     }
     @media(max-width:420px) { body.embedded .brand { visibility:hidden; width:0; margin:0; } body.embedded .tools { margin-left:auto; } }
     @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; } }
@@ -176,7 +213,7 @@
           </div>
           <div class="future-preview" aria-label="Example fictional future conversation">
             <p class="kicker" style="text-align:center">Tomorrow has a notification for you</p>
-            <div class="preview-time">11:45</div><p class="preview-date">PM · Somewhere in an alternate timeline</p>
+            <div id="previewTime" class="preview-time">11:45</div><p id="previewDate" class="preview-date">PM · Somewhere in an alternate timeline</p>
             <div class="preview-alert"><small>YOUR PERSON · NOW</small>“We need to talk.”</div>
             <div class="preview-reply">Okay… about us or the missing fries?</div>
             <p class="preview-caption">THE ORACLE HAS THE FINAL WORD.</p>
@@ -188,11 +225,23 @@
         <form id="profileForm">
           <div id="profiles" class="profiles"></div>
           <div class="tone-row"><div><p style="font-weight:650">How loud is the Oracle?</p><p id="toneDescription" class="muted" style="font-size:12px">A little warmth. A little mischief.</p></div><fieldset style="margin:0"><legend class="kicker">Choose the commentary</legend><div id="tones" class="tones"></div></fieldset></div>
-          <div class="form-bottom"><p class="muted">Your picks shape the story. Friends, crushes or a duo with no official label—all welcome. The future is entirely made up.</p><button class="primary" type="submit">Open our future <span aria-hidden="true">↗</span></button></div>
+          <div class="form-bottom"><p class="muted">Your picks shape the story. Friends, crushes or a duo with no official label—all welcome. The future is entirely made up.</p><button class="primary" type="submit">Start the scan <span aria-hidden="true">↗</span></button></div>
         </form>
       </section>
       <section id="scan" class="screen scan-screen" hidden aria-live="polite">
-        <div class="orbit" aria-hidden="true">✧</div><p class="kicker">Connecting to tomorrow</p><h2 tabindex="-1">Incoming plot twist.</h2><p id="scanMessage" class="muted">Finding your alternate timeline…</p><div class="scan-track" aria-hidden="true"><span id="scanProgress"></span></div><button id="skipScan" class="quiet">Open it now</button>
+        <div class="oracle-stage" aria-hidden="true">
+          <span class="orb-label">ORACLE NODE / 01</span>
+          <div class="orb-wrap">
+            <div class="orb-ring ring-a"></div><div class="orb-ring ring-b"></div><div class="orb-ring ring-c"></div>
+            <span class="orb-glyph glyph-a">✦</span><span class="orb-glyph glyph-b">◇</span><span class="orb-glyph glyph-c">✧</span><span class="orb-glyph glyph-d">⋆</span>
+            <div class="oracle-orb"><span class="orb-core"></span></div>
+          </div>
+          <div class="signal-line"></div>
+        </div>
+        <p class="kicker">The Oracle is waking up</p><h2 id="scanTitle" tabindex="-1">Opening the timeline.</h2><div id="scanPercent" class="scan-count">0%</div><p id="scanMessage" class="muted">Finding your alternate timeline...</p>
+        <div class="scan-feed" aria-hidden="true"><p id="scanFeedA"><b>INPUT</b> waiting for nicknames</p><p id="scanFeedB"><b>PRIVACY</b> photos stay local</p><p id="scanFeedC"><b>STORY</b> shuffling future chaos</p><p id="scanFeedD"><b>RESULT</b> sealed until reveal</p></div>
+        <div class="scan-readout" aria-hidden="true"><span>VIBE SIGNAL<b>WAITING</b></span><span>SHARED TIMELINE<b>OFFLINE</b></span><span>CHAOS INDEX<b>LOW</b></span></div>
+        <div class="scan-track" aria-hidden="true"><span id="scanProgress"></span></div><button id="skipScan" class="quiet">Reveal now</button>
       </section>
       <section id="reading" class="screen" hidden>
         <div class="reading-grid">
@@ -208,7 +257,7 @@
               <div id="messages" class="messages" role="log" aria-label="Your fictional future conversation" aria-live="polite"></div><div id="typing" class="typing" aria-live="off"></div>
               <p id="forecastStatus" class="forecast-status" role="status">Your forecast is unfolding…</p>
             </div>
-            <section id="ending" class="ending" hidden aria-labelledby="endingTitle"><p class="kicker">The Oracle has seen enough</p><h3 id="endingTitle" tabindex="-1"></h3><p id="endingCopy" class="ending-copy"></p><p id="receipt" class="receipt"></p><div class="reactions"><span class="muted" style="font-size:12px">The accuracy?</span><button class="quiet" data-reaction="yes" aria-pressed="false">That is so us</button><button class="quiet" data-reaction="no" aria-pressed="false">Absolutely not</button></div><p id="reactionNote" aria-live="polite"></p><div class="ending-actions"><button id="collectButton" class="primary">Collect QuestPass stamp <span aria-hidden="true">↗</span></button><button id="newPlayersButton" class="secondary">New players</button></div><p class="end-note">Random entertainment, not relationship advice. Your photo cards clear when you finish or start over.</p></section>
+            <section id="ending" class="ending" hidden aria-labelledby="endingTitle"><div class="ending-topline"><p class="kicker">Oracle transmission complete</p><span class="signal-chip">✦ signal locked</span></div><div class="verdict-emblem" aria-hidden="true"><span>✧</span></div><h3 id="endingTitle" tabindex="-1"></h3><p id="endingCopy" class="ending-copy"></p><div class="forecast-pills" aria-hidden="true"><span>FUTURE MESSAGE <b>FOUND</b></span><span>PLOT TWIST <b>CONFIRMED</b></span><span>FATE STATUS <b>UNSTABLE</b></span></div><p id="receipt" class="receipt"></p><div class="reactions"><span class="muted" style="font-size:12px">The accuracy?</span><button class="quiet" data-reaction="yes" aria-pressed="false">That is so us</button><button class="quiet" data-reaction="no" aria-pressed="false">Absolutely not</button></div><p id="reactionNote" aria-live="polite"></p><div class="ending-actions"><button id="collectButton" class="primary">Collect QuestPass stamp <span aria-hidden="true">↗</span></button><button id="newPlayersButton" class="secondary">New players</button></div><p class="end-note">Random entertainment, not relationship advice. Your photo cards clear when you finish or start over.</p></section>
           </div>
         </div>
       </section>
@@ -485,6 +534,17 @@
       try { const saved=JSON.parse(sessionStorage.getItem(HISTORY_KEY)||'[]'); history=Array.isArray(saved)?saved.filter(id=>typeof id==='string').slice(-E.SCENES.length):[]; }
       catch { storageAvailable=false; history=[]; }
     }
+    function randomizePreviewClock() {
+      const previews=[
+        ['9:18','PM · The message arrives too casually'],
+        ['10:07','PM · Group chat silence detected'],
+        ['11:45','PM · Somewhere in an alternate timeline'],
+        ['12:03','AM · Somebody is definitely overthinking'],
+        ['7:26','PM · One notification changes the plot']
+      ];
+      const [time,label]=previews[Math.floor(Math.random()*previews.length)];
+      $('previewTime').textContent=time;$('previewDate').textContent=label;
+    }
     function saveHistory(id) {
       history=E.remember(history,id);
       if(storageAvailable) try { sessionStorage.setItem(HISTORY_KEY,JSON.stringify(history)); } catch { storageAvailable=false; }
@@ -605,10 +665,20 @@
       // Pass only text choices to the story engine. Photos never enter its data.
       episode=E.createEpisode(players.map(({name,style,interest})=>({name,style,interest})),tone,history);
       saveHistory(episode.story.id); show('scan');
-      const lines=[`Casting ${episode.a.name} + ${episode.b.name}…`,'One notification. Two possible endings.','Your tomorrow is ready to open.'];
-      for(let i=0;i<lines.length;i++) {
-        $('scanMessage').textContent=lines[i];$('scanProgress').style.width=`${(i+1)/lines.length*100}%`;
-        if(!scanSkip&&!reducedMotion&&!await wait(750))return;
+      $('scanProgress').style.width='0%';$('scanPercent').textContent='0%';
+      const scanSteps=[
+        {percent:9,title:'Signal detected.',message:`${episode.a.name} and ${episode.b.name} have entered the timeline.`,readout:['LOCKING','BOOTING','LOW'],feed:[['INPUT','nicknames received'],['PRIVACY','photos stay on this device'],['STORY','choosing a scene'],['RESULT','still sealed']],ms:800},
+        {percent:27,title:'Pulling tomorrow closer.',message:'The Oracle is checking for suspicious notifications.',readout:['LOCKED','SEARCHING','RISING'],feed:[['CHAT','first message found'],['TIMING','future clock unstable'],['STYLE','reply habits loaded'],['TONE',E.TONES[episode.tone].toUpperCase()]],ms:950},
+        {percent:52,title:'Finding the plot twist.',message:'Matching your choices with the most dramatic possible timeline.',readout:['LOUD','MAPPING','UNHELPFUL'],feed:[['SCENE',episode.story.title],['HANGOUT',E.INTERESTS[episode.a.interest]],['REACTION',E.INTERESTS[episode.b.interest]],['ORACLE','pretending this is scientific']],ms:1050},
+        {percent:78,title:'Sealing the verdict.',message:'The final message is being written. Nobody act normal.',readout:['PEAKING','ALIGNED','HIGH'],feed:[['EVIDENCE','chat transcript prepared'],['WARNING','side-eye probability high'],['FORECAST','one ending selected'],['STAMP','locked until finish']],ms:950},
+        {percent:100,title:'Transmission ready.',message:'Future loaded. The Oracle is about to expose the timeline.',readout:['LOCKED','READY','CONFIRMED'],feed:[['SIGNAL','clean'],['TIMELINE','connected'],['VERDICT','armed'],['COUNTDOWN','opening now']],ms:650}
+      ];
+      const feedIds=['scanFeedA','scanFeedB','scanFeedC','scanFeedD'];
+      for(const step of scanSteps) {
+        $('scanTitle').textContent=step.title;$('scanMessage').textContent=step.message;$('scanPercent').textContent=`${step.percent}%`;$('scanProgress').style.width=`${step.percent}%`;
+        document.querySelectorAll('.scan-readout b').forEach((node,index)=>{node.textContent=step.readout[index];});
+        feedIds.forEach((id,index)=>{$(id).replaceChildren(el('b','',step.feed[index][0]),document.createTextNode(` ${step.feed[index][1]}`));});
+        if(!scanSkip&&!await wait(step.ms))return;
         if(token!==epoch)return;
       }
       if(token===epoch)openReading(token);
@@ -659,14 +729,20 @@
       closeCamera(); players=[{name:'',style:'',interest:'',photo:null},{name:'',style:'',interest:'',photo:null}]; episode=null;
       $('profileForm').reset();profileElements.forEach((nodes,i)=>{nodes.name.value='';nodes.name.setCustomValidity('');refreshProfile(i);});
       $('castAvatarA').replaceChildren();$('castAvatarB').replaceChildren();$('messages').replaceChildren();
-      for(const id of ['castNames','castNoteA','castNoteB','chatSubtitle','scanMessage','cameraTitle','forecastStatus'])$(id).textContent='';
+      for(const id of ['castNames','castNoteA','castNoteB','chatSubtitle','scanTitle','scanMessage','scanPercent','cameraTitle','forecastStatus'])$(id).textContent='';
       $('captureCanvas').width=0;$('captureCanvas').height=0;
     }
     function reset() {
       cancelRun();clearPersonalData();completed=false;sent=false;tone='friendly';
       $('consentA').checked=$('consentB').checked=false;$('beginButton').disabled=true;
       document.querySelector('input[name="tone"][value="friendly"]').checked=true;$('toneDescription').textContent=E.TONE_COPY.friendly;
-      $('scanProgress').style.width='0%';$('ending').hidden=true;$('typing').textContent='';setRevealStep('moment');show('welcome',false);$('beginButton').focus({preventScroll:true});
+      $('scanTitle').textContent='Opening the timeline.';$('scanMessage').textContent='Finding your alternate timeline...';$('scanPercent').textContent='0%';$('scanProgress').style.width='0%';
+      $('scanFeedA').replaceChildren(el('b','','INPUT'),document.createTextNode(' waiting for nicknames'));
+      $('scanFeedB').replaceChildren(el('b','','PRIVACY'),document.createTextNode(' photos stay local'));
+      $('scanFeedC').replaceChildren(el('b','','STORY'),document.createTextNode(' shuffling future chaos'));
+      $('scanFeedD').replaceChildren(el('b','','RESULT'),document.createTextNode(' sealed until reveal'));
+      document.querySelectorAll('.scan-readout b').forEach((node,index)=>{node.textContent=['WAITING','OFFLINE','LOW'][index];});
+      $('ending').hidden=true;$('typing').textContent='';setRevealStep('moment');show('welcome',false);$('beginButton').focus({preventScroll:true});
     }
     function collect() {
       if(!completed||sent)return;
@@ -693,7 +769,7 @@
     }));
     document.addEventListener('visibilitychange',()=>{if(document.hidden&&$('cameraDialog').open)closeCamera();});
     window.addEventListener('pagehide',()=>{cancelRun();clearPersonalData();});
-    readHistory();buildProfiles();
+    readHistory();randomizePreviewClock();buildProfiles();
   })();
   </script>
 </body>
