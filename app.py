@@ -330,6 +330,21 @@ _career_voice_reader = st.components.v2.component(
 <section class="voice-reader">
   <button id="readBtn" type="button">🔊 Read prediction aloud</button>
   <button id="cancelBtn" type="button">Stop voice</button>
+  <label class="voice-tone" for="voiceSelect">
+    <span>Voice</span>
+    <select id="voiceSelect">
+      <option value="auto">Loading voices...</option>
+    </select>
+  </label>
+  <label class="voice-tone" for="toneSelect">
+    <span>Tone</span>
+    <select id="toneSelect">
+      <option value="human" selected>Cool human</option>
+      <option value="hype">Hype announcer</option>
+      <option value="chill">Chill guide</option>
+      <option value="scanner">Robot scanner</option>
+    </select>
+  </label>
   <span id="readerStatus">Optional: let the app announce the result.</span>
 </section>
 """,
@@ -376,6 +391,41 @@ button:disabled {
   opacity: 0.55;
 }
 
+.voice-tone {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  max-width: 100%;
+  color: #b7c7df;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.voice-tone span {
+  color: #9be9ff;
+  font-size: 0.72rem;
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+}
+
+select {
+  max-width: min(290px, 72vw);
+  min-height: 40px;
+  padding: 0.5rem 0.8rem;
+  border: 1px solid rgba(125, 211, 252, 0.34);
+  border-radius: 999px;
+  background: rgba(15, 35, 72, 0.72);
+  color: #f8fbff;
+  font: inherit;
+  font-weight: 800;
+  outline: none;
+}
+
+select:focus {
+  border-color: #cffafe;
+  box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.12);
+}
+
 #cancelBtn {
   background: rgba(2, 6, 23, 0.45);
 }
@@ -398,9 +448,11 @@ export default function(component) {
   const { data, parentElement } = component;
   const readBtn = parentElement.querySelector("#readBtn");
   const cancelBtn = parentElement.querySelector("#cancelBtn");
+  const voiceSelect = parentElement.querySelector("#voiceSelect");
+  const toneSelect = parentElement.querySelector("#toneSelect");
   const status = parentElement.querySelector("#readerStatus");
 
-  if (!readBtn || !cancelBtn || !status) {
+  if (!readBtn || !cancelBtn || !voiceSelect || !toneSelect || !status) {
     return;
   }
 
@@ -414,9 +466,123 @@ export default function(component) {
   if (!canSpeak) {
     readBtn.disabled = true;
     cancelBtn.disabled = true;
+    voiceSelect.disabled = true;
     setStatus("Voice output is not supported in this browser.", "error");
     return;
   }
+
+  let voices = [];
+
+  const refreshVoices = () => {
+    voices = window.speechSynthesis.getVoices();
+  };
+
+  const scoreVoice = (voice) => {
+    const name = String(voice.name || "").toLowerCase();
+    const lang = String(voice.lang || "").toLowerCase();
+    let score = 0;
+
+    if (lang.startsWith("en")) score += 25;
+    if (/natural|neural|premium|enhanced/.test(name)) score += 35;
+    if (/aria|jenny|samantha|sonia|zira|guy|google|microsoft|apple/.test(name)) score += 18;
+    if (/female|woman/.test(name)) score += 6;
+    if (voice.default) score += 8;
+
+    return score;
+  };
+
+  const describeVoice = (voice) => {
+    const name = String(voice.name || "Browser voice").replace(/\\s+/g, " ").trim();
+    const lang = String(voice.lang || "unknown");
+    return `${name} · ${lang}${voice.default ? " · default" : ""}`;
+  };
+
+  const populateVoiceOptions = () => {
+    const previousValue = voiceSelect.value || "auto";
+    refreshVoices();
+
+    const englishVoices = voices.filter((voice) =>
+      String(voice.lang || "").toLowerCase().startsWith("en")
+    );
+    const visibleVoices = englishVoices.length ? englishVoices : voices;
+
+    voiceSelect.innerHTML = "";
+
+    const autoOption = document.createElement("option");
+    autoOption.value = "auto";
+    autoOption.textContent = "Auto best voice";
+    voiceSelect.appendChild(autoOption);
+
+    if (!visibleVoices.length) {
+      const loadingOption = document.createElement("option");
+      loadingOption.value = "loading";
+      loadingOption.textContent = "Loading browser voices...";
+      loadingOption.disabled = true;
+      voiceSelect.appendChild(loadingOption);
+      voiceSelect.value = "auto";
+      setStatus("Loading browser voices. If this stays empty, refresh once.");
+      return;
+    }
+
+    visibleVoices.forEach((voice) => {
+      const originalIndex = voices.indexOf(voice);
+      const option = document.createElement("option");
+      option.value = String(originalIndex);
+      option.textContent = describeVoice(voice);
+      voiceSelect.appendChild(option);
+    });
+
+    const stillHasPrevious = Array.from(voiceSelect.options).some(
+      (option) => option.value === previousValue
+    );
+    voiceSelect.value = stillHasPrevious ? previousValue : "auto";
+
+    if (status.className === "active") {
+      return;
+    }
+
+    if (visibleVoices.length === 1) {
+      setStatus(`Only one browser voice found: ${describeVoice(visibleVoices[0])}. Tone changes delivery, not speaker.`);
+    } else {
+      setStatus(`${visibleVoices.length} browser voices found. Pick a voice, then read the result.`);
+    }
+  };
+
+  const pickBestVoice = () => {
+    refreshVoices();
+    return [...voices].sort((first, second) => scoreVoice(second) - scoreVoice(first))[0] || null;
+  };
+
+  const getSelectedVoice = () => {
+    const selectedValue = voiceSelect.value;
+
+    if (selectedValue && selectedValue !== "auto" && selectedValue !== "loading") {
+      const index = Number(selectedValue);
+      return Number.isInteger(index) ? voices[index] || null : null;
+    }
+
+    return pickBestVoice();
+  };
+
+  const getToneSettings = () => {
+    const tone = toneSelect.value || "human";
+
+    return {
+      human: { rate: 0.91, pitch: 1.0 },
+      hype: { rate: 1.12, pitch: 1.18 },
+      chill: { rate: 0.78, pitch: 0.86 },
+      scanner: { rate: 0.84, pitch: 0.55 },
+    }[tone] || { rate: 0.91, pitch: 1.0 };
+  };
+
+  populateVoiceOptions();
+
+  if ("onvoiceschanged" in window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = populateVoiceOptions;
+  }
+
+  window.setTimeout(populateVoiceOptions, 300);
+  window.setTimeout(populateVoiceOptions, 1200);
 
   readBtn.onclick = () => {
     const text = String(data?.text || "").trim();
@@ -429,11 +595,20 @@ export default function(component) {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = data?.language || "en-US";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
+    const toneSettings = getToneSettings();
+    const voice = getSelectedVoice();
+
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang || data?.language || "en-US";
+    } else {
+      utterance.lang = data?.language || "en-US";
+    }
+
+    utterance.rate = toneSettings.rate;
+    utterance.pitch = toneSettings.pitch;
     utterance.volume = 1;
-    utterance.onstart = () => setStatus("Reading prediction...", "active");
+    utterance.onstart = () => setStatus("Reading prediction with selected tone...", "active");
     utterance.onend = () => setStatus("Done reading. You can run another prediction.");
     utterance.onerror = () => setStatus("Voice output had trouble reading that.", "error");
 
@@ -593,20 +768,19 @@ def apply_career_voice_transcript(transcript: object) -> None:
 
 
 def build_career_spoken_result(student_name: str, predictions: list[dict]) -> str:
-    """Create a short text-to-speech result that avoids long explanations."""
+    """Create a short, informal text-to-speech prediction."""
     top_prediction = predictions[0]
-    student_intro = f"{student_name}, your" if student_name else "Your"
+    student_intro = f"{student_name}, " if student_name else ""
     spoken = (
-        "Career Quest prediction unlocked. "
-        f"{student_intro} strongest career signal is {top_prediction['career']}, "
-        f"with a {top_prediction['score']} percent match."
+        f"{student_intro}prediction locked. "
+        f"Your top match is {top_prediction['career']}, "
+        f"{top_prediction['score']} percent."
     )
 
     if len(predictions) > 1:
         backup_names = [prediction["career"] for prediction in predictions[1:]]
-        spoken += " Also detected: " + " and ".join(backup_names) + "."
+        spoken += " Backup picks: " + " and ".join(backup_names) + "."
 
-    spoken += " Remember, this is just an interest based suggestion for Open Day."
     return spoken
 
 
