@@ -9,7 +9,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import FeatureUnion, Pipeline
 
 
-DATA_PATH = Path(__file__).with_name("data.csv")
+DATA_PATH = Path(__file__).with_name("data_v3.csv")
+
+if not DATA_PATH.exists():
+    DATA_PATH = Path(__file__).with_name("data.csv")
+
 TOKEN_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z'-]*")
 
 
@@ -127,20 +131,27 @@ def predict_careers(subjects, hobbies, limit=3):
     probabilities = model.predict_proba([profile_text])[0]
     careers = model.named_steps["classifier"].classes_
     top_indices = probabilities.argsort()[::-1][:limit]
+    top_probability_total = probabilities[top_indices].sum()
 
     predictions = []
 
     for index in top_indices:
         career = careers[index]
+        match_score = (
+            round(float(probabilities[index] / top_probability_total) * 100)
+            if top_probability_total
+            else 0
+        )
 
         predictions.append(
             {
                 "career": career,
-                "score": round(float(probabilities[index]) * 100),
+                "score": match_score,
                 "evidence": find_career_evidence(
                     profile_text,
                     career,
                 ),
+                "model_probability": round(float(probabilities[index]) * 100, 2),
             }
         )
 
