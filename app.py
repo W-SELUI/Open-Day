@@ -3,7 +3,6 @@ from pathlib import Path
 import streamlit as st
 
 from career_model import predict_careers
-from ollama_explainer import generate_career_explanation
 from questpass_bridge import (
     render_gravity_thief_activity,
     render_hand_puzzle_activity,
@@ -190,8 +189,8 @@ if page == "home":
                 <div class="mode-icon">🎓</div>
                 <h2>Career Quest</h2>
                 <p>
-                    Tell our trained model what you enjoy, then see career
-                    matches and an AI-powered explanation.
+                    Tell our trained model what you enjoy, then see simple
+                    career matches from this project's training data.
                 </p>
             </div>
             """,
@@ -653,20 +652,6 @@ elif page == "career":
                 )
 
             else:
-                explanation = None
-
-                # Wait for Ollama before rendering any of the final results.
-                try:
-                    with st.spinner("Analysing your interests..."):
-                        explanation = generate_career_explanation(
-                            name,
-                            subjects,
-                            hobbies,
-                            predictions,
-                        )
-                except Exception:
-                    explanation = None
-
                 student_name = name.strip()
                 heading = (
                     f"{student_name}'s top career matches"
@@ -703,15 +688,6 @@ elif page == "career":
                     "These are interest-based suggestions from this project's "
                     "training data, not a decision about your future."
                 )
-
-                if explanation:
-                    st.subheader("Why this may suit you")
-                    st.write(explanation)
-                else:
-                    st.info(
-                        "Your model result is ready, but the local Ollama "
-                        "explanation service is unavailable right now."
-                    )
 
                 if "career" not in st.session_state.quest_stamps:
                     award_questpass_stamp("career")

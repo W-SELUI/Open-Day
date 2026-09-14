@@ -118,10 +118,6 @@
       <td>Supports data processing</td>
     </tr>
     <tr>
-      <td>Ollama</td>
-      <td>Generates local AI career explanations</td>
-    </tr>
-    <tr>
       <td>HTML, CSS, JavaScript</td>
       <td>Builds the interactive games and experiences</td>
     </tr>
@@ -141,7 +137,6 @@
 ├── app.py                     # Main Streamlit application
 ├── UI_theme.py                # Shared app styling and theme
 ├── career_model.py            # Career machine-learning model
-├── ollama_explainer.py        # Ollama AI explanation feature
 ├── data.csv                   # Career model training data
 ├── requirements.txt           # Python dependencies
 │
@@ -187,24 +182,6 @@ source .venv/bin/activate
 
 <pre><code>pip install -r requirements.txt
 </code></pre>
-
-<h3>4. Install Ollama (Optional but Recommended)</h3>
-
-<p>
-  Ollama is only needed for the AI-written explanation in Career Quest.
-  Download it from:
-  <a href="https://ollama.com/download">ollama.com/download</a>
-</p>
-
-<p>After installing Ollama, download the model:</p>
-
-<pre><code>ollama pull llama3.2
-</code></pre>
-
-<p>
-  If Ollama is not installed, the career prediction should still work,
-  but the AI-generated explanation may not appear.
-</p>
 
 <hr>
 
