@@ -1,4 +1,6 @@
 from pathlib import Path
+from html import escape
+import time
 
 import streamlit as st
 
@@ -59,6 +61,179 @@ QUEST_STAMPS = {
     "vibe_link": ("✨", "Vibe Scanner"),
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
 }
+
+CAREER_SCAN_STEPS = (
+    (12, "Powering up the career scanner..."),
+    (29, "Reading subject energy..."),
+    (46, "Checking interest patterns..."),
+    (64, "Comparing 45 possible paths..."),
+    (82, "Locking onto your strongest match..."),
+    (100, "Prediction ready."),
+)
+
+CAREER_CLUE_STOP_WORDS = {
+    "and",
+    "are",
+    "for",
+    "how",
+    "the",
+    "to",
+    "with",
+    "your",
+}
+
+
+def render_career_scan() -> None:
+    """Show a short theatrical loading moment before revealing predictions."""
+    scan_slot = st.empty()
+    progress_slot = st.empty()
+
+    with scan_slot.container():
+        st.markdown(
+            """
+            <section class="career-scan-panel">
+                <div class="career-scan-orb">🎓</div>
+                <div>
+                    <p class="career-scan-eyebrow">Career Quest scanner</p>
+                    <h3>Building your future signal...</h3>
+                    <p>Subjects, hobbies and Open Day chaos are being matched.</p>
+                </div>
+                <div class="career-scan-beam"></div>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    for value, step in CAREER_SCAN_STEPS:
+        progress_slot.progress(value, text=step)
+        time.sleep(0.28)
+
+    progress_slot.empty()
+    scan_slot.empty()
+
+
+def format_career_clue(clue: str) -> str:
+    """Make model clue words look nicer for the visitor."""
+    special_words = {
+        "ai": "AI",
+        "pe": "PE",
+        "ui": "UI",
+        "ux": "UX",
+    }
+
+    return " ".join(
+        special_words.get(word, word.capitalize())
+        for word in clue.split()
+    )
+
+
+def collect_career_clues(result: dict, predictions: list[dict], limit: int = 5) -> list[str]:
+    """Pick a few clean clue words or phrases without showing a technical report."""
+    clues = []
+
+    def add_clue(term: str) -> None:
+        cleaned = term.strip().lower()
+
+        if (
+            not cleaned
+            or cleaned in CAREER_CLUE_STOP_WORDS
+            or len(cleaned) < 3
+            or cleaned in {clue.lower() for clue in clues}
+        ):
+            return
+
+        clues.append(format_career_clue(cleaned))
+
+    for prediction in predictions:
+        for clue in prediction.get("evidence", []):
+            add_clue(clue)
+
+            if len(clues) >= limit:
+                return clues
+
+    for clue in result.get("recognized_terms", []):
+        add_clue(clue)
+
+        if len(clues) >= limit:
+            break
+
+    return clues
+
+
+def render_career_reveal(student_name: str, predictions: list[dict], result: dict) -> None:
+    """Render the final Career Quest result as a dramatic prediction card."""
+    top_prediction = predictions[0]
+    backup_predictions = predictions[1:]
+    owner = (
+        f"{escape(student_name)}'s strongest career signal"
+        if student_name
+        else "Your strongest career signal"
+    )
+
+    st.markdown(
+        f"""
+        <section class="career-result-stage">
+            <p class="career-result-eyebrow">Prediction unlocked</p>
+            <p class="career-result-owner">{owner}</p>
+            <h2>{escape(top_prediction["career"])}</h2>
+            <div class="career-match-score">
+                <strong>{top_prediction["score"]}</strong>
+                <span>% match</span>
+            </div>
+            <p class="career-result-tagline">
+                Career Quest found this as your strongest match from the training data.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if backup_predictions:
+        st.markdown(
+            '<p class="career-backup-title">Also detected in your future timeline</p>',
+            unsafe_allow_html=True,
+        )
+
+        columns = st.columns(len(backup_predictions), gap="medium")
+
+        for rank, column, prediction in zip(
+            range(2, len(backup_predictions) + 2),
+            columns,
+            backup_predictions,
+        ):
+            with column:
+                st.markdown(
+                    f"""
+                    <div class="career-path-card">
+                        <span>Option {rank}</span>
+                        <h3>{escape(prediction["career"])}</h3>
+                        <p>{prediction["score"]}% match</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    clues = collect_career_clues(result, predictions)
+
+    if clues:
+        clue_markup = "".join(
+            f"<span>{escape(clue)}</span>"
+            for clue in clues
+        )
+        st.markdown(
+            f"""
+            <div class="career-clue-card">
+                <p>Clues caught by the scanner</p>
+                <div>{clue_markup}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+    st.caption(
+        "These are interest-based suggestions from this project's training data, "
+        "not a decision about your future."
+    )
 
 
 def award_questpass_stamp(activity: str) -> None:
@@ -653,41 +828,8 @@ elif page == "career":
 
             else:
                 student_name = name.strip()
-                heading = (
-                    f"{student_name}'s top career matches"
-                    if student_name
-                    else "Your top career matches"
-                )
-
-                st.success(heading)
-
-                columns = st.columns(len(predictions))
-
-                for column, prediction in zip(columns, predictions):
-                    with column:
-                        st.metric(
-                            prediction["career"],
-                            f"{prediction['score']}% match",
-                        )
-
-                recognized = ", ".join(result["recognized_terms"])
-                st.caption(
-                    f"Words recognised from your answer: {recognized}."
-                )
-
-                top_evidence = predictions[0]["evidence"]
-
-                if top_evidence:
-                    st.caption(
-                        "Strongest model evidence: "
-                        + ", ".join(top_evidence)
-                        + "."
-                    )
-
-                st.caption(
-                    "These are interest-based suggestions from this project's "
-                    "training data, not a decision about your future."
-                )
+                render_career_scan()
+                render_career_reveal(student_name, predictions, result)
 
                 if "career" not in st.session_state.quest_stamps:
                     award_questpass_stamp("career")
