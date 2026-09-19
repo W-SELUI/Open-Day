@@ -626,6 +626,7 @@ export default function(component) {
 QUEST_STAMPS = {
     "hand_puzzle": ("🧩", "Puzzle Solver"),
     "hand_rush": ("⚡", "Gravity Bender"),
+    "slice_club": ("🍉", "Slice Champion"),
     "career": ("🎓", "Future Explorer"),
     "vibe_link": ("✨", "Vibe Scanner"),
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
@@ -912,7 +913,7 @@ if page == "home":
         unsafe_allow_html=True,
     )
 
-    # QuestPass is a visible progress board, not a sixth activity. Visitors
+    # QuestPass is a visible progress board, not a separate activity. Visitors
     # can see their stamp hunt before choosing what to try next.
     stamp_count = len(st.session_state.quest_stamps)
     total_stamps = len(QUEST_STAMPS)
@@ -926,7 +927,7 @@ if page == "home":
         for activity, (icon, title) in QUEST_STAMPS.items()
     )
 
-    if stamp_count >= 5:
+    if stamp_count >= total_stamps:
         quest_message = "Full collection unlocked: Master of Open Day Chaos."
     elif stamp_count >= 3:
         quest_message = "Explorer title unlocked: Certified Open Day Chaos Engineer."
@@ -1036,7 +1037,7 @@ if page == "home":
             st.session_state.page = "vibe_link"
             st.rerun()
 
-    oracle_column, _ = st.columns(2, gap="large")
+    oracle_column, slice_column = st.columns(2, gap="large")
 
     with oracle_column:
         st.markdown(
@@ -1055,6 +1056,25 @@ if page == "home":
 
         if st.button("Ask the Vibe Oracle", key="open_vibe_oracle"):
             st.session_state.page = "vibe_oracle"
+            st.rerun()
+
+    with slice_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">🍉</div>
+                <h2>Slice Club</h2>
+                <p>
+                    Turn your index finger into a blade, slice flying fruit,
+                    dodge bombs, and chase the highest 30-second score.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Enter Slice Club", key="open_slice_club"):
+            st.session_state.page = "slice_club"
             st.rerun()
 
     st.markdown(
@@ -1245,6 +1265,100 @@ elif page == "hand_rush":
             st.session_state.page = "home"
             st.rerun()
         if completion == {"action": "back"}:
+            st.session_state.page = "home"
+            st.rerun()
+
+elif page == "slice_club":
+    # Slice Club is served from Streamlit's static directory so its JavaScript,
+    # artwork, MediaPipe model, worker, and WebAssembly files stay together.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                min-height: 100vh !important;
+                width: 100vw !important;
+                height: auto !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+            }
+
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+            }
+
+            .st-key-back_from_slice_club,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_slice_club button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: relative !important;
+                inset: auto !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to AI Lab", key="back_from_slice_club"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    slice_club_build = (
+        Path(__file__).with_name("static") / "slice-club" / "index.html"
+    )
+
+    if not slice_club_build.exists():
+        st.error("The Slice Club game build could not be found.")
+    else:
+        completion = render_questpass_activity(
+            None,
+            "slice_club",
+            key="slice_club_activity",
+            game_url="/app/static/slice-club/index.html",
+        )
+        if completion == "slice_club":
+            award_questpass_stamp("slice_club")
             st.session_state.page = "home"
             st.rerun()
 

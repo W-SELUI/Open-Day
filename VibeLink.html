@@ -345,8 +345,34 @@
         text-align: left;
       }
 
+      .choice-button {
+        position: relative;
+        overflow: hidden;
+        padding: 18px 20px;
+        font-size: 1rem;
+        line-height: 1.35;
+        transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        animation: choiceIn 0.35s ease both;
+      }
+
+      .choice-button:nth-child(2) { animation-delay: 0.04s; }
+      .choice-button:nth-child(3) { animation-delay: 0.08s; }
+      .choice-button:nth-child(4) { animation-delay: 0.12s; }
+      .choice-button:nth-child(5) { animation-delay: 0.16s; }
+      .choice-button:nth-child(6) { animation-delay: 0.2s; }
+
+      @keyframes choiceIn {
+        from { opacity: 0; transform: translateY(9px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
       .choice-button:hover,
-      .level-button:hover { border-color: var(--cyan); }
+      .level-button:hover {
+        border-color: var(--cyan);
+        background: rgba(8, 47, 73, 0.54);
+        box-shadow: 0 12px 24px rgba(8, 47, 73, 0.24);
+        transform: translateY(-3px) rotate(-0.4deg);
+      }
 
       .level-grid {
         display: grid;
@@ -551,7 +577,7 @@
           <div class="question-card">
             <div id="questionPlayer" class="player-pill">Player 1 · Question 1 of 3</div>
             <h2 id="questionPrompt"></h2>
-            <p>Choose the answer that feels closest. There are no serious answers here.</p>
+            <p>Choose your most honest answer. Your dignity is optional; your vibe is not.</p>
             <div id="choiceGrid" class="choice-grid"></div>
           </div>
         </div>
@@ -614,32 +640,34 @@
       const questions = [
         {
           id: 'mission',
-          prompt: 'What is your Open Day mission?',
+          prompt: 'Okay, be honest: why are you really here?',
           options: [
-            ['future', 'Plan my future'],
-            ['explore', 'Explore everything'],
-            ['food', 'Find free food'],
-            ['friends', 'Support my friends'],
+            ['food', 'I heard there might be free food 🍕'],
+            ['romance', 'Looking for a cute meet-cute 💘'],
+            ['ex', 'Trying to find my ex (for closure) 🕵️'],
+            ['usp', 'Enjoying USP and looking mysterious ✨'],
+            ['vibes', 'Just here for the vibes 🪩'],
+            ['lost', "I don't know why I'm here LOL 🫠"],
           ],
         },
         {
           id: 'path',
-          prompt: 'Which future zone sounds most like you?',
+          prompt: 'What is your current side quest?',
           options: [
-            ['tech', 'Tech & innovation'],
-            ['creative', 'Creative design'],
-            ['health', 'Health & science'],
-            ['business', 'Business & leadership'],
+            ['career', 'Pretend I have my life together 📚'],
+            ['society', 'Find my people and join something 🎉'],
+            ['content', 'Get a good story out of today 📸'],
+            ['escape', 'Avoid eye contact and explore quietly 🫣'],
           ],
         },
         {
           id: 'team',
-          prompt: 'In a group project, you are the...',
+          prompt: 'If the vibes get awkward, you will...',
           options: [
-            ['organiser', 'Organiser'],
-            ['ideas', 'Idea machine'],
-            ['lastminute', 'Last-minute legend'],
-            ['calm', 'Calm teammate'],
+            ['organiser', 'Take charge and save the day 🫡'],
+            ['ideas', 'Say something random but useful 💡'],
+            ['lastminute', 'Disappear and return with snacks 🍟'],
+            ['calm', 'Smile politely and trust the universe 😌'],
           ],
         },
       ];
