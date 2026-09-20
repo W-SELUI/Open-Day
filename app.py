@@ -1025,8 +1025,8 @@ if page == "home":
                 <div class="mode-icon">✨</div>
                 <h2>VibeLink</h2>
                 <p>
-                    Take two temporary photos, answer quick questions, then
-                    reveal a playful Open Day vibe match.
+                    Two strangers from different schools answer in secret.
+                    VibeLink delivers the final verdict: match or no match.
                 </p>
             </div>
             """,
@@ -1438,10 +1438,12 @@ elif page == "vibe_link":
         st.session_state.page = "home"
         st.rerun()
 
-    vibe_link_file = Path(__file__).with_name("VibeLink.html")
+    # The rebuilt VibeLink experience lives separately so the previous
+    # version remains available as a safe fallback while this one is tested.
+    vibe_link_file = Path(__file__).with_name("VibeLink_Rebuilt.html")
 
     if not vibe_link_file.exists():
-        st.error("The VibeLink.html file could not be found.")
+        st.error("The VibeLink_Rebuilt.html file could not be found.")
     else:
         completion = render_questpass_activity(
             vibe_link_file,
