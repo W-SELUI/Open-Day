@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VibeLink — Open Day AI Lab</title>
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=DM+Sans:wght@400;500;600;700;800&display=swap");
+
       :root {
         color-scheme: dark;
-        --ink: #f8fafc;
-        --muted: #cbd5e1;
-        --panel: rgba(15, 23, 42, 0.78);
-        --line: rgba(196, 181, 253, 0.32);
-        --violet: #a78bfa;
-        --pink: #f472b6;
-        --cyan: #67e8f9;
+        --ink: #fffaf1;
+        --muted: #c4b9c9;
+        --panel: rgba(27, 18, 39, 0.9);
+        --line: rgba(255, 250, 241, 0.18);
+        --lime: #d6fd51;
+        --pink: #ff7fa8;
+        --cyan: #65e6e0;
+        --plum: #1b1227;
       }
 
       * { box-sizing: border-box; }
@@ -25,11 +28,12 @@
         margin: 0;
         overflow: hidden;
         background:
-          radial-gradient(circle at 15% 10%, rgba(147, 51, 234, 0.28), transparent 32%),
-          radial-gradient(circle at 85% 85%, rgba(236, 72, 153, 0.2), transparent 34%),
-          #020617;
+          radial-gradient(circle at 8% 5%, rgba(214, 253, 81, 0.11), transparent 22%),
+          radial-gradient(circle at 92% 90%, rgba(255, 127, 168, 0.18), transparent 28%),
+          #100d17;
         color: var(--ink);
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-family: "DM Sans", ui-sans-serif, sans-serif;
+        font-synthesis: none;
       }
 
       button,
@@ -37,20 +41,23 @@
 
       button {
         border: 1px solid transparent;
-        border-radius: 999px;
-        padding: 12px 20px;
-        background: linear-gradient(135deg, #7c3aed, #ec4899);
-        box-shadow: 0 12px 28px rgba(124, 58, 237, 0.25);
-        color: #fff;
+        border-radius: 12px;
+        padding: 13px 20px;
+        background: var(--lime);
+        box-shadow: 0 10px 0 #9ab82e, 0 18px 28px rgba(0, 0, 0, 0.2);
+        color: #17121d;
         font-weight: 800;
         cursor: pointer;
-        transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+        transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease, box-shadow 0.18s ease;
       }
 
       button:hover:not(:disabled) {
         filter: brightness(1.12);
-        transform: translateY(-2px);
+        transform: translateY(-3px) rotate(-1deg);
+        box-shadow: 0 13px 0 #9ab82e, 0 22px 30px rgba(0, 0, 0, 0.25);
       }
+
+      button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 5px 0 #9ab82e; }
 
       button:disabled {
         cursor: not-allowed;
@@ -58,10 +65,10 @@
       }
 
       .secondary-button {
-        border-color: var(--line);
-        background: rgba(15, 23, 42, 0.72);
+        border-color: rgba(255, 250, 241, 0.28);
+        background: rgba(255, 250, 241, 0.07);
         box-shadow: none;
-        color: #e2e8f0;
+        color: var(--ink);
       }
 
       .app-shell {
@@ -69,6 +76,16 @@
         width: 100vw;
         height: 100vh;
         overflow: auto;
+      }
+
+      .app-shell::before {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image: linear-gradient(rgba(255, 250, 241, 0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 250, 241, 0.035) 1px, transparent 1px);
+        background-size: 44px 44px;
+        content: "";
+        mask-image: linear-gradient(to bottom, black, transparent 85%);
       }
 
       .screen {
@@ -82,12 +99,11 @@
 
       .panel {
         width: min(1050px, 100%);
-        border: 1px solid var(--line);
-        border-radius: 30px;
-        background:
-          linear-gradient(145deg, rgba(30, 41, 59, 0.94), rgba(15, 23, 42, 0.86));
-        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.45);
-        backdrop-filter: blur(13px);
+        border: 1px solid rgba(255, 250, 241, 0.16);
+        border-radius: 26px;
+        background: linear-gradient(145deg, rgba(39, 27, 52, 0.96), rgba(22, 15, 31, 0.94));
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.4), 8px 8px 0 rgba(214, 253, 81, 0.06);
+        backdrop-filter: blur(16px);
       }
 
       .landing-panel {
@@ -98,10 +114,10 @@
 
       .eyebrow {
         margin: 0 0 10px;
-        color: var(--cyan);
+        color: var(--lime);
         font-size: 0.78rem;
         font-weight: 800;
-        letter-spacing: 0.16rem;
+        letter-spacing: 0.13rem;
       }
 
       h1,
@@ -110,13 +126,15 @@
 
       h1 {
         margin-bottom: 16px;
-        font-size: clamp(3.3rem, 11vw, 6.8rem);
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-size: clamp(4.6rem, 14vw, 9rem);
         line-height: 0.85;
-        letter-spacing: -0.08em;
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
       }
 
       .gradient-text {
-        background: linear-gradient(120deg, #ddd6fe, #f9a8d4, #67e8f9);
+        background: linear-gradient(110deg, var(--lime) 5%, #fffaf1 48%, var(--pink) 92%);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -136,10 +154,10 @@
         align-items: center;
         margin: 26px 0 18px;
         padding: 9px 13px;
-        border: 1px solid rgba(103, 232, 249, 0.28);
+        border: 1px solid rgba(214, 253, 81, 0.36);
         border-radius: 999px;
-        background: rgba(8, 47, 73, 0.38);
-        color: #cffafe;
+        background: rgba(214, 253, 81, 0.08);
+        color: #e7fca3;
         font-size: 0.85rem;
       }
 
@@ -156,14 +174,14 @@
         gap: 12px;
         align-items: flex-start;
         padding: 13px 15px;
-        border: 1px solid rgba(196, 181, 253, 0.22);
+        border: 1px solid rgba(255, 250, 241, 0.14);
         border-radius: 15px;
-        background: rgba(2, 6, 23, 0.34);
-        color: #e2e8f0;
+        background: rgba(255, 250, 241, 0.045);
+        color: #f0e9ef;
         line-height: 1.45;
       }
 
-      .consent-row input { margin-top: 4px; accent-color: #a78bfa; }
+      .consent-row input { margin-top: 4px; accent-color: var(--lime); }
 
       .small-print {
         margin: 15px auto 0;
@@ -526,16 +544,487 @@
         .choice-grid { grid-template-columns: 1fr; }
         .scan-readouts { grid-template-columns: 1fr; }
       }
+
+      .top-line {
+        color: var(--lime);
+        font-size: 0.76rem;
+      }
+
+      .camera-card,
+      .photo-summary,
+      .question-card,
+      .level-card,
+      .result-card {
+        border-color: rgba(255, 250, 241, 0.14);
+        background: rgba(16, 11, 23, 0.56);
+      }
+
+      .camera-card {
+        box-shadow: inset 0 0 0 1px rgba(101, 230, 224, 0.08);
+      }
+
+      .face-guide {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 999px rgba(16, 13, 23, 0.28), 0 0 25px rgba(101, 230, 224, 0.32);
+      }
+
+      .camera-label {
+        border-color: rgba(101, 230, 224, 0.36);
+        background: rgba(16, 13, 23, 0.82);
+        color: #b8fffa;
+      }
+
+      .photo-summary h2,
+      .question-card h2,
+      .level-card h2,
+      .result-card h2,
+      .scan-panel h2 {
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        letter-spacing: 0.015em;
+        text-transform: uppercase;
+      }
+
+      .photo-slot,
+      .metric,
+      .scan-readout {
+        border-color: rgba(255, 250, 241, 0.12);
+        background: rgba(255, 250, 241, 0.045);
+      }
+
+      .slot-image {
+        border-color: rgba(214, 253, 81, 0.34);
+        background: linear-gradient(135deg, rgba(214, 253, 81, 0.12), rgba(255, 127, 168, 0.14));
+      }
+
+      .player-pill {
+        border-color: rgba(214, 253, 81, 0.34);
+        background: rgba(214, 253, 81, 0.08);
+        color: #e7fca3;
+      }
+
+      .choice-button,
+      .level-button {
+        border-color: rgba(255, 250, 241, 0.16);
+        background: rgba(255, 250, 241, 0.055);
+        color: var(--ink);
+      }
+
+      .choice-button:hover,
+      .level-button:hover {
+        border-color: var(--lime);
+        background: rgba(214, 253, 81, 0.1);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      .level-button.friendly { border-color: rgba(101, 230, 224, 0.42); }
+      .level-button.spicy { border-color: rgba(255, 127, 168, 0.42); }
+      .level-button.chaos { border-color: rgba(214, 253, 81, 0.42); }
+      .level-button.friendly:hover { background: rgba(101, 230, 224, 0.1); }
+      .level-button.spicy:hover { background: rgba(255, 127, 168, 0.1); }
+      .level-button.chaos:hover { background: rgba(214, 253, 81, 0.1); }
+
+      .scanner-icon {
+        border-color: var(--lime);
+        box-shadow: 0 0 28px rgba(214, 253, 81, 0.28);
+        color: var(--lime);
+      }
+
+      #scanProgress {
+        background: linear-gradient(90deg, var(--lime), var(--cyan), var(--pink));
+      }
+
+      .scan-readout { color: #e7fca3; }
+
+      .result-photo {
+        border-color: rgba(255, 250, 241, 0.44);
+        box-shadow: 7px 7px 0 rgba(214, 253, 81, 0.12), 0 15px 35px rgba(0, 0, 0, 0.3);
+      }
+
+      .result-photo:nth-child(2) { border-color: rgba(101, 230, 224, 0.64); }
+
+      .verdict {
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
+      .verdict.match { color: var(--lime); text-shadow: 0 0 28px rgba(214, 253, 81, 0.26); }
+      .verdict.mix { color: var(--pink); text-shadow: 0 0 28px rgba(255, 127, 168, 0.28); }
+
+      .score-number {
+        background: linear-gradient(120deg, var(--lime), #fffaf1 48%, var(--pink));
+      }
+
+      .metric strong { color: var(--cyan); }
+
+      @media (max-width: 700px) {
+        h1 { font-size: clamp(4.2rem, 23vw, 6.8rem); }
+        .landing-panel { padding: 34px 22px 30px; }
+        .result-actions button,
+        .capture-actions button { width: 100%; }
+      }
+
+      /* VibeLink 2.0: quick-game presentation and staged reveal */
+      .sound-toggle {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        z-index: 50;
+        padding: 9px 13px;
+        border-color: rgba(255, 250, 241, 0.18);
+        background: rgba(16, 13, 23, 0.78);
+        box-shadow: none;
+        color: var(--ink);
+        font-size: 0.78rem;
+        backdrop-filter: blur(12px);
+      }
+
+      .sound-toggle:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: none;
+      }
+
+      .game-kicker {
+        display: inline-block;
+        margin: 3px 0 18px;
+        padding: 7px 15px;
+        border: 1px solid var(--pink);
+        border-radius: 999px;
+        background: rgba(255, 127, 168, 0.1);
+        color: #ffd4e2;
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-size: clamp(1.3rem, 4vw, 2rem);
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        line-height: 1;
+        text-transform: uppercase;
+        transform: rotate(-2deg);
+      }
+
+      .secret-progress {
+        width: min(560px, 100%);
+        margin: 0 auto 16px;
+      }
+
+      .secret-progress-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .secret-track {
+        height: 7px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 250, 241, 0.14);
+        border-radius: 999px;
+        background: rgba(255, 250, 241, 0.06);
+      }
+
+      #secretProgressBar {
+        width: 0;
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--lime), var(--cyan), var(--pink));
+        transition: width 0.28s ease;
+      }
+
+      .answer-reaction {
+        position: fixed;
+        inset: 0;
+        z-index: 45;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.12s ease;
+      }
+
+      .answer-reaction::before {
+        position: absolute;
+        inset: 0;
+        background: rgba(16, 13, 23, 0.68);
+        content: "";
+        backdrop-filter: blur(4px);
+      }
+
+      .answer-reaction span {
+        position: relative;
+        padding: 14px 24px;
+        border: 3px solid #17121d;
+        background: var(--lime);
+        box-shadow: 8px 8px 0 var(--pink);
+        color: #17121d;
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-size: clamp(2rem, 7vw, 5rem);
+        font-weight: 900;
+        letter-spacing: 0.03em;
+        line-height: 0.94;
+        text-align: center;
+        text-transform: uppercase;
+        transform: rotate(-3deg) scale(0.74);
+        transition: transform 0.18s cubic-bezier(.2,.9,.25,1.3);
+      }
+
+      .answer-reaction.active { opacity: 1; }
+      .answer-reaction.active span { transform: rotate(-3deg) scale(1); }
+
+      .scan-panel {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .scan-panel::before {
+        position: absolute;
+        inset: -40%;
+        background: conic-gradient(from 90deg, transparent, rgba(101, 230, 224, 0.08), transparent 24%);
+        content: "";
+        animation: radarSweep 3.2s linear infinite;
+      }
+
+      .scan-content { position: relative; z-index: 1; }
+
+      .scan-duo {
+        display: grid;
+        grid-template-columns: minmax(110px, 220px) minmax(90px, 1fr) minmax(110px, 220px);
+        gap: clamp(10px, 3vw, 28px);
+        align-items: center;
+        width: min(760px, 100%);
+        margin: 18px auto 22px;
+      }
+
+      .scan-photo-card {
+        position: relative;
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        border: 8px solid #fffaf1;
+        padding-bottom: 24px;
+        background: #2a2035;
+        box-shadow: 10px 12px 0 rgba(0, 0, 0, 0.28);
+      }
+
+      .scan-photo-card:first-child { transform: rotate(-5deg); }
+      .scan-photo-card:last-child { transform: rotate(5deg); }
+      .scan-photo-card img { width: 100%; height: 100%; object-fit: cover; }
+
+      .scan-photo-card span {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        min-height: 24px;
+        padding-top: 4px;
+        background: #fffaf1;
+        color: #17121d;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .connection-rig { display: grid; gap: 10px; place-items: center; }
+
+      .connection-bolt {
+        width: 100%;
+        height: 5px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, var(--lime), var(--cyan), var(--pink));
+        box-shadow: 0 0 18px var(--cyan), 0 0 40px rgba(255, 127, 168, 0.4);
+        animation: connectionPulse 0.8s ease-in-out infinite alternate;
+      }
+
+      .connection-rig strong {
+        color: var(--cyan);
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-size: clamp(1.4rem, 4vw, 2.4rem);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .scan-readout.done {
+        border-color: rgba(214, 253, 81, 0.5);
+        background: rgba(214, 253, 81, 0.1);
+        color: var(--lime);
+        transform: translateY(-2px);
+      }
+
+      .scan-countdown {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        place-items: center;
+        background: rgba(16, 13, 23, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.18s ease;
+      }
+
+      .scan-countdown.active { opacity: 1; }
+
+      .scan-countdown span {
+        color: var(--lime);
+        font-family: "Barlow Condensed", Impact, sans-serif;
+        font-size: min(42vw, 18rem);
+        font-weight: 900;
+        line-height: 0.8;
+        text-shadow: 10px 10px 0 var(--pink), 0 0 70px rgba(214, 253, 81, 0.45);
+        animation: countdownHit 0.5s cubic-bezier(.2,.8,.2,1);
+      }
+
+      .result-panel {
+        position: relative;
+        overflow: hidden;
+        padding: clamp(24px, 5vw, 48px);
+      }
+
+      .result-panel::after {
+        position: absolute;
+        inset: auto -8% 8% -8%;
+        z-index: 0;
+        height: 54px;
+        border-top: 2px solid #17121d;
+        border-bottom: 2px solid #17121d;
+        background: repeating-linear-gradient(-45deg, var(--lime) 0 16px, #17121d 16px 32px);
+        content: "";
+        opacity: 0.11;
+        transform: rotate(-3deg);
+      }
+
+      .result-panel > * { position: relative; z-index: 2; }
+      .result-panel[data-band="high"] { box-shadow: 0 28px 90px rgba(214, 253, 81, 0.16), 8px 8px 0 rgba(214, 253, 81, 0.12); }
+      .result-panel[data-band="mid"] { box-shadow: 0 28px 90px rgba(101, 230, 224, 0.14), 8px 8px 0 rgba(101, 230, 224, 0.1); }
+      .result-panel[data-band="low"] { box-shadow: 0 28px 90px rgba(255, 127, 168, 0.14), 8px 8px 0 rgba(255, 127, 168, 0.1); }
+
+      .reveal-stage {
+        opacity: 0;
+        transform: translateY(24px) scale(0.94);
+        transition: opacity 0.38s ease, transform 0.48s cubic-bezier(.2,.9,.25,1.2);
+      }
+
+      .reveal-stage.revealed { opacity: 1; transform: translateY(0) scale(1); }
+
+      .result-photos.reveal-stage.revealed .result-photo:first-child { animation: cardSlamLeft 0.55s cubic-bezier(.2,.9,.2,1.2) both; }
+      .result-photos.reveal-stage.revealed .result-photo:last-child { animation: cardSlamRight 0.55s 0.08s cubic-bezier(.2,.9,.2,1.2) both; }
+
+      .verdict {
+        display: inline-block;
+        margin: 12px auto 6px;
+        padding: 7px 16px;
+        border: 4px solid currentColor;
+        background: rgba(16, 13, 23, 0.88);
+        font-size: clamp(2rem, 7vw, 4.6rem);
+        transform: rotate(-3deg);
+      }
+
+      .verdict.high { color: var(--lime); }
+      .verdict.mid { color: var(--cyan); }
+      .verdict.low { color: var(--pink); }
+      .verdict.chaotic { color: #ffc857; }
+
+      .score-wrap { margin: 4px 0 14px; text-align: center; }
+      .score-number { margin: 0; font-size: clamp(5rem, 16vw, 10rem); line-height: 0.82; }
+      .score-caption { color: var(--muted); font-size: 0.76rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; }
+
+      .receipt-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: min(800px, 100%);
+        margin: 20px auto;
+      }
+
+      .receipt {
+        position: relative;
+        min-height: 128px;
+        padding: 19px;
+        border: 1px solid rgba(255, 250, 241, 0.18);
+        border-radius: 16px;
+        background: rgba(255, 250, 241, 0.055);
+        text-align: left;
+      }
+
+      .receipt:first-child { transform: rotate(-1deg); }
+      .receipt:last-child { transform: rotate(1deg); }
+
+      .receipt-tag {
+        display: inline-block;
+        margin-bottom: 9px;
+        color: var(--lime);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+      }
+
+      .receipt strong {
+        display: block;
+        color: var(--ink);
+        font-size: 1rem;
+        line-height: 1.45;
+      }
+
+      .roast-copy {
+        max-width: 760px;
+        margin: 18px auto;
+        color: #fffaf1;
+        font-size: clamp(1.05rem, 2.3vw, 1.38rem);
+        font-weight: 700;
+        line-height: 1.5;
+      }
+
+      .confetti-layer { position: absolute; inset: 0; z-index: 9; overflow: hidden; pointer-events: none; }
+
+      .confetti-piece {
+        position: absolute;
+        top: -8%;
+        width: 9px;
+        height: 18px;
+        border-radius: 2px;
+        animation: confettiFall var(--fall-time) linear forwards;
+      }
+
+      .impact-shake { animation: screenShake 0.42s linear; }
+      .glitch-hit { animation: glitchHit 0.42s steps(2, end); }
+
+      @keyframes radarSweep { to { transform: rotate(360deg); } }
+      @keyframes connectionPulse { from { opacity: 0.45; transform: scaleX(0.82); } to { opacity: 1; transform: scaleX(1.04); } }
+      @keyframes countdownHit { from { opacity: 0; transform: scale(2.2) rotate(8deg); } to { opacity: 1; transform: scale(1) rotate(-2deg); } }
+      @keyframes cardSlamLeft { from { opacity: 0; transform: translate(-45vw, -8vh) rotate(-24deg) scale(1.25); } to { opacity: 1; transform: rotate(-4deg) scale(1); } }
+      @keyframes cardSlamRight { from { opacity: 0; transform: translate(45vw, -8vh) rotate(24deg) scale(1.25); } to { opacity: 1; transform: rotate(4deg) scale(1); } }
+      @keyframes confettiFall { to { transform: translate3d(var(--drift), 115vh, 0) rotate(780deg); } }
+      @keyframes screenShake { 0%,100% { transform: translate(0); } 20% { transform: translate(-7px, 3px); } 40% { transform: translate(6px, -3px); } 60% { transform: translate(-4px, -2px); } 80% { transform: translate(4px, 3px); } }
+      @keyframes glitchHit { 0%,100% { filter: none; } 25% { filter: hue-rotate(80deg) contrast(1.5); transform: translateX(5px); } 50% { filter: hue-rotate(-70deg) saturate(1.8); transform: translateX(-5px); } }
+
+      @media (max-width: 700px) {
+        .sound-toggle { top: 10px; right: 10px; }
+        .scan-duo { grid-template-columns: minmax(88px, 1fr) 64px minmax(88px, 1fr); }
+        .scan-photo-card { border-width: 5px; padding-bottom: 22px; }
+        .connection-rig strong { font-size: 1rem; }
+        .receipt-grid { grid-template-columns: 1fr; }
+        .result-panel { padding: 24px 16px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+      }
     </style>
   </head>
 
   <body>
+    <button id="soundToggle" class="sound-toggle" type="button" aria-pressed="false">🔇 Sound off</button>
     <main class="app-shell">
       <section id="welcomeScreen" class="screen active">
         <div class="panel landing-panel">
           <p class="eyebrow">OPEN DAY · PLAYFUL COMPATIBILITY SCAN</p>
           <h1><span class="gradient-text">VibeLink</span></h1>
-          <p class="lead">Two students. Three quick choices. One dramatically unnecessary vibe report.</p>
+          <div class="game-kicker">Match or Menace?</div>
+          <p class="lead">Two people enter. Six secrets get exposed. One completely unnecessary verdict leaves.</p>
           <div class="privacy-badge">🔒 Photos stay in this browser session only</div>
           <div class="consent-list">
             <label class="consent-row"><input id="consentOne" type="checkbox" /> <span><strong>Student 1 agrees:</strong> I am happy to take a temporary photo and receive a playful school-life result.</span></label>
@@ -574,6 +1063,10 @@
 
       <section id="questionScreen" class="screen">
         <div class="panel question-shell">
+          <div class="secret-progress">
+            <div class="secret-progress-top"><span>Secret collection</span><span id="secretProgressLabel">0 / 6 exposed</span></div>
+            <div class="secret-track"><div id="secretProgressBar"></div></div>
+          </div>
           <div class="question-card">
             <div id="questionPlayer" class="player-pill">Player 1 · Question 1 of 3</div>
             <h2 id="questionPrompt"></h2>
@@ -600,39 +1093,49 @@
 
       <section id="scanScreen" class="screen">
         <div class="panel scan-panel">
-          <div class="scanner-icon">✦</div>
-          <p class="eyebrow">VIBELINK ENGINE · RUNNING</p>
-          <h2>Scanning the vibes...</h2>
-          <p id="scanMessage">Comparing Open Day energy levels.</p>
-          <div class="progress-track"><div id="scanProgress"></div></div>
-          <div class="scan-readouts">
-            <div class="scan-readout" id="readoutOne">Checking shared interests...</div>
-            <div class="scan-readout" id="readoutTwo">Measuring group-project survival...</div>
-            <div class="scan-readout" id="readoutThree">Calculating free-food motivation...</div>
-            <div class="scan-readout" id="readoutFour">Asking the universe for confirmation...</div>
+          <div class="scan-content">
+            <p class="eyebrow">VIBELINK ENGINE · ABSOLUTELY OVERTHINKING THIS</p>
+            <h2>Do not move. The drama is loading.</h2>
+            <div class="scan-duo">
+              <div class="scan-photo-card"><img id="scanPhotoOne" alt="Player 1 scan photo" /><span>Player 1</span></div>
+              <div class="connection-rig"><strong>Vibe link</strong><div class="connection-bolt"></div><strong id="scanPercent">0%</strong></div>
+              <div class="scan-photo-card"><img id="scanPhotoTwo" alt="Player 2 scan photo" /><span>Player 2</span></div>
+            </div>
+            <p id="scanMessage">Warming up the suspicious-choice detector.</p>
+            <div class="progress-track"><div id="scanProgress"></div></div>
+            <div class="scan-readouts">
+              <div class="scan-readout" id="readoutOne">Checking shared alibis...</div>
+              <div class="scan-readout" id="readoutTwo">Auditing group-project behaviour...</div>
+              <div class="scan-readout" id="readoutThree">Locating the chaos source...</div>
+              <div class="scan-readout" id="readoutFour">Preparing the final receipt...</div>
+            </div>
           </div>
+          <div id="scanCountdown" class="scan-countdown" aria-live="polite"><span>3</span></div>
         </div>
       </section>
 
       <section id="resultScreen" class="screen">
-        <div class="panel result-panel">
+        <div id="resultPanel" class="panel result-panel">
+          <div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div>
           <p class="eyebrow">VIBELINK REPORT COMPLETE</p>
-          <div class="result-photos">
+          <div id="resultPhotos" class="result-photos reveal-stage">
             <div class="result-photo"><img id="resultPhotoOne" alt="Player 1 captured photo" /></div>
             <div class="result-photo"><img id="resultPhotoTwo" alt="Player 2 captured photo" /></div>
           </div>
-          <div id="verdict" class="verdict"></div>
-          <p id="scoreNumber" class="score-number"></p>
-          <p id="roastCopy" class="roast-copy"></p>
-          <div id="metricGrid" class="metric-grid"></div>
-          <div class="result-actions">
+          <div id="scoreWrap" class="score-wrap reveal-stage"><p id="scoreNumber" class="score-number">0%</p><span class="score-caption">Vibe compatibility — scientifically questionable</span></div>
+          <div id="verdict" class="verdict reveal-stage"></div>
+          <div id="receiptGrid" class="receipt-grid reveal-stage"></div>
+          <p id="roastCopy" class="roast-copy reveal-stage"></p>
+          <div id="resultActions" class="result-actions reveal-stage">
             <button id="collectStampButton" class="secondary-button">Collect QuestPass Stamp &amp; Return</button>
             <button id="restartButton">Start a New Vibe Scan</button>
           </div>
-          <p class="result-note">For entertainment only · Score is based on the choices made in this session, not appearance.</p>
+          <p id="resultNote" class="result-note reveal-stage">For entertainment only · Score is based on the choices made in this session, never appearance.</p>
         </div>
       </section>
     </main>
+
+    <div id="answerReaction" class="answer-reaction" aria-live="polite"><span></span></div>
 
     <canvas id="captureCanvas" hidden></canvas>
 
@@ -717,6 +1220,55 @@
         },
       };
 
+      const reactionCopy = {
+        food: ['SNACK RADAR CONFIRMED', 'FREE FOOD HAS ENTERED THE CHAT'],
+        romance: ['MAIN-CHARACTER INTENTIONS', 'MEET-CUTE MODE ACTIVATED'],
+        ex: ['DETECTIVE BEHAVIOUR DETECTED', 'THE ALIBI IS WEAK'],
+        usp: ['MYSTERIOUS FOR NO REASON', 'CAMPUS AURA: MAXIMUM'],
+        vibes: ['ZERO PLAN. ELITE CONFIDENCE.', 'JUST VIBES? SUSPICIOUS.'],
+        lost: ['NO PLAN FOUND', 'HONESTY LEVEL: UNCOMFORTABLE'],
+        career: ['FUTURE LOADING... MAYBE', 'RESPONSIBLE ANSWER DETECTED'],
+        society: ['SOCIAL BATTERY AT 94%', 'NEW CREW SEARCH ACTIVE'],
+        content: ['CAMERA ROLL IN DANGER', 'CONTENT CREATOR ALIBI'],
+        escape: ['STEALTH MODE ACTIVATED', 'EYE CONTACT HAS LEFT THE CHAT'],
+        organiser: ['GROUP PROJECT CAPTAIN', 'CONTROL ISSUES? PRODUCTIVE.'],
+        ideas: ['ONE IDEA AWAY FROM CHAOS', 'BRAINSTORM WARNING'],
+        lastminute: ['SNACK-BASED LEADERSHIP', 'DEADLINE? NEVER HEARD OF IT.'],
+        calm: ['UNBOTHERED. POSSIBLY TOO CALM.', 'TRUSTING THE UNIVERSE AGAIN'],
+      };
+
+      const verdictCopy = {
+        high: ['DANGEROUSLY COMPATIBLE', 'CERTIFIED CHAOS DUO', 'MATCHING ENERGY DETECTED', 'PLOT ARMOUR ACTIVATED'],
+        mid: ['POTENTIAL DETECTED', 'PLOT-TWIST PAIRING', 'FRIENDS UNDER INVESTIGATION', 'UNEXPECTEDLY OPERATIONAL'],
+        low: ['DIFFERENT PLANETS', 'CONNECTION FAILED SUCCESSFULLY', 'PARALLEL UNIVERSES', 'VIBE WI-FI UNSTABLE'],
+      };
+
+      const missionReceipt = {
+        food: 'Both followed the snack signal. Romance has serious competition.',
+        romance: 'Both arrived expecting a meet-cute. Confidence level: cinema.',
+        ex: 'Mutual detective behaviour detected. Nobody is beating the allegations.',
+        usp: 'Two mysterious campus characters. No explanation was provided.',
+        vibes: 'No plan. Maximum confidence. Respectfully dangerous.',
+        lost: 'Neither knows why they are here. Somehow, that is the strongest plot.',
+      };
+
+      const missionNames = {
+        food: 'a snack hunter', romance: 'a meet-cute believer', ex: 'a part-time detective',
+        usp: 'a campus main character', vibes: 'pure vibes', lost: 'a beautifully lost tourist',
+      };
+
+      const teamReceipt = {
+        organiser: 'Two captains, one group project. A power struggle is already typing...',
+        ideas: 'The idea count is high. The finished-work count remains classified.',
+        lastminute: 'Both disappeared and returned with snacks. Leadership, apparently.',
+        calm: 'Nobody panicked. Nobody made a plan either. Impressive balance.',
+      };
+
+      const teamActions = {
+        organiser: 'take control', ideas: 'invent a suspicious solution',
+        lastminute: 'vanish and return with snacks', calm: 'smile and trust the universe',
+      };
+
       const screens = [...document.querySelectorAll('.screen')];
       const consentOne = document.getElementById('consentOne');
       const consentTwo = document.getElementById('consentTwo');
@@ -735,14 +1287,29 @@
       const questionPlayer = document.getElementById('questionPlayer');
       const questionPrompt = document.getElementById('questionPrompt');
       const choiceGrid = document.getElementById('choiceGrid');
+      const secretProgressLabel = document.getElementById('secretProgressLabel');
+      const secretProgressBar = document.getElementById('secretProgressBar');
+      const answerReaction = document.getElementById('answerReaction');
       const scanProgress = document.getElementById('scanProgress');
       const scanMessage = document.getElementById('scanMessage');
+      const scanPercent = document.getElementById('scanPercent');
+      const scanPhotoOne = document.getElementById('scanPhotoOne');
+      const scanPhotoTwo = document.getElementById('scanPhotoTwo');
+      const scanCountdown = document.getElementById('scanCountdown');
+      const scanReadouts = [...document.querySelectorAll('.scan-readout')];
       const resultPhotoOne = document.getElementById('resultPhotoOne');
       const resultPhotoTwo = document.getElementById('resultPhotoTwo');
+      const resultPanel = document.getElementById('resultPanel');
+      const resultPhotos = document.getElementById('resultPhotos');
+      const scoreWrap = document.getElementById('scoreWrap');
       const verdictEl = document.getElementById('verdict');
       const scoreNumber = document.getElementById('scoreNumber');
       const roastCopy = document.getElementById('roastCopy');
-      const metricGrid = document.getElementById('metricGrid');
+      const receiptGrid = document.getElementById('receiptGrid');
+      const resultActions = document.getElementById('resultActions');
+      const resultNote = document.getElementById('resultNote');
+      const confettiLayer = document.getElementById('confettiLayer');
+      const soundToggle = document.getElementById('soundToggle');
       const collectStampButton = document.getElementById('collectStampButton');
       const restartButton = document.getElementById('restartButton');
 
@@ -753,10 +1320,64 @@
       let photos = [null, null];
       let answers = [{}, {}];
       let roastLevel = 'friendly';
-      let scanTimer = null;
+      let answerLocked = false;
+      let runToken = 0;
+      let soundEnabled = false;
+      let audioContext = null;
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, reducedMotion ? 12 : milliseconds));
+      const pick = (items) => items[Math.floor(Math.random() * items.length)];
 
       function showScreen(id) {
         screens.forEach((screen) => screen.classList.toggle('active', screen.id === id));
+        document.querySelector('.app-shell').scrollTo({ top: 0, behavior: 'auto' });
+      }
+
+      function playTone(frequency = 440, duration = 0.08, type = 'sine', volume = 0.035) {
+        if (!soundEnabled) return;
+        try {
+          audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          oscillator.type = type;
+          oscillator.frequency.value = frequency;
+          gain.gain.setValueAtTime(volume, audioContext.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + duration);
+        } catch (_) {
+          soundEnabled = false;
+          soundToggle.innerText = '🔇 Sound off';
+          soundToggle.setAttribute('aria-pressed', 'false');
+        }
+      }
+
+      function impact(className = 'impact-shake') {
+        document.body.classList.remove('impact-shake', 'glitch-hit');
+        void document.body.offsetWidth;
+        document.body.classList.add(className);
+        window.setTimeout(() => document.body.classList.remove(className), 500);
+      }
+
+      function updateSecretProgress() {
+        const total = questions.length * 2;
+        const completed = questionPlayerIndex * questions.length + questionIndex;
+        secretProgressLabel.innerText = `${completed} / ${total} exposed`;
+        secretProgressBar.style.width = `${(completed / total) * 100}%`;
+      }
+
+      async function flashReaction(value) {
+        const reaction = pick(reactionCopy[value] || ['SUSPICIOUS CHOICE']);
+        answerReaction.querySelector('span').innerText = reaction;
+        answerReaction.classList.add('active');
+        playTone(540, 0.08, 'square', 0.025);
+        impact();
+        await wait(430);
+        answerReaction.classList.remove('active');
+        await wait(90);
       }
 
       function updateConsentButton() {
@@ -817,6 +1438,8 @@
         const status = photoTurn === 0 ? photoOneStatus : photoTwoStatus;
         preview.src = photos[photoTurn];
         status.innerText = 'Photo captured ✓';
+        playTone(760, 0.06, 'square', 0.025);
+        impact();
         updateCaptureUI();
       }
 
@@ -824,6 +1447,7 @@
         const question = questions[questionIndex];
         questionPlayer.innerText = `Player ${questionPlayerIndex + 1} · Question ${questionIndex + 1} of ${questions.length}`;
         questionPrompt.innerText = question.prompt;
+        updateSecretProgress();
         choiceGrid.innerHTML = '';
         question.options.forEach(([value, label]) => {
           const button = document.createElement('button');
@@ -834,20 +1458,30 @@
         });
       }
 
-      function chooseAnswer(questionId, value) {
+      async function chooseAnswer(questionId, value) {
+        if (answerLocked) return;
+        answerLocked = true;
+        [...choiceGrid.querySelectorAll('button')].forEach((button) => { button.disabled = true; });
         answers[questionPlayerIndex][questionId] = value;
         questionIndex++;
+        updateSecretProgress();
+        await flashReaction(value);
         if (questionIndex < questions.length) {
           renderQuestion();
+          answerLocked = false;
           return;
         }
         if (questionPlayerIndex === 0) {
           questionPlayerIndex = 1;
           questionIndex = 0;
           renderQuestion();
+          answerLocked = false;
           return;
         }
+        secretProgressLabel.innerText = `${questions.length * 2} / ${questions.length * 2} exposed`;
+        secretProgressBar.style.width = '100%';
         showScreen('roastScreen');
+        answerLocked = false;
       }
 
       function calculateResult() {
@@ -864,75 +1498,177 @@
         score = Math.max(16, Math.min(96, score));
 
         const band = score >= 75 ? 'high' : score >= 48 ? 'mid' : 'low';
-        const choices = roastTemplates[roastLevel][band];
-        const roast = choices[Math.floor(Math.random() * choices.length)];
-        const freeFood = (first.mission === 'food' ? 45 : 14) + (second.mission === 'food' ? 45 : 14);
+        const roast = pick(roastTemplates[roastLevel][band]);
+        const missionEvidence = first.mission === second.mission
+          ? missionReceipt[first.mission]
+          : `Player 1 showed up as ${missionNames[first.mission]}; Player 2 showed up as ${missionNames[second.mission]}. The plot immediately lost adult supervision.`;
+
+        const teamEvidence = first.team === second.team
+          ? teamReceipt[first.team]
+          : `When things get awkward, one will ${teamActions[first.team]}; the other will ${teamActions[second.team]}. Weirdly balanced.`;
+
+        const pathMatch = first.path === second.path
+          ? 'Their side quests match. This is either teamwork or a highly organised coincidence.'
+          : 'Different side quests detected. At least they will never fight over the same excuse.';
+
         return {
           score,
           roast,
-          isMatch: score >= 60,
-          metrics: [
-            ['Academic survival', `${Math.min(99, 53 + matches * 12 + Math.floor(Math.random() * 16))}%`],
-            ['Teamwork sync', `${Math.min(98, 44 + matches * 15 + (first.team !== second.team ? 12 : 0))}%`],
-            ['Free-food motivation', `${Math.min(99, freeFood)}%`],
+          band,
+          verdict: pick(verdictCopy[band]),
+          verdictClass: roastLevel === 'chaos' && band !== 'low' ? 'chaotic' : band,
+          receipts: [
+            ['RECEIPT 01 · THE ALIBI', missionEvidence],
+            ['RECEIPT 02 · CHAOS REPORT', `${teamEvidence} ${pathMatch}`],
           ],
         };
       }
 
-      function runScan() {
+      async function runScan() {
+        const token = ++runToken;
         const result = calculateResult();
         showScreen('scanScreen');
+        scanPhotoOne.src = photos[0];
+        scanPhotoTwo.src = photos[1];
         scanProgress.style.width = '0%';
-        const messages = [
-          'Comparing Open Day energy levels.',
-          'Checking shared interests.',
-          'Running entirely unnecessary group-project maths.',
-          'Preparing a school-safe final verdict.',
+        scanPercent.innerText = '0%';
+        scanReadouts.forEach((readout) => readout.classList.remove('done'));
+        scanCountdown.classList.remove('active');
+
+        const steps = [
+          [22, 'Checking whether both stories can be trusted.'],
+          [47, 'Reviewing group-project survival evidence.'],
+          [73, 'Locating the exact source of the chaos.'],
+          [100, 'Verdict locked. It is too late to run.'],
         ];
-        let progress = 0;
-        let messageIndex = 0;
-        clearInterval(scanTimer);
-        scanTimer = setInterval(() => {
-          progress = Math.min(100, progress + 4 + Math.random() * 5);
+
+        for (let index = 0; index < steps.length; index++) {
+          if (token !== runToken) return;
+          const [progress, message] = steps[index];
+          scanMessage.innerText = message;
           scanProgress.style.width = `${progress}%`;
-          if (progress > (messageIndex + 1) * 25 && messageIndex < messages.length - 1) {
-            messageIndex++;
-            scanMessage.innerText = messages[messageIndex];
-          }
-          if (progress >= 100) {
-            clearInterval(scanTimer);
-            window.setTimeout(() => revealResult(result), 400);
-          }
-        }, 140);
+          scanPercent.innerText = `${progress}%`;
+          scanReadouts[index].classList.add('done');
+          playTone(260 + index * 90, 0.1, index === 3 ? 'square' : 'sine', 0.025);
+          await wait(index === 3 ? 520 : 650);
+        }
+
+        if (token !== runToken) return;
+        scanCountdown.classList.add('active');
+        const countdownNumber = scanCountdown.querySelector('span');
+        for (const value of ['3', '2', '1']) {
+          countdownNumber.innerText = value;
+          countdownNumber.style.animation = 'none';
+          void countdownNumber.offsetWidth;
+          countdownNumber.style.animation = '';
+          playTone(value === '1' ? 620 : 360, 0.16, 'square', 0.035);
+          await wait(520);
+          if (token !== runToken) return;
+        }
+        scanCountdown.classList.remove('active');
+        await revealResult(result, token);
       }
 
-      function revealResult(result) {
+      async function animateScore(target, token) {
+        const steps = reducedMotion ? 1 : 28;
+        for (let step = 0; step <= steps; step++) {
+          if (token !== runToken) return;
+          const eased = 1 - Math.pow(1 - step / steps, 3);
+          scoreNumber.innerText = `${Math.round(target * eased)}%`;
+          await wait(20);
+        }
+      }
+
+      function launchConfetti() {
+        confettiLayer.innerHTML = '';
+        const colours = ['#d6fd51', '#ff7fa8', '#65e6e0', '#fffaf1', '#ffc857'];
+        for (let index = 0; index < 36; index++) {
+          const piece = document.createElement('i');
+          piece.className = 'confetti-piece';
+          piece.style.left = `${Math.random() * 100}%`;
+          piece.style.background = pick(colours);
+          piece.style.setProperty('--drift', `${-90 + Math.random() * 180}px`);
+          piece.style.setProperty('--fall-time', `${1.8 + Math.random() * 1.5}s`);
+          piece.style.animationDelay = `${Math.random() * 0.35}s`;
+          confettiLayer.appendChild(piece);
+        }
+        window.setTimeout(() => { confettiLayer.innerHTML = ''; }, 3800);
+      }
+
+      async function revealResult(result, token) {
         resultPhotoOne.src = photos[0];
         resultPhotoTwo.src = photos[1];
-        verdictEl.innerText = result.isMatch ? 'VIBE MATCH' : 'VIBE MIX';
-        verdictEl.className = `verdict ${result.isMatch ? 'match' : 'mix'}`;
-        scoreNumber.innerText = `${result.score}%`;
+        resultPanel.dataset.band = result.band;
+        verdictEl.innerText = result.verdict;
+        verdictEl.className = `verdict reveal-stage ${result.verdictClass}`;
+        scoreNumber.innerText = '0%';
         roastCopy.innerText = result.roast;
-        metricGrid.innerHTML = result.metrics.map(([label, value]) => (
-          `<div class="metric"><span>${label}</span><strong>${value}</strong></div>`
+        receiptGrid.innerHTML = result.receipts.map(([label, copy]) => (
+          `<article class="receipt"><span class="receipt-tag">${label}</span><strong>${copy}</strong></article>`
         )).join('');
+        [resultPhotos, scoreWrap, verdictEl, receiptGrid, roastCopy, resultActions, resultNote]
+          .forEach((element) => element.classList.remove('revealed'));
+        confettiLayer.innerHTML = '';
         showScreen('resultScreen');
+
+        await wait(130);
+        if (token !== runToken) return;
+        resultPhotos.classList.add('revealed');
+        impact();
+        playTone(180, 0.18, 'sawtooth', 0.035);
+
+        await wait(620);
+        if (token !== runToken) return;
+        scoreWrap.classList.add('revealed');
+        await animateScore(result.score, token);
+
+        if (token !== runToken) return;
+        verdictEl.classList.add('revealed');
+        impact(roastLevel === 'chaos' ? 'glitch-hit' : 'impact-shake');
+        playTone(result.band === 'high' ? 720 : result.band === 'mid' ? 520 : 320, 0.24, 'square', 0.04);
+        if (result.band === 'high') launchConfetti();
+
+        await wait(650);
+        if (token !== runToken) return;
+        receiptGrid.classList.add('revealed');
+        playTone(420, 0.08, 'sine', 0.02);
+
+        await wait(560);
+        if (token !== runToken) return;
+        roastCopy.classList.add('revealed');
+
+        await wait(520);
+        if (token !== runToken) return;
+        resultActions.classList.add('revealed');
+        resultNote.classList.add('revealed');
       }
 
       function resetSession() {
-        clearInterval(scanTimer);
+        runToken++;
         stopCamera();
         photos = [null, null];
         answers = [{}, {}];
         photoTurn = 0;
         questionPlayerIndex = 0;
         questionIndex = 0;
+        answerLocked = false;
+        roastLevel = 'friendly';
         consentOne.checked = false;
         consentTwo.checked = false;
+        captureButton.disabled = false;
         photoOnePreview.removeAttribute('src');
         photoTwoPreview.removeAttribute('src');
+        scanPhotoOne.removeAttribute('src');
+        scanPhotoTwo.removeAttribute('src');
+        resultPhotoOne.removeAttribute('src');
+        resultPhotoTwo.removeAttribute('src');
         photoOneStatus.innerText = 'Waiting for photo';
         photoTwoStatus.innerText = 'Waiting for photo';
+        secretProgressLabel.innerText = `0 / ${questions.length * 2} exposed`;
+        secretProgressBar.style.width = '0%';
+        answerReaction.classList.remove('active');
+        confettiLayer.innerHTML = '';
+        delete resultPanel.dataset.band;
         updateConsentButton();
         showScreen('welcomeScreen');
       }
@@ -944,6 +1680,22 @@
         );
       }
 
+      soundToggle.addEventListener('click', async () => {
+        soundEnabled = !soundEnabled;
+        soundToggle.innerText = soundEnabled ? '🔊 Sound on' : '🔇 Sound off';
+        soundToggle.setAttribute('aria-pressed', String(soundEnabled));
+        if (soundEnabled) {
+          try {
+            audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+            await audioContext.resume();
+            playTone(620, 0.1, 'sine', 0.035);
+          } catch (_) {
+            soundEnabled = false;
+            soundToggle.innerText = '🔇 Sound off';
+            soundToggle.setAttribute('aria-pressed', 'false');
+          }
+        }
+      });
       consentOne.addEventListener('change', updateConsentButton);
       consentTwo.addEventListener('change', updateConsentButton);
       consentButton.addEventListener('click', async () => {
@@ -972,6 +1724,7 @@
       collectStampButton.addEventListener('click', collectQuestPassStamp);
       restartButton.addEventListener('click', resetSession);
       window.addEventListener('beforeunload', stopCamera);
+      window.addEventListener('pagehide', stopCamera);
     </script>
   </body>
 </html>
