@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#09071a" />
+    <meta
+      name="description"
+      content="Vibe Oracle is a one-player, hand-controlled fortune experience built for Open Day."
+    />
+    <title>Vibe Oracle — Touch tomorrow</title>
+    <link rel="stylesheet" href="styles.css?v=20260920c" />
+  </head>
+  <body>
+    <video id="camera" autoplay muted playsinline hidden></video>
+    <canvas id="handCanvas" aria-hidden="true"></canvas>
+
+    <div class="cosmos" aria-hidden="true">
+      <div class="aurora aurora-one"></div>
+      <div class="aurora aurora-two"></div>
+      <div class="stars stars-near"></div>
+      <div class="stars stars-far"></div>
+      <div class="noise"></div>
+    </div>
+
+    <main id="app" class="app" data-state="boot">
+      <header class="topbar">
+        <div class="brand" aria-label="Vibe Oracle">
+          <span class="brand-eye" aria-hidden="true"><i></i></span>
+          <span>VIBE ORACLE</span>
+          <small>OPEN DAY / 01</small>
+        </div>
+        <div class="topbar-right">
+          <div id="cameraBadge" class="camera-badge">
+            <span></span><b id="cameraBadgeText">AWAKENING</b>
+          </div>
+          <button
+            id="soundButton"
+            class="icon-button"
+            type="button"
+            aria-label="Turn sound on"
+            aria-pressed="false"
+            title="Sound (M)"
+          >
+            ♫
+          </button>
+          <button
+            id="fullscreenButton"
+            class="icon-button"
+            type="button"
+            aria-label="Enter fullscreen"
+            title="Fullscreen"
+          >
+            ⛶
+          </button>
+        </div>
+      </header>
+
+      <section class="experience" aria-label="Vibe Oracle hand experience">
+        <aside class="chapter chapter-left" aria-hidden="true">
+          <span>01</span>
+          <p>ONE HAND</p>
+        </aside>
+        <aside class="chapter chapter-right" aria-hidden="true">
+          <span>02</span>
+          <p>ONE FUTURE</p>
+        </aside>
+
+        <section id="oracleScreen" class="oracle-screen">
+          <div class="headline">
+            <p id="eyebrow" class="eyebrow">A MESSAGE FROM ALMOST TOMORROW</p>
+            <h1 id="mainTitle">TOUCH<br /><em>TOMORROW.</em></h1>
+            <p id="introCopy" class="intro-copy">
+              No questions. No profile. Just your hand and one suspiciously
+              specific future.
+            </p>
+          </div>
+
+          <div id="chamber" class="chamber">
+            <div class="orbit orbit-one" aria-hidden="true">
+              <span></span><span></span><span></span><span></span>
+            </div>
+            <div class="orbit orbit-two" aria-hidden="true"></div>
+            <div class="sigil sigil-one" aria-hidden="true">✦</div>
+            <div class="sigil sigil-two" aria-hidden="true">☾</div>
+            <div class="sigil sigil-three" aria-hidden="true">◇</div>
+
+            <div id="orb" class="orb" aria-hidden="true">
+              <div class="orb-surface"></div>
+              <div class="orb-cloud orb-cloud-one"></div>
+              <div class="orb-cloud orb-cloud-two"></div>
+              <div class="orb-flare"></div>
+              <div class="orb-core">✦</div>
+              <svg class="charge-ring" viewBox="0 0 220 220">
+                <circle class="ring-track" cx="110" cy="110" r="102"></circle>
+                <circle id="chargeRing" class="ring-value" cx="110" cy="110" r="102"></circle>
+              </svg>
+            </div>
+
+            <div id="scanReadout" class="scan-readout" hidden>
+              <span id="scanCode">SIGNAL 00</span>
+              <div class="scan-track"><i id="scanBar"></i></div>
+              <b id="scanPercent">0%</b>
+            </div>
+          </div>
+
+          <div class="instruction-block">
+            <p id="instruction" class="instruction" role="status" aria-live="polite">
+              Waking the Oracle…
+            </p>
+            <p id="subInstruction" class="sub-instruction">
+              Your camera is used only for hand tracking. Nothing is saved.
+            </p>
+            <button id="retryButton" class="retry-button" type="button" hidden>
+              Retry camera <span>↗</span>
+            </button>
+          </div>
+        </section>
+
+        <section id="revealScreen" class="reveal-screen" hidden>
+          <div class="reveal-stamp" aria-hidden="true">
+            <span>TRANSMISSION</span><b>RECEIVED</b>
+          </div>
+          <p id="fortuneCategory" class="fortune-category">THE ORACLE SAW SOMETHING</p>
+          <div class="fortune-lines" aria-live="polite">
+            <p id="fortuneLineOne" class="fortune-line line-one"></p>
+            <p id="fortuneLineTwo" class="fortune-line line-two"></p>
+            <p id="fortuneLineThree" class="fortune-line line-three"></p>
+          </div>
+          <div id="exitPrompt" class="exit-prompt" hidden>
+            <span class="palm-icon" aria-hidden="true">✋</span>
+            <div>
+              <b>SHOW YOUR OPEN PALM</b>
+              <small>Hold it up to seal your QuestPass stamp</small>
+            </div>
+            <i id="exitProgress"></i>
+          </div>
+        </section>
+
+        <div id="handHint" class="hand-hint" hidden aria-hidden="true">
+          <span></span>
+          <b>YOUR ENERGY</b>
+        </div>
+
+        <div id="flash" class="flash" aria-hidden="true"></div>
+        <div id="curtain" class="curtain" aria-hidden="true">
+          <div></div><div></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>NO ANSWERS REQUIRED</span>
+        <p><i></i> HAND TRACKING STAYS ON THIS DEVICE</p>
+        <span>ABSOLUTELY NO PSYCHIC QUALIFICATIONS</span>
+      </footer>
+    </main>
+
+    <div id="announcer" class="sr-only" role="status" aria-live="assertive"></div>
+    <script type="module" src="oracle.js?v=20260920c"></script>
+  </body>
+</html>

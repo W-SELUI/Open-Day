@@ -1046,8 +1046,8 @@ if page == "home":
                 <div class="mode-icon">🔮</div>
                 <h2>Vibe Oracle</h2>
                 <p>
-                    Your future just texted. Create two profile cards,
-                    watch a fictional chat unfold, and choose how it ends.
+                    Raise one hand, awaken the crystal, and let the Oracle
+                    reveal the harmless chaos hiding in your future.
                 </p>
             </div>
             """,
@@ -1456,8 +1456,9 @@ elif page == "vibe_link":
             st.rerun()
 
 elif page == "vibe_oracle":
-    # The Oracle is a standalone full-screen camera experience. Its temporary
-    # profile photos and random forecast live only inside this iframe session.
+    # The rebuilt Oracle is a one-player, hand-controlled experience. It is
+    # served from Streamlit's static directory so the MediaPipe worker, local
+    # model, WASM runtime, styling, and interaction code stay together.
     st.markdown(
         """
         <style>
@@ -1532,12 +1533,18 @@ elif page == "vibe_oracle":
         st.session_state.page = "home"
         st.rerun()
 
-    vibe_oracle_file = Path(__file__).with_name("Vibe Oracle.html")
+    vibe_oracle_file = (
+        Path(__file__).with_name("static") / "vibe-oracle" / "index.html"
+    )
 
     if not vibe_oracle_file.exists():
-        st.error("The Vibe Oracle.html file could not be found.")
+        st.error("The rebuilt Vibe Oracle files could not be found.")
     else:
-        st.iframe(vibe_oracle_file, height=760, width="stretch")
+        st.iframe(
+            "/app/static/vibe-oracle/index.html",
+            height="stretch",
+            width="stretch",
+        )
         completion = _vibe_oracle_completion_listener(
             data={"activity": "vibe_oracle"},
             default=None,
