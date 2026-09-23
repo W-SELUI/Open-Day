@@ -39,7 +39,7 @@
   <li>Uses a custom machine-learning model built with Scikit-learn.</li>
   <li>Suggests possible career paths with confidence percentages.</li>
   <li>Shows words recognised from the student's answer.</li>
-  <li>Uses Ollama to generate a friendly explanation for the suggested career.</li>
+  <li>Supports optional browser voice input and spoken results.</li>
   <li>Reminds users that the result is only an interest-based suggestion.</li>
 </ul>
 
@@ -53,12 +53,27 @@
   <li>Built with HTML, CSS, and JavaScript.</li>
 </ul>
 
-<h3>Hand Rush</h3>
+<h3>Gravity Thief</h3>
 
 <ul>
-  <li>A fast hand-tracking reaction game.</li>
-  <li>Uses the device camera and MediaPipe hand tracking.</li>
-  <li>Designed as a quick, fun challenge for Open Day visitors.</li>
+  <li>A hand-controlled gravity challenge.</li>
+  <li>Players guide a stolen core through security lasers and into a portal.</li>
+</ul>
+
+<h3>Slice Club</h3>
+
+<ul>
+  <li>A 30-second finger-tracking fruit-slicing challenge.</li>
+  <li>Players slice fruit, avoid bombs, and chase a high score.</li>
+</ul>
+
+<h3>SkyShot</h3>
+
+<ul>
+  <li>A 30-second finger-gun arcade experience using MediaPipe Hands.</li>
+  <li>Includes Solo Blast and independent two-player Duel modes.</li>
+  <li>Uses a stabilised thumb trigger, local tracking files, and separate game rendering for smooth play.</li>
+  <li>Awards its QuestPass stamp only after a completed round.</li>
 </ul>
 
 <h3>VibeLink</h3>
@@ -127,7 +142,7 @@
     </tr>
     <tr>
       <td>MediaPipe Hands</td>
-      <td>Detects hand movement for Hand Puzzle and Hand Rush</td>
+      <td>Detects hand movement for Hand Puzzle, Gravity Thief, Slice Club, SkyShot, and Vibe Oracle</td>
     </tr>
   </tbody>
 </table>
@@ -145,13 +160,14 @@
 ├── requirements.txt           # Python dependencies
 │
 ├── Hand Puzzle.html           # Camera-controlled puzzle game
-├── Hand Rush.html             # Hand-tracking reaction game
-├── VibeLink.html              # Compatibility experience
-├── Vibe Oracle.html           # Relationship fortune-telling experience
+├── VibeLink_Rebuilt.html      # Two-person compatibility experience
 │
 ├── questpass_bridge.py        # Connects HTML games to Streamlit QuestPass
-└── questpass_bridge/
-    └── index.html             # QuestPass browser component
+├── questpass_bridge/          # Component builds for Hand Puzzle and Gravity Thief
+└── static/
+    ├── slice-club/            # Fruit-slicing camera game
+    ├── skyshot/               # Finger-gun arcade game
+    └── vibe-oracle/           # One-player fortune experience
 </code></pre>
 
 <hr>
@@ -210,14 +226,14 @@ source .venv/bin/activate
 <h2>Camera Permission</h2>
 
 <p>
-  Hand Puzzle, Hand Rush, VibeLink, and Vibe Oracle may use the device camera.
+  Hand Puzzle, Gravity Thief, Slice Club, SkyShot, VibeLink, and Vibe Oracle may use the device camera.
   When asked by the browser, select <strong>Allow</strong>.
 </p>
 
 <ul>
   <li>Use a modern browser such as Google Chrome, Microsoft Edge, or Safari.</li>
   <li>Ensure another application is not already using the camera.</li>
-  <li>Keep an internet connection available for MediaPipe hand-tracking resources.</li>
+  <li>SkyShot keeps its MediaPipe runtime locally so its tracking does not depend on a CDN.</li>
 </ul>
 
 <hr>

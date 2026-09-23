@@ -627,6 +627,7 @@ QUEST_STAMPS = {
     "hand_puzzle": ("🧩", "Puzzle Solver"),
     "hand_rush": ("⚡", "Gravity Bender"),
     "slice_club": ("🍉", "Slice Champion"),
+    "skyshot": ("🎯", "Sky Ace"),
     "career": ("🎓", "Future Explorer"),
     "vibe_link": ("✨", "Vibe Scanner"),
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
@@ -1077,6 +1078,27 @@ if page == "home":
             st.session_state.page = "slice_club"
             st.rerun()
 
+    sky_left, skyshot_column, sky_right = st.columns([1, 2, 1], gap="large")
+
+    with skyshot_column:
+        st.markdown(
+            """
+            <div class="mode-card">
+                <div class="mode-icon">🎯</div>
+                <h2>SkyShot</h2>
+                <p>
+                    Turn your hand into a steady arcade blaster, track flying
+                    targets, dodge decoys, or challenge a friend side by side.
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if st.button("Enter SkyShot", key="open_skyshot"):
+            st.session_state.page = "skyshot"
+            st.rerun()
+
     st.markdown(
         '<p class="small-note">NEUROVERSE · Built for Open Day · Designed for quick, private play.</p>',
         unsafe_allow_html=True,
@@ -1359,6 +1381,99 @@ elif page == "slice_club":
         )
         if completion == "slice_club":
             award_questpass_stamp("slice_club")
+            st.session_state.page = "home"
+            st.rerun()
+
+elif page == "skyshot":
+    # SkyShot is a full-screen, camera-controlled arcade experience. Its
+    # MediaPipe runtime is served locally with the game so Open Day play does
+    # not depend on a third-party CDN.
+    st.markdown(
+        """
+        <style>
+            header[data-testid="stHeader"] {
+                display: none;
+            }
+
+            html,
+            body,
+            [data-testid="stAppViewContainer"],
+            [data-testid="stMain"],
+            .stMain,
+            [data-testid="stAppViewContainer"] .main,
+            section.main {
+                min-height: 100vh !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                overflow: hidden !important;
+            }
+
+            [data-testid="stMainBlockContainer"],
+            .stMainBlockContainer,
+            section.main > div.block-container,
+            .block-container {
+                max-width: none !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .st-key-back_from_skyshot,
+            div[data-testid="stButton"] {
+                position: fixed;
+                top: 14px;
+                left: 14px;
+                z-index: 1000000;
+                width: auto !important;
+            }
+
+            .st-key-back_from_skyshot button,
+            div[data-testid="stButton"] > button {
+                width: auto !important;
+                border-radius: 999px !important;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25) !important;
+            }
+
+            [data-testid="stIFrame"],
+            [data-testid="stIFrame"] iframe,
+            iframe[title="st.iframe"] {
+                position: relative !important;
+                inset: auto !important;
+                z-index: 0 !important;
+                display: block !important;
+                width: 100vw !important;
+                min-width: 100vw !important;
+                min-height: 100vh !important;
+                height: 100vh !important;
+                margin: 0 !important;
+                border: 0 !important;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button("← Back to NeuroVerse", key="back_from_skyshot"):
+        st.session_state.page = "home"
+        st.rerun()
+
+    skyshot_build = Path(__file__).with_name("static") / "skyshot" / "index.html"
+
+    if not skyshot_build.exists():
+        st.error("The SkyShot game build could not be found.")
+    else:
+        completion = render_questpass_activity(
+            None,
+            "skyshot",
+            key="skyshot_activity",
+            game_url="/app/static/skyshot/index.html",
+        )
+        if completion == "skyshot":
+            award_questpass_stamp("skyshot")
             st.session_state.page = "home"
             st.rerun()
 

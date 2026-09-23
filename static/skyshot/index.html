@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#030712" />
+  <title>SkyShot · NeuroVerse</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f7fbff;
+      --muted: #aabbd4;
+      --cyan: #67e8f9;
+      --blue: #3b82f6;
+      --violet: #a78bfa;
+      --lime: #c8ff62;
+      --rose: #fb7185;
+      --panel: rgba(6, 16, 38, 0.82);
+      --line: rgba(148, 163, 184, 0.24);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: #030712;
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    button { font: inherit; }
+
+    #app {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 560px;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(14, 165, 233, 0.22), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(139, 92, 246, 0.22), transparent 30%),
+        #030712;
+    }
+
+    #camera,
+    #gameCanvas {
+      position: absolute;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #camera {
+      z-index: 0;
+      object-fit: cover;
+      transform: scaleX(-1);
+      filter: saturate(0.82) contrast(1.08) brightness(0.72);
+    }
+
+    #gameCanvas {
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .camera-wash {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(2, 6, 23, 0.55), transparent 25%, transparent 70%, rgba(2, 6, 23, 0.68)),
+        radial-gradient(circle at center, transparent 25%, rgba(2, 6, 23, 0.28) 100%);
+    }
+
+    .camera-wash::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      opacity: 0.16;
+      background-image:
+        linear-gradient(rgba(103, 232, 249, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(103, 232, 249, 0.08) 1px, transparent 1px);
+      background-size: 44px 44px;
+      mask-image: radial-gradient(circle at center, black, transparent 78%);
+    }
+
+    .hud {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: none;
+      pointer-events: none;
+    }
+
+    .hud.visible { display: block; }
+
+    .topbar {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      left: 18px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: start;
+      gap: 18px;
+    }
+
+    .brand-lockup,
+    .timer-card,
+    .sound-button,
+    .player-card,
+    .tracking-pill {
+      border: 1px solid var(--line);
+      background: rgba(3, 10, 28, 0.76);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand-lockup {
+      width: max-content;
+      padding: 10px 14px;
+      border-radius: 16px;
+    }
+
+    .brand-lockup span {
+      display: block;
+      color: var(--cyan);
+      font-size: 0.62rem;
+      font-weight: 850;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .brand-lockup strong {
+      display: block;
+      margin-top: 2px;
+      font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+      letter-spacing: -0.03em;
+    }
+
+    .timer-card {
+      min-width: 170px;
+      overflow: hidden;
+      border-radius: 18px;
+      text-align: center;
+    }
+
+    .timer-copy {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 8px;
+      padding: 9px 16px 7px;
+    }
+
+    #timerValue {
+      color: var(--ink);
+      font-size: clamp(1.55rem, 3.4vw, 2.35rem);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.055em;
+      line-height: 1;
+    }
+
+    .timer-copy span:last-child {
+      color: var(--muted);
+      font-size: 0.69rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .timer-track { height: 4px; background: rgba(148, 163, 184, 0.16); }
+    #timerFill {
+      width: 100%;
+      height: 100%;
+      transform-origin: left;
+      background: linear-gradient(90deg, var(--cyan), var(--blue), var(--violet));
+      box-shadow: 0 0 14px rgba(103, 232, 249, 0.65);
+    }
+
+    .sound-button {
+      justify-self: end;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      color: var(--ink);
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    .sound-button:hover,
+    .sound-button:focus-visible {
+      border-color: rgba(103, 232, 249, 0.65);
+      outline: none;
+    }
+
+    .player-card {
+      position: absolute;
+      top: 50%;
+      width: 152px;
+      padding: 14px;
+      border-radius: 19px;
+      transform: translateY(-50%);
+    }
+
+    .player-card.one { left: 18px; border-color: rgba(103, 232, 249, 0.42); }
+    .player-card.two { right: 18px; border-color: rgba(167, 139, 250, 0.48); }
+    .player-card.hidden { display: none; }
+
+    .player-label {
+      color: var(--muted);
+      font-size: 0.67rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .player-score {
+      margin-top: 2px;
+      font-size: 2.25rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.07em;
+      line-height: 1;
+    }
+
+    .player-card.one .player-score { color: var(--cyan); }
+    .player-card.two .player-score { color: var(--violet); }
+
+    .player-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      color: #c7d7ee;
+      font-size: 0.72rem;
+    }
+
+    .tracking-pill {
+      position: absolute;
+      bottom: 18px;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 36px);
+      padding: 9px 14px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      color: #d9e6f6;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .tracking-dot {
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--rose);
+      box-shadow: 0 0 14px currentColor;
+    }
+
+    .tracking-pill.ready .tracking-dot { background: var(--lime); }
+    .tracking-pill.armed .tracking-dot { background: var(--cyan); }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: grid;
+      overflow: auto;
+      padding: clamp(22px, 4vw, 52px);
+      background:
+        radial-gradient(circle at 12% 10%, rgba(14, 165, 233, 0.21), transparent 28%),
+        radial-gradient(circle at 88% 16%, rgba(139, 92, 246, 0.21), transparent 30%),
+        rgba(2, 6, 23, 0.90);
+      place-items: center;
+      transition: opacity 220ms ease, visibility 220ms ease;
+    }
+
+    .overlay.hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .setup-card,
+    .result-card,
+    .error-card {
+      width: min(900px, 100%);
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 30px;
+      background:
+        linear-gradient(145deg, rgba(12, 31, 66, 0.96), rgba(6, 14, 34, 0.96));
+      box-shadow: var(--shadow), inset 0 1px rgba(255, 255, 255, 0.06);
+    }
+
+    .setup-card { padding: clamp(25px, 5vw, 48px); }
+
+    .setup-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 30px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--cyan);
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 0.19em;
+      text-transform: uppercase;
+    }
+
+    .setup-head h1,
+    .result-card h2,
+    .error-card h2 {
+      margin: 0;
+      color: var(--ink);
+      font-size: clamp(3rem, 9vw, 6.6rem);
+      letter-spacing: -0.075em;
+      line-height: 0.84;
+    }
+
+    .setup-head h1 span { color: var(--cyan); }
+
+    .setup-intro {
+      max-width: 340px;
+      margin: 0;
+      color: #c5d5eb;
+      font-size: 0.96rem;
+      line-height: 1.58;
+    }
+
+    .setup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .choice-block {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(2, 6, 23, 0.38);
+    }
+
+    .choice-label {
+      margin: 0 0 11px;
+      color: var(--muted);
+      font-size: 0.68rem;
+      font-weight: 850;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .choice-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
+    .choice-row.two { grid-template-columns: repeat(2, 1fr); }
+
+    .choice {
+      min-height: 82px;
+      padding: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 15px;
+      background: rgba(15, 30, 61, 0.66);
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+
+    .choice:hover,
+    .choice:focus-visible {
+      border-color: rgba(103, 232, 249, 0.62);
+      outline: none;
+      transform: translateY(-2px);
+    }
+
+    .choice.active {
+      border-color: var(--cyan);
+      background: linear-gradient(145deg, rgba(14, 116, 144, 0.34), rgba(30, 41, 89, 0.78));
+      box-shadow: inset 0 0 0 1px rgba(103, 232, 249, 0.14), 0 9px 24px rgba(6, 182, 212, 0.10);
+    }
+
+    .choice strong,
+    .choice small { display: block; }
+    .choice strong { font-size: 0.9rem; }
+    .choice small { margin-top: 4px; color: var(--muted); font-size: 0.68rem; line-height: 1.3; }
+
+    .control-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-top: 18px;
+    }
+
+    .control-step {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(15, 30, 61, 0.55);
+      color: #d6e3f3;
+      font-size: 0.76rem;
+      line-height: 1.35;
+    }
+
+    .control-step span {
+      display: grid;
+      width: 25px;
+      height: 25px;
+      flex: 0 0 auto;
+      border-radius: 8px;
+      background: rgba(103, 232, 249, 0.12);
+      color: var(--cyan);
+      font-weight: 900;
+      place-items: center;
+    }
+
+    .setup-actions,
+    .result-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 22px;
+    }
+
+    .primary,
+    .secondary {
+      min-height: 46px;
+      padding: 0 18px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 850;
+    }
+
+    .primary {
+      border: 0;
+      background: linear-gradient(135deg, var(--cyan), #60a5fa);
+      box-shadow: 0 12px 30px rgba(34, 211, 238, 0.18);
+      color: #04101f;
+    }
+
+    .primary:hover:not(:disabled),
+    .primary:focus-visible:not(:disabled) { transform: translateY(-2px); }
+    .primary:disabled { cursor: wait; opacity: 0.46; }
+
+    .secondary {
+      border: 1px solid var(--line);
+      background: rgba(15, 30, 61, 0.62);
+      color: var(--ink);
+    }
+
+    .secondary:hover,
+    .secondary:focus-visible { border-color: rgba(103, 232, 249, 0.62); outline: none; }
+
+    #cameraStatus {
+      margin: 0 0 0 auto;
+      color: var(--muted);
+      font-size: 0.74rem;
+    }
+
+    #cameraStatus.ready { color: var(--lime); }
+
+    .countdown {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      display: none;
+      place-items: center;
+      pointer-events: none;
+      background: rgba(2, 6, 23, 0.24);
+    }
+
+    .countdown.visible { display: grid; }
+
+    #countdownValue {
+      color: var(--ink);
+      font-size: clamp(7rem, 24vw, 17rem);
+      font-weight: 950;
+      letter-spacing: -0.09em;
+      line-height: 1;
+      text-shadow: 0 0 70px rgba(103, 232, 249, 0.52);
+    }
+
+    .result-card,
+    .error-card {
+      max-width: 680px;
+      padding: clamp(28px, 6vw, 52px);
+      text-align: center;
+    }
+
+    .result-card h2,
+    .error-card h2 { font-size: clamp(2.8rem, 8vw, 5.5rem); }
+
+    .result-subtitle,
+    .error-card p {
+      margin: 14px auto 0;
+      color: #c5d5eb;
+      line-height: 1.6;
+    }
+
+    .result-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .stat {
+      padding: 15px 10px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(2, 6, 23, 0.48);
+    }
+
+    .stat strong,
+    .stat span { display: block; }
+    .stat strong { color: var(--cyan); font-size: 1.75rem; font-variant-numeric: tabular-nums; }
+    .stat span { margin-top: 3px; color: var(--muted); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; }
+    .result-actions { justify-content: center; }
+
+    .pause-card {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: none;
+      background: rgba(2, 6, 23, 0.76);
+      color: var(--ink);
+      font-size: clamp(1.5rem, 5vw, 3rem);
+      font-weight: 900;
+      place-items: center;
+      text-align: center;
+    }
+
+    .pause-card.visible { display: grid; }
+
+    @media (max-width: 760px) {
+      #app { min-height: 500px; }
+      .setup-head { grid-template-columns: 1fr; gap: 14px; }
+      .setup-grid { grid-template-columns: 1fr; }
+      .control-strip { grid-template-columns: 1fr; }
+      .topbar { grid-template-columns: 1fr auto; }
+      .timer-card { grid-column: 1 / -1; grid-row: 2; justify-self: center; min-width: 140px; }
+      .sound-button { grid-column: 2; grid-row: 1; }
+      .player-card { top: auto; bottom: 62px; width: 126px; transform: none; }
+      .player-score { font-size: 1.75rem; }
+      .tracking-pill { bottom: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main id="app">
+    <video id="camera" autoplay muted playsinline aria-hidden="true"></video>
+    <div class="camera-wash" aria-hidden="true"></div>
+    <canvas id="gameCanvas" aria-label="SkyShot game area"></canvas>
+
+    <section id="hud" class="hud" aria-live="polite">
+      <div class="topbar">
+        <div class="brand-lockup"><span>NeuroVerse arcade</span><strong>SkyShot</strong></div>
+        <div class="timer-card">
+          <div class="timer-copy"><strong id="timerValue">30.0</strong><span>seconds</span></div>
+          <div class="timer-track"><div id="timerFill"></div></div>
+        </div>
+        <button id="soundButton" class="sound-button" type="button" aria-label="Mute sound" aria-pressed="false">♪</button>
+      </div>
+
+      <div id="playerOneCard" class="player-card one">
+        <div id="playerOneLabel" class="player-label">Player 1</div>
+        <div id="playerOneScore" class="player-score">0</div>
+        <div class="player-meta"><span id="playerOneStreak">x0 streak</span><span id="playerOneAccuracy">0%</span></div>
+      </div>
+
+      <div id="playerTwoCard" class="player-card two hidden">
+        <div class="player-label">Player 2</div>
+        <div id="playerTwoScore" class="player-score">0</div>
+        <div class="player-meta"><span id="playerTwoStreak">x0 streak</span><span id="playerTwoAccuracy">0%</span></div>
+      </div>
+
+      <div id="trackingPill" class="tracking-pill">
+        <span class="tracking-dot"></span>
+        <span id="trackingText">Show a finger-gun pose to aim</span>
+      </div>
+    </section>
+
+    <section id="setupOverlay" class="overlay">
+      <div class="setup-card">
+        <div class="setup-head">
+          <div>
+            <p class="kicker">NeuroVerse hand-tracking challenge</p>
+            <h1>Sky<span>Shot</span></h1>
+          </div>
+          <p class="setup-intro">Point with your index finger. Raise your thumb to load, then lower it once to fire.</p>
+        </div>
+
+        <div class="setup-grid">
+          <div class="choice-block">
+            <p class="choice-label">Choose your mission</p>
+            <div class="choice-row two" role="group" aria-label="Game mode">
+              <button class="choice mode-choice active" type="button" data-mode="solo" aria-pressed="true">
+                <strong>Solo blast</strong><small>One player · 30 seconds</small>
+              </button>
+              <button class="choice mode-choice" type="button" data-mode="duel" aria-pressed="false">
+                <strong>Side-by-side duel</strong><small>Two players · one lane each</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="choice-block">
+            <p class="choice-label">Choose difficulty</p>
+            <div class="choice-row" role="group" aria-label="Difficulty">
+              <button class="choice difficulty-choice" type="button" data-difficulty="easy" aria-pressed="false">
+                <strong>Easy</strong><small>Slower birds</small>
+              </button>
+              <button class="choice difficulty-choice active" type="button" data-difficulty="medium" aria-pressed="true">
+                <strong>Medium</strong><small>Balanced flight</small>
+              </button>
+              <button class="choice difficulty-choice" type="button" data-difficulty="hard" aria-pressed="false">
+                <strong>Hard</strong><small>Fast + more decoys</small>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-strip" aria-label="How to play">
+          <div class="control-step"><span>1</span>Point your index finger</div>
+          <div class="control-step"><span>2</span>Keep your other fingers folded</div>
+          <div class="control-step"><span>3</span>Thumb up, then down to shoot</div>
+        </div>
+
+        <div class="setup-actions">
+          <button id="startButton" class="primary" type="button" disabled>Preparing camera…</button>
+          <p id="cameraStatus">Camera permission is required for this game.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="countdown" class="countdown" aria-live="assertive">
+      <div id="countdownValue">3</div>
+    </section>
+
+    <section id="resultOverlay" class="overlay hidden" aria-live="polite">
+      <div class="result-card">
+        <p class="kicker">Round complete</p>
+        <h2 id="resultTitle">Mission complete</h2>
+        <p id="resultSubtitle" class="result-subtitle"></p>
+        <div id="resultStats" class="result-stats"></div>
+        <div class="result-actions">
+          <button id="playAgainButton" class="secondary" type="button">Play again</button>
+          <button id="setupButton" class="secondary" type="button">Change setup</button>
+          <button id="collectButton" class="primary" type="button">Collect QuestPass stamp</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="errorOverlay" class="overlay hidden" role="alert">
+      <div class="error-card">
+        <p class="kicker">Camera connection failed</p>
+        <h2>We lost the signal.</h2>
+        <p id="errorText">Allow camera access, check that another application is not using it, then try again.</p>
+        <div class="result-actions"><button id="retryButton" class="primary" type="button">Try camera again</button></div>
+      </div>
+    </section>
+
+    <div id="pauseCard" class="pause-card">Game paused<br><small>Return to this tab to continue</small></div>
+  </main>
+
+  <script src="./mediapipe-hands/hands.js"></script>
+  <script type="module" src="./game.js"></script>
+</body>
+</html>
