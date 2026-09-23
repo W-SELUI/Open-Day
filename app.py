@@ -13,7 +13,7 @@ from questpass_bridge import (
 from UI_theme import apply_theme
 
 
-st.set_page_config(page_title="Career Quest", page_icon="🎓")
+st.set_page_config(page_title="NeuroVerse", page_icon="🧠")
 
 apply_theme()
 
@@ -894,7 +894,7 @@ page = st.session_state.page
 if page == "home":
     if "quest_pass_notice" in st.session_state:
         st.toast(
-            f"QuestPass stamp collected: {st.session_state.quest_pass_notice}!",
+            f"NeuroVerse QuestPass stamp collected: {st.session_state.quest_pass_notice}!",
             icon="✅",
         )
         del st.session_state.quest_pass_notice
@@ -902,11 +902,11 @@ if page == "home":
     st.markdown(
         """
         <section class="hero">
-            <div class="eyebrow">OPEN DAY · AI EXPERIENCE</div>
-            <h1>Discover how you think.</h1>
+            <div class="eyebrow">NEUROVERSE · OPEN DAY EXPERIENCE</div>
+            <h1>Your mind. Your moves. Your universe.</h1>
             <p>
-                Try a hands-on puzzle challenge or explore career paths
-                with a machine-learning model built for this project.
+                Enter a universe of machine-learning predictions,
+                hand-tracked challenges, and playful social experiences.
             </p>
         </section>
         """,
@@ -928,23 +928,23 @@ if page == "home":
     )
 
     if stamp_count >= total_stamps:
-        quest_message = "Full collection unlocked: Master of Open Day Chaos."
+        quest_message = "Full collection unlocked: Master of the NeuroVerse."
     elif stamp_count >= 3:
-        quest_message = "Explorer title unlocked: Certified Open Day Chaos Engineer."
+        quest_message = "Explorer title unlocked: Certified NeuroVerse Navigator."
     else:
         stamps_needed = 3 - stamp_count
         quest_message = (
             f"Collect {stamps_needed} more stamp{'s' if stamps_needed != 1 else ''} "
-            "to unlock your Explorer title."
+            "to unlock your NeuroVerse Explorer title."
         )
 
     st.markdown(
         f"""
         <section class="questpass-card">
             <div class="questpass-copy">
-                <p class="questpass-eyebrow">OPEN DAY AI LAB PASSPORT</p>
-                <h2>QuestPass</h2>
-                <p>Try the experiences, collect stamps, and unlock a completely unnecessary title.</p>
+                <p class="questpass-eyebrow">NEUROVERSE EXPERIENCE PASSPORT</p>
+                <h2>NeuroVerse QuestPass</h2>
+                <p>Explore the universe, collect stamps, and unlock a completely unnecessary title.</p>
             </div>
             <div class="questpass-progress-area">
                 <div class="questpass-count">{stamp_count} <span>/ {total_stamps} stamps</span></div>
@@ -1078,7 +1078,7 @@ if page == "home":
             st.rerun()
 
     st.markdown(
-        '<p class="small-note">Built for Open Day · Your answers stay in this session.</p>',
+        '<p class="small-note">NEUROVERSE · Built for Open Day · Designed for quick, private play.</p>',
         unsafe_allow_html=True,
     )
 
@@ -1161,7 +1161,7 @@ elif page == "puzzle":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to AI Lab", key="back_from_puzzle"):
+    if st.button("← Back to NeuroVerse", key="back_from_puzzle"):
         st.session_state.page = "home"
         st.rerun()
 
@@ -1250,7 +1250,7 @@ elif page == "hand_rush":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to AI Lab", key="back_from_hand_rush"):
+    if st.button("← Back to NeuroVerse", key="back_from_hand_rush"):
         st.session_state.page = "home"
         st.rerun()
 
@@ -1340,7 +1340,7 @@ elif page == "slice_club":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to AI Lab", key="back_from_slice_club"):
+    if st.button("← Back to NeuroVerse", key="back_from_slice_club"):
         st.session_state.page = "home"
         st.rerun()
 
@@ -1434,7 +1434,7 @@ elif page == "vibe_link":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to AI Lab", key="back_from_vibe_link"):
+    if st.button("← Back to NeuroVerse", key="back_from_vibe_link"):
         st.session_state.page = "home"
         st.rerun()
 
@@ -1529,7 +1529,7 @@ elif page == "vibe_oracle":
         unsafe_allow_html=True,
     )
 
-    if st.button("← Back to AI Lab", key="back_from_vibe_oracle"):
+    if st.button("← Back to NeuroVerse", key="back_from_vibe_oracle"):
         st.session_state.page = "home"
         st.rerun()
 
@@ -1559,7 +1559,7 @@ elif page == "vibe_oracle":
 
 elif page == "career":
 
-    if st.button("← Back to AI Lab", key="back_from_career"):
+    if st.button("← Back to NeuroVerse", key="back_from_career"):
         st.session_state.page = "home"
         st.rerun()
 

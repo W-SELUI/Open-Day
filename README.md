@@ -1,11 +1,14 @@
-<h1 align="center">Open Day AI Lab</h1>
+<h1 align="center">NeuroVerse</h1>
+
+<h3 align="center">Your mind. Your moves. Your universe.</h3>
 
 <p align="center">
-  An interactive Streamlit experience for university Open Day visitors.
+  An interactive universe of AI, machine learning, and camera-powered experiences
+  built for university Open Day visitors.
 </p>
 
 <p align="center">
-  Career suggestions • Camera games • Fun social experiences • QuestPass achievements
+  Career suggestions • Camera games • Fun social experiences • NeuroVerse QuestPass achievements
 </p>
 
 <hr>
@@ -13,9 +16,10 @@
 <h2>About the Project</h2>
 
 <p>
-  Open Day AI Lab is an interactive project designed to make university Open Day more fun
+  NeuroVerse is an interactive project designed to make university Open Day more fun
   for high-school students. Visitors can explore possible careers, play camera-controlled
-  games, try fun social experiences, and collect digital achievements through QuestPass.
+  games, try fun social experiences, and collect digital achievements through the
+  NeuroVerse QuestPass.
 </p>
 
 <p>
@@ -76,10 +80,10 @@
   <li>Includes Friendly and Spicy modes.</li>
 </ul>
 
-<h3>QuestPass</h3>
+<h3>NeuroVerse QuestPass</h3>
 
 <ul>
-  <li>A digital achievement system inside Open Day AI Lab.</li>
+  <li>A digital achievement system connecting the experiences inside NeuroVerse.</li>
   <li>Tracks completed activities during the current session.</li>
   <li>Rewards players with a stamp after genuinely completing an activity.</li>
   <li>Refresh the app to begin a new QuestPass session.</li>
@@ -266,7 +270,7 @@ source .venv/bin/activate
   <li>Add a two-player Hand Puzzle race mode.</li>
   <li>Add voice input to Career Quest.</li>
   <li>Expand the career-training dataset with more realistic examples.</li>
-  <li>Add more Open Day mini-games.</li>
+  <li>Add more NeuroVerse mini-games.</li>
   <li>Add sound effects, animations, and a leaderboard.</li>
   <li>Add QR-code sharing for QuestPass results.</li>
   <li>Save QuestPass progress using QR codes or accounts.</li>
@@ -278,6 +282,6 @@ source .venv/bin/activate
 <h2>Author</h2>
 
 <p>
-  Created by <strong>Root | Knox | Juls</strong> for an interactive Open Day
-  software-development project.
+  Created by <strong>Root | Knox | Juls</strong> for NeuroVerse, an interactive
+  Open Day software-development project.
 </p>
