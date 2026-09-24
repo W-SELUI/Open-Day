@@ -298,6 +298,6 @@ source .venv/bin/activate
 <h2>Author</h2>
 
 <p>
-  Created by <strong>Root | Knox | Juls</strong> for NeuroVerse, an interactive
+  Created by <strong>Root | Knox | Juls | Leila </strong> for NeuroVerse, an interactive
   Open Day software-development project.
 </p>
