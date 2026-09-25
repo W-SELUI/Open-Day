@@ -23,7 +23,7 @@ export default function(component) {
   const previous = instances.get(parentElement);
 
   if (previous) {
-    window.removeEventListener("message", previous);
+    window.removeEventListener("message", previous);b
   }
 
   const onMessage = (event) => {
@@ -49,7 +49,6 @@ export default function(component) {
 """,
 )
 
-#So basically what happenes is a game where students pinch to measure the size in the square
 # Hand Puzzle is a complete web build, rather than one self-contained HTML
 # file.  Give it its own Streamlit component so it has a single iframe and
 # can load its JavaScript modules, MediaPipe files, and model directly.
