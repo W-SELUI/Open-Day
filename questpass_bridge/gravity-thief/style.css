@@ -6,3 +6,52 @@
 @media(max-width:650px){.shell{padding:0 14px}.topbar-inner{padding:14px 16px}.brand{font-size:13px;letter-spacing:3px;gap:10px}.brand svg{width:25px;height:25px}.camera-status{font-size:12px;gap:7px}.edition{font-size:9px;letter-spacing:1.5px}.back-row{min-height:35px}.game-heading{flex-wrap:wrap;gap:18px;padding-bottom:15px}h1{font-size:31px;letter-spacing:2px}.game-heading>div>p{font-size:12px;letter-spacing:.7px;margin-top:7px}.hud{width:100%;justify-content:space-between}.level-info{flex:1;border:0}.level-info strong{display:block;font-size:12px}.level-info>span{font-size:11px}#timer{font-size:23px}.hud .icon-button{width:39px;height:39px}.stage{aspect-ratio:auto;height:360px;border-radius:13px}.mission{font-size:11px;top:12px}.mission svg{width:16px;height:16px}.stage-corner{font-size:8px;bottom:10px}.hint-pill{bottom:43px;font-size:11px;max-width:90%}.overlay{padding:12px}.dialog-card{padding:20px 22px 14px;max-width:340px}.dialog-card h2{font-size:26px}.dialog-card>p:not(.eyebrow):not(.privacy-note):not(.error-message){font-size:14px;margin:10px 0 16px}.orb-symbol{width:32px;height:32px;margin-bottom:15px}.orb-symbol span{width:15px;height:15px}.eyebrow{font-size:9px;margin-bottom:8px}.privacy-note{margin-top:9px;font-size:11px}.primary-button{font-size:14px;padding:12px}.secondary-button{font-size:13px;padding:12px 8px 5px}.control-bar{padding:12px 0;gap:10px}.control-bar>p{font-size:12px}.control-actions{width:100%;justify-content:flex-end;gap:9px}#modeButton{margin-right:auto;font-size:12px}.restart-button{font-size:12px;padding:9px 10px}.instructions{grid-template-columns:1fr;padding:18px 0;gap:15px}.instruction{border:0;gap:15px}.instruction-visual{width:35px;height:35px}.instruction h3{font-size:12px}.instruction p{font-size:12px;margin-top:5px}.pull-visual:after{inset:10px}.pull-visual:before{inset:5px}.pull-visual i{top:10px}.portal-visual i{width:25px;height:33px}.coast-visual:before{top:17px;width:26px}.coast-visual i{top:11px}.result-stats{margin:16px 0}.result-stats strong{font-size:22px}body.embedded .shell{padding:0 12px}}
 @media(max-height:550px) and (min-width:651px){.topbar,.back-row,footer,.instructions{display:none}.shell{padding:10px 22px}.game-heading{padding:0 0 10px}h1{font-size:25px}.game-heading>div>p,.level-info strong{display:none}.stage{height:calc(100dvh - 125px);aspect-ratio:auto}.control-bar{padding:7px 0}.dialog-card{padding:14px 23px}.orb-symbol,.privacy-note{display:none}.dialog-card h2{font-size:25px}.dialog-card>p:not(.eyebrow):not(.privacy-note):not(.error-message){margin:8px 0 12px}.primary-button{padding:10px}.secondary-button{padding:10px 5px 0}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* NeuroVerse fullscreen: compact the chrome and dedicate the screen to play. */
+#fullscreenButton[aria-pressed=false]{color:#c4d7e8}
+#fullscreenButton[aria-pressed=false]:after{display:none}
+html.nv-fullscreen-active,
+html.nv-fullscreen-active body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+html.nv-fullscreen-active .topbar,
+html.nv-fullscreen-active .back-row,
+html.nv-fullscreen-active .instructions,
+html.nv-fullscreen-active footer{display:none}
+html.nv-fullscreen-active .shell{
+  width:var(--nv-viewport-width,100vw);
+  height:var(--nv-viewport-height,100dvh);
+  max-width:none;
+  margin:0;
+  padding:10px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left));
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+html.nv-fullscreen-active .game-heading{
+  flex:0 0 auto;
+  justify-content:flex-end;
+  padding:0 0 9px;
+}
+html.nv-fullscreen-active .game-heading>div:first-child{display:none}
+html.nv-fullscreen-active .hud{width:100%;justify-content:flex-end}
+html.nv-fullscreen-active .stage{
+  flex:1 1 auto;
+  width:100%;
+  height:auto;
+  min-height:0;
+  aspect-ratio:auto;
+  border-radius:14px;
+}
+html.nv-fullscreen-active .control-bar{flex:0 0 auto;padding:7px 0;border-bottom:0}
+
+@media(max-width:650px){
+  html.nv-fullscreen-active .shell{padding:7px 8px 5px}
+  html.nv-fullscreen-active .game-heading{padding-bottom:6px}
+  html.nv-fullscreen-active .level-info strong{display:none}
+  html.nv-fullscreen-active .stage{height:auto}
+  html.nv-fullscreen-active .control-bar>p{display:none}
+  html.nv-fullscreen-active .control-actions{width:100%}
+}

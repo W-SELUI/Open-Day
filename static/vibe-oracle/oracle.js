@@ -606,21 +606,8 @@ function staffAdvance() {
 $("retryButton").addEventListener("click", () => void startCamera());
 $("soundButton").addEventListener("click", toggleSound);
 document.querySelector(".brand").addEventListener("dblclick", staffAdvance);
-$("fullscreenButton").addEventListener("click", async () => {
-  try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await document.documentElement.requestFullscreen();
-  } catch {
-    setInstruction("Fullscreen is unavailable", "The Oracle will still work in this view.");
-  }
-});
-
-if (!document.documentElement.requestFullscreen) $("fullscreenButton").hidden = true;
-document.addEventListener("fullscreenchange", () => {
-  $("fullscreenButton").setAttribute(
-    "aria-label",
-    document.fullscreenElement ? "Exit fullscreen" : "Enter fullscreen",
-  );
+window.addEventListener("neuroverse:fullscreenerror", () => {
+  setInstruction("Fullscreen is unavailable", "The Oracle will still work in this view.");
 });
 
 document.addEventListener("keydown", (event) => {

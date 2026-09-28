@@ -814,21 +814,9 @@ $("help-dialog").addEventListener("click", (event) => {
       event.target.close();
   }
 });
-$("fullscreen-button").addEventListener("click", async () => {
-  try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await arena.requestFullscreen();
-  } catch {
-    text("announcer", "Fullscreen is not supported in this browser window.");
-  }
+window.addEventListener("neuroverse:fullscreenerror", () => {
+  text("announcer", "Fullscreen is not supported in this browser window.");
 });
-if (!document.fullscreenEnabled) $("fullscreen-button").hidden = true;
-document.addEventListener("fullscreenchange", () =>
-  $("fullscreen-button").setAttribute(
-    "aria-label",
-    document.fullscreenElement ? "Exit fullscreen" : "Enter fullscreen",
-  ),
-);
 document.addEventListener("keydown", (event) => {
   if ($("help-dialog").open || event.target.matches("input") || event.repeat)
     return;

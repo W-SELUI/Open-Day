@@ -358,12 +358,9 @@ $('collectStampButton').addEventListener('click', () => {
   window.parent.postMessage({ type: 'questpass:completed', activity: 'hand_puzzle' }, '*');
 });
 $('soundButton').addEventListener('click', () => { soundEnabled = !soundEnabled; unlockAudio(); refreshSound(); try { localStorage.setItem('hand-puzzle.sound.v1', soundEnabled ? 'on' : 'off'); } catch { /* Optional preference. */ } if (soundEnabled) chime('snap'); });
-$('fullscreenButton').addEventListener('click', async () => {
-  try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); }
-  catch { if (state.stream) status('Fullscreen is unavailable in this browser. You can keep playing here.'); }
+window.addEventListener('neuroverse:fullscreenerror', () => {
+  if (state.stream) status('Fullscreen is unavailable in this browser. You can keep playing here.');
 });
-document.addEventListener('fullscreenchange', () => $('fullscreenButton').setAttribute('aria-label', document.fullscreenElement ? 'Exit fullscreen' : 'Enter fullscreen'));
-if (!document.documentElement.requestFullscreen) $('fullscreenButton').hidden = true;
 function syncPause() {
   const paused = document.hidden || $('helpDialog').open;
   if (!state.stream) return;

@@ -999,3 +999,13 @@ h1 em {
     scroll-behavior: auto !important;
   }
 }
+
+html.nv-fullscreen-active .app {
+  width: var(--nv-viewport-width, 100vw);
+  height: var(--nv-viewport-height, 100dvh);
+}
+
+html.nv-fullscreen-active #fullscreenButton[aria-pressed="true"] {
+  border-color: var(--cyan);
+  color: var(--cyan);
+}

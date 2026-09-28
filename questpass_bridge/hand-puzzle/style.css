@@ -6,3 +6,47 @@
 @media(max-width:1000px){.app-shell{padding:0 28px}.edition{display:none}.game-stage{height:570px}.target-card{width:115px;right:18px}.target-label{font-size:8px;letter-spacing:.8px}.scoreboard{left:18px}.scoreboard>span{padding:8px 9px;gap:7px}.scoreboard strong{font-size:15px}.control-buttons{gap:12px}.how-strip{gap:12px}.how-strip p span{font-size:11px}.tracking-badge{bottom:10px;left:18px}.status-pill{bottom:32px}}
 @media(max-width:650px){.app-shell{padding:0 17px}.topbar{height:77px;gap:10px}.wordmark{font-size:13px;gap:8px;letter-spacing:1.7px}.brand-icon{font-size:29px}.toolbar{gap:7px}.toolbar .text-button{font-size:0;width:25px}.toolbar .text-button>span{font-size:12px}.icon-button{width:32px;height:32px;padding:7px}.game-heading{padding:25px 0 20px;align-items:center}.game-heading .eyebrow{font-size:9px;letter-spacing:1.8px;margin-bottom:9px}.game-heading h1{font-size:26px;max-width:280px}.heading-note{display:none}.game-stage{height:590px;border-radius:13px}.stage-top{inset:15px 13px auto;gap:7px}.phase-tabs{padding:10px;gap:9px}.phase{font-size:9px;letter-spacing:1px;gap:5px}.phase-tabs i{font-size:11px}.live-badge{font-size:8px;padding:9px 7px;letter-spacing:.4px;gap:5px}.live-badge i{width:5px;height:5px}.welcome{padding-top:66px}.welcome h2{font-size:37px}.welcome>p:not(.eyebrow):not(.privacy-note):not(.error-message){font-size:14px}.target-card{top:71px;right:13px;width:91px;padding:6px}.target-card p{display:none}.target-label{font-size:7px;letter-spacing:.4px;margin:2px 0 5px}.scoreboard{top:74px;left:13px;flex-direction:column;gap:6px}.scoreboard>span{padding:7px 9px;gap:7px}.scoreboard svg{width:15px;height:15px}.scoreboard strong{font-size:14px}.status-pill{font-size:12px;padding:11px 13px;gap:8px;max-width:calc(100% - 22px);bottom:31px}.gesture-indicator{font-size:21px}.game-controls{padding:12px 0;flex-direction:column;align-items:flex-start;gap:8px}.control-buttons{flex-wrap:wrap;gap:10px 17px}.control-buttons button{font-size:12px}#controlLabel{font-size:9px}.how-strip{grid-template-columns:1fr;padding:21px 0;gap:18px}.how-strip>div{gap:12px}.how-strip p{gap:4px}.how-strip p span{font-size:12px}.how-strip strong{font-size:14px}footer{font-size:10px;padding:21px 0}footer>span:last-child{font-size:8px;letter-spacing:1px}.win-card h2{font-size:43px}.win-mark{font-size:53px}.accessible-board{grid-template-columns:repeat(3,1fr)}.accessible-board button{max-height:90px}.privacy-note{font-size:11px}dialog{padding:30px 24px}dialog h2{font-size:27px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* NeuroVerse fullscreen: preserve the controls while the camera stage takes the available space. */
+#fullscreenButton[aria-pressed=false]{color:#adb8b2}
+html.nv-fullscreen-active,
+html.nv-fullscreen-active body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+html.nv-fullscreen-active .app-shell{
+  width:var(--nv-viewport-width,100vw);
+  height:var(--nv-viewport-height,100dvh);
+  max-width:none;
+  margin:0;
+  padding:0 max(14px,env(safe-area-inset-right)) 0 max(14px,env(safe-area-inset-left));
+  display:grid;
+  grid-template-rows:64px minmax(0,1fr);
+}
+html.nv-fullscreen-active .topbar{height:64px}
+html.nv-fullscreen-active main{
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+html.nv-fullscreen-active .game-heading,
+html.nv-fullscreen-active .how-strip,
+html.nv-fullscreen-active footer{display:none}
+html.nv-fullscreen-active .game-stage{
+  flex:1 1 auto;
+  width:100%;
+  height:auto;
+  min-height:0;
+  border-radius:14px;
+}
+html.nv-fullscreen-active .game-controls{flex:0 0 auto;min-height:52px}
+
+@media(max-width:650px){
+  html.nv-fullscreen-active .app-shell{grid-template-rows:54px minmax(0,1fr);padding:0 9px}
+  html.nv-fullscreen-active .topbar{height:54px}
+  html.nv-fullscreen-active .wordmark{font-size:11px}
+  html.nv-fullscreen-active .game-controls{min-height:46px;padding:5px 0;flex-direction:row;align-items:center}
+  html.nv-fullscreen-active #controlLabel{display:none}
+}

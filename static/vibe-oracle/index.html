@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#09071a" />
     <meta
       name="description"
@@ -49,7 +49,10 @@
             class="icon-button"
             type="button"
             aria-label="Enter fullscreen"
+            aria-pressed="false"
             title="Fullscreen"
+            data-neuroverse-fullscreen
+            data-fullscreen-target="document"
           >
             ⛶
           </button>
@@ -156,6 +159,7 @@
     </main>
 
     <div id="announcer" class="sr-only" role="status" aria-live="assertive"></div>
+    <script src="../neuroverse-fullscreen.js"></script>
     <script type="module" src="oracle.js?v=20260920c"></script>
   </body>
 </html>

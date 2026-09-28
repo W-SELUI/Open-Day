@@ -114,6 +114,7 @@
     .brand-lockup,
     .timer-card,
     .sound-button,
+    .fullscreen-button,
     .player-card,
     .tracking-pill {
       border: 1px solid var(--line);
@@ -185,8 +186,15 @@
       box-shadow: 0 0 14px rgba(103, 232, 249, 0.65);
     }
 
-    .sound-button {
+    .topbar-actions {
       justify-self: end;
+      display: flex;
+      gap: 8px;
+      pointer-events: auto;
+    }
+
+    .sound-button,
+    .fullscreen-button {
       width: 44px;
       height: 44px;
       border-radius: 14px;
@@ -196,10 +204,29 @@
     }
 
     .sound-button:hover,
-    .sound-button:focus-visible {
+    .sound-button:focus-visible,
+    .fullscreen-button:hover,
+    .fullscreen-button:focus-visible {
       border-color: rgba(103, 232, 249, 0.65);
       outline: none;
     }
+
+    .fullscreen-button[aria-pressed="true"] {
+      border-color: rgba(103, 232, 249, 0.75);
+      color: var(--cyan);
+    }
+
+    .setup-fullscreen-button {
+      position: absolute;
+      top: max(18px, env(safe-area-inset-top));
+      right: max(18px, env(safe-area-inset-right));
+      z-index: 20;
+      background: rgba(3, 10, 28, 0.76);
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(16px);
+    }
+
+    .hud.visible + .setup-fullscreen-button { display: none; }
 
     .player-card {
       position: absolute;
@@ -554,7 +581,7 @@
       .control-strip { grid-template-columns: 1fr; }
       .topbar { grid-template-columns: 1fr auto; }
       .timer-card { grid-column: 1 / -1; grid-row: 2; justify-self: center; min-width: 140px; }
-      .sound-button { grid-column: 2; grid-row: 1; }
+      .topbar-actions { grid-column: 2; grid-row: 1; }
       .player-card { top: auto; bottom: 62px; width: 126px; transform: none; }
       .player-score { font-size: 1.75rem; }
       .tracking-pill { bottom: 12px; }
@@ -562,6 +589,12 @@
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+    }
+
+    html.nv-fullscreen-active #app {
+      width: var(--nv-viewport-width, 100vw);
+      height: var(--nv-viewport-height, 100dvh);
+      min-height: 0;
     }
   </style>
 </head>
@@ -578,7 +611,10 @@
           <div class="timer-copy"><strong id="timerValue">30.0</strong><span>seconds</span></div>
           <div class="timer-track"><div id="timerFill"></div></div>
         </div>
-        <button id="soundButton" class="sound-button" type="button" aria-label="Mute sound" aria-pressed="false">♪</button>
+        <div class="topbar-actions">
+          <button id="soundButton" class="sound-button" type="button" aria-label="Mute sound" aria-pressed="false">♪</button>
+          <button id="fullscreenButton" class="fullscreen-button" type="button" aria-label="Enter fullscreen" aria-pressed="false" title="Fullscreen" data-neuroverse-fullscreen data-fullscreen-target="document">⛶</button>
+        </div>
       </div>
 
       <div id="playerOneCard" class="player-card one">
@@ -598,6 +634,8 @@
         <span id="trackingText">Show a finger-gun pose to aim</span>
       </div>
     </section>
+
+    <button id="setupFullscreenButton" class="fullscreen-button setup-fullscreen-button" type="button" aria-label="Enter fullscreen" aria-pressed="false" title="Fullscreen" data-neuroverse-fullscreen data-fullscreen-target="document">⛶</button>
 
     <section id="setupOverlay" class="overlay">
       <div class="setup-card">
@@ -681,6 +719,7 @@
     <div id="pauseCard" class="pause-card">Game paused<br><small>Return to this tab to continue</small></div>
   </main>
 
+  <script src="../neuroverse-fullscreen.js"></script>
   <script src="./mediapipe-hands/hands.js"></script>
   <script type="module" src="./game.js"></script>
 </body>

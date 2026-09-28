@@ -1046,6 +1046,29 @@ kbd {
     min-height: 620px;
   }
 }
+
+html.nv-fullscreen-active,
+html.nv-fullscreen-active body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+html.nv-fullscreen-active .arena,
+.arena:-webkit-full-screen,
+.arena:fullscreen {
+  width: var(--nv-viewport-width, 100vw);
+  height: var(--nv-viewport-height, 100dvh);
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+}
+
+html.nv-fullscreen-active #fullscreen-button[aria-pressed="true"] {
+  color: var(--lime);
+  text-decoration: none;
+}
 @media (max-width: 680px) {
   .ready-line {
     font-size: clamp(40px, 12vw, 58px);

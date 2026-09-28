@@ -47,7 +47,7 @@
       </div>
       <div id="handNotice" class="hand-notice" hidden>Hand out of view · game paused</div>
     </section>
-    <div class="control-bar"><p id="levelHint">Pull gently around the wall. Release to let the core coast.</p><div class="control-actions"><button id="modeButton" class="text-button" hidden>Use mouse / touch</button><button id="soundButton" class="icon-button subtle" aria-label="Turn sound on" aria-pressed="false" title="Sound"><svg><use href="#i-sound"/></svg></button><button id="fullscreenButton" class="icon-button subtle" aria-label="Enter fullscreen" title="Fullscreen"><svg><use href="#i-expand"/></svg></button><button id="restartButton" class="restart-button" disabled><svg><use href="#i-restart"/></svg><span>Restart level</span></button></div></div>
+    <div class="control-bar"><p id="levelHint">Pull gently around the wall. Release to let the core coast.</p><div class="control-actions"><button id="modeButton" class="text-button" hidden>Use mouse / touch</button><button id="soundButton" class="icon-button subtle" aria-label="Turn sound on" aria-pressed="false" title="Sound"><svg><use href="#i-sound"/></svg></button><button id="fullscreenButton" class="icon-button subtle" type="button" aria-label="Enter fullscreen" aria-pressed="false" title="Fullscreen" data-neuroverse-fullscreen data-fullscreen-target="document"><svg><use href="#i-expand"/></svg></button><button id="restartButton" class="restart-button" disabled><svg><use href="#i-restart"/></svg><span>Restart level</span></button></div></div>
     <section class="instructions" aria-label="How to play">
       <div class="instruction"><span class="instruction-visual pull-visual" aria-hidden="true"><i></i><b></b></span><div><h3><span>01</span> FIST TO PULL</h3><p>Close your hand to steer the gravity field.</p></div></div>
       <div class="instruction"><span class="instruction-visual coast-visual" aria-hidden="true"><i></i><b></b></span><div><h3><span>02</span> RELEASE TO COAST</h3><p>Let momentum carry the core forward.</p></div></div>
@@ -58,6 +58,7 @@
   <dialog id="helpDialog"><button id="closeHelp" class="dialog-close icon-button" aria-label="Close controls">×</button><p class="eyebrow">A LITTLE FIELD GUIDE</p><h2>Get a feel for gravity.</h2><p><strong>Camera:</strong> keep one hand visible. Close your hand into a fist to pull. Move your fist to steer; open your hand to release.</p><p><strong>Mouse / touch:</strong> hold anywhere in the play area to pull toward that spot. Release to coast.</p><p><strong>Keyboard:</strong> arrow keys move the field. Hold Space to pull. Esc pauses; R restarts.</p><p>To brake, hold the field near the core. To turn, guide it in small steps. Walls and screen edges give a gentle bump so you can recover. A dark, dashed laser is safe to cross. Every level can be retried.</p><p class="help-note">Bright, even light helps tracking. A larger play area or landscape view gives you more room. Camera mode pauses when your hand leaves view.</p><button id="gotItButton" class="primary-button">Got it</button></dialog>
   <div id="announcer" class="sr-only" aria-live="polite"></div>
   <noscript>This game needs JavaScript enabled in your browser.</noscript>
+  <script src="./neuroverse-fullscreen.js"></script>
   <script type="module" src="./app.js"></script>
 </body>
 </html>

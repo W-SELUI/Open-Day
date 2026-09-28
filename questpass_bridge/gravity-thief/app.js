@@ -144,12 +144,9 @@ $('soundButton').addEventListener('click', () => {
   sound = !sound; unlockAudio(); refreshHUD(); if (sound) playSound('start');
   try { localStorage.setItem('gravity-thief.sound', sound ? 'on' : 'off'); } catch { /* Optional preference. */ }
 });
-$('fullscreenButton').addEventListener('click', async () => {
-  try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); }
-  catch { text('levelHint', 'Fullscreen is unavailable here. You can keep playing in this view.'); }
+window.addEventListener('neuroverse:fullscreenerror', () => {
+  text('levelHint', 'Fullscreen is unavailable here. You can keep playing in this view.');
 });
-if (!document.documentElement.requestFullscreen) $('fullscreenButton').hidden = true;
-document.addEventListener('fullscreenchange', () => $('fullscreenButton').setAttribute('aria-label', document.fullscreenElement ? 'Exit fullscreen' : 'Enter fullscreen'));
 
 function pointerPoint(e) {
   const r = $('gameCanvas').getBoundingClientRect();
