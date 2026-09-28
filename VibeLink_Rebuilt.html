@@ -1020,6 +1020,56 @@
         opacity: 1;
         transform: translateY(0);
       }
+
+      .reveal-advance {
+        display: flex;
+        width: fit-content;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin: 16px auto 0;
+        padding: 9px 16px;
+        border: 1px solid rgba(248, 241, 223, 0.34);
+        border-radius: 999px;
+        background: rgba(8, 10, 20, 0.72);
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 0.76rem;
+        font-weight: 900;
+        letter-spacing: 0.11em;
+        opacity: 0;
+        pointer-events: none;
+        text-transform: uppercase;
+        transform: translateY(8px);
+        transition:
+          opacity 0.22s ease,
+          transform 0.22s ease,
+          border-color 0.22s ease;
+      }
+
+      .reveal-advance.show {
+        border-color: rgba(255, 228, 84, 0.72);
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .reveal-advance kbd {
+        min-width: 74px;
+        padding: 6px 11px;
+        border: 1px solid rgba(255, 255, 255, 0.42);
+        border-bottom-width: 4px;
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--night);
+        font: inherit;
+        letter-spacing: 0.08em;
+      }
+
+      .reveal-advance.show kbd {
+        animation: spacePulse 1.35s ease-in-out infinite;
+      }
+
       .result-actions {
         display: flex;
         flex-wrap: wrap;
@@ -1056,6 +1106,13 @@
       }
       .hidden {
         display: none !important;
+      }
+
+      @keyframes spacePulse {
+        50% {
+          box-shadow: 0 0 24px rgba(255, 228, 84, 0.38);
+          transform: translateY(2px);
+        }
       }
 
       @keyframes marquee {
@@ -1495,6 +1552,15 @@
             </div>
           </div>
           <div id="punchline" class="punchline" aria-live="polite"></div>
+          <button
+            id="revealAdvance"
+            class="reveal-advance"
+            type="button"
+            disabled
+          >
+            <kbd>SPACE</kbd>
+            <span id="revealAdvanceText">Reveal the first message</span>
+          </button>
           <div id="resultActions" class="result-actions">
             <button id="collectButton" class="primary" type="button">
               Collect QuestPass stamp & return
@@ -1640,6 +1706,8 @@
       const resultSchoolB = document.getElementById("resultSchoolB");
       const verdict = document.getElementById("verdict");
       const punchline = document.getElementById("punchline");
+      const revealAdvance = document.getElementById("revealAdvance");
+      const revealAdvanceText = document.getElementById("revealAdvanceText");
       const resultActions = document.getElementById("resultActions");
       const collectButton = document.getElementById("collectButton");
       const replayButton = document.getElementById("replayButton");
@@ -1662,15 +1730,56 @@
       let audioContext = null;
       let revealToken = 0;
       let lastResult = null;
-
-      const reducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)",
-      ).matches;
+      let revealAdvanceResolve = null;
+      let revealAdvanceToken = 0;
 
       function pause(milliseconds) {
         return new Promise(function (resolve) {
-          window.setTimeout(resolve, reducedMotion ? 12 : milliseconds);
+          // Reduced-motion CSS removes movement, but the story still needs
+          // readable pauses. Shortening every beat to 12ms made reactions and
+          // reveal lines appear to be skipped on some laptops.
+          window.setTimeout(resolve, milliseconds);
         });
+      }
+
+      function hideRevealAdvance() {
+        revealAdvance.classList.remove("show");
+        revealAdvance.disabled = true;
+      }
+
+      function cancelRevealAdvance() {
+        const resolve = revealAdvanceResolve;
+        revealAdvanceResolve = null;
+        hideRevealAdvance();
+        if (resolve) resolve(false);
+      }
+
+      function waitForRevealAdvance(token, index, total) {
+        if (token !== revealToken) return Promise.resolve(false);
+        revealAdvanceToken = token;
+        revealAdvanceText.textContent =
+          index === 0
+            ? "Reveal message 1 of " + total
+            : "Next message " + (index + 1) + " of " + total;
+        revealAdvance.disabled = false;
+        revealAdvance.classList.add("show");
+        return new Promise(function (resolve) {
+          revealAdvanceResolve = resolve;
+        });
+      }
+
+      function advanceReveal() {
+        if (
+          !revealAdvanceResolve ||
+          revealAdvanceToken !== revealToken
+        ) {
+          return;
+        }
+        const resolve = revealAdvanceResolve;
+        revealAdvanceResolve = null;
+        hideRevealAdvance();
+        tone(470, 0.07, "square", 0.022);
+        resolve(true);
       }
 
       function pick(items) {
@@ -1871,9 +1980,9 @@
         );
         answerFlash.classList.add("active");
         tone(510, 0.08, "square", 0.025);
-        await pause(420);
+        await pause(700);
         answerFlash.classList.remove("active");
-        await pause(90);
+        await pause(130);
         questionIndex += 1;
         if (questionIndex < questions.length) {
           renderQuestion();
@@ -2189,6 +2298,7 @@
       }
 
       async function playResult(token, result) {
+        cancelRevealAdvance();
         resultPersonA.classList.remove("show");
         resultPersonB.classList.remove("show");
         verdict.className =
@@ -2211,9 +2321,15 @@
         shake();
         tone(result.isMatch ? 720 : 250, 0.28, "square", 0.04);
         if (result.isMatch) launchConfetti();
-        await pause(1000);
+        await pause(850);
         for (let index = 0; index < result.lines.length; index += 1) {
           if (token !== revealToken) return;
+          const shouldContinue = await waitForRevealAdvance(
+            token,
+            index,
+            result.lines.length,
+          );
+          if (!shouldContinue || token !== revealToken) return;
           punchline.classList.remove("show");
           await pause(170);
           punchline.textContent = result.lines[index];
@@ -2224,13 +2340,14 @@
           } else {
             tone(390 + index * 60, 0.08, "sine", 0.02);
           }
-          await pause(index === result.lines.length - 1 ? 800 : 2050);
+          if (index === result.lines.length - 1) await pause(800);
         }
         if (token === revealToken) resultActions.classList.add("show");
       }
 
       function resetSession() {
         revealToken += 1;
+        cancelRevealAdvance();
         stopCamera();
         photos = [null, null];
         answers = [{}, {}];
@@ -2334,6 +2451,13 @@
       revealButton.addEventListener("click", runReveal);
       replayButton.addEventListener("click", runReveal);
       restartButton.addEventListener("click", resetSession);
+      revealAdvance.addEventListener("click", advanceReveal);
+      document.addEventListener("keydown", function (event) {
+        const isSpace = event.code === "Space" || event.key === " ";
+        if (!isSpace || event.repeat || !revealAdvanceResolve) return;
+        event.preventDefault();
+        advanceReveal();
+      });
       collectButton.addEventListener("click", function () {
         window.parent.postMessage(
           { type: "questpass:completed", activity: "vibe_link" },
