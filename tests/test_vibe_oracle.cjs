@@ -19,10 +19,25 @@ function seededRandom(seed) {
     ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 4294967296);
 }
 
-test("The Oracle has 56 complete, unique, short fortunes", () => {
-  assert.equal(FORTUNES.length, 56);
-  assert.equal(new Set(FORTUNES.map((fortune) => fortune.id)).size, 56);
-  assert.equal(new Set(FORTUNES.map((fortune) => fortune.category)).size, 7);
+test("The Oracle has 96 complete, unique, short fortunes", () => {
+  const expectedCategories = [
+    "CRUSH DETECTED",
+    "ACADEMIC CRIME SCENE",
+    "GROUP CHAT LEAK",
+    "FRIENDSHIP BETRAYAL",
+    "PUBLIC EMBARRASSMENT LOADING",
+    "MAIN CHARACTER MOMENT",
+    "SUSPICIOUSLY GOOD LUCK",
+    "OPEN DAY CHAOS",
+  ];
+  assert.equal(FORTUNES.length, 96);
+  assert.equal(new Set(FORTUNES.map((fortune) => fortune.id)).size, 96);
+  assert.equal(new Set(FORTUNES.map((fortune) => fortune.category)).size, 8);
+  assert.deepEqual(
+    Array.from(new Set(FORTUNES.map((fortune) => fortune.category))),
+    expectedCategories,
+  );
+  const allLines = [];
   for (const fortune of FORTUNES) {
     assert.match(fortune.id, /^[a-z0-9-]+$/);
     assert.ok(fortune.category.length > 3);
@@ -30,10 +45,12 @@ test("The Oracle has 56 complete, unique, short fortunes", () => {
     for (const line of fortune.lines) {
       assert.equal(typeof line, "string");
       assert.ok(line.trim().length >= 12, fortune.id);
-      assert.ok(line.trim().length <= 90, `${fortune.id}: ${line}`);
+      assert.ok(line.trim().length <= 75, `${fortune.id}: ${line}`);
       assert.doesNotMatch(line, /undefined|null|\{\w+\}/i);
+      allLines.push(line.trim());
     }
   }
+  assert.equal(new Set(allLines).size, allLines.length, "Every reveal line should be unique");
 });
 
 test("Every category has the same amount of variety", () => {
@@ -41,7 +58,7 @@ test("Every category has the same amount of variety", () => {
   for (const fortune of FORTUNES) {
     counts.set(fortune.category, (counts.get(fortune.category) || 0) + 1);
   }
-  assert.deepEqual([...counts.values()], [8, 8, 8, 8, 8, 8, 8]);
+  assert.deepEqual([...counts.values()], [12, 12, 12, 12, 12, 12, 12, 12]);
 });
 
 test("A full deck never repeats and a new deck never repeats consecutively", () => {

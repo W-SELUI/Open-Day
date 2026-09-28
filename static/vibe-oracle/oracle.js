@@ -1,4 +1,4 @@
-import { FORTUNES, selectFortune } from "./fortune-engine.js";
+import { FORTUNES, selectFortune } from "./fortune-engine.js?v=20260928a";
 import {
   HAND_CONNECTIONS,
   HandTracker,
