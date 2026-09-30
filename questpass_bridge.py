@@ -23,7 +23,7 @@ export default function(component) {
   const previous = instances.get(parentElement);
 
   if (previous) {
-    window.removeEventListener("message", previous);b
+    window.removeEventListener("message", previous);
   }
 
   const onMessage = (event) => {
