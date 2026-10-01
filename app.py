@@ -1,10 +1,12 @@
 from pathlib import Path
 from html import escape
-import time
+from uuid import uuid4
 
 import streamlit as st
 
-from career_model import predict_careers
+from career_model import EXCLUDED_CAREERS, predict_careers
+from career_cards import career_card
+from career_reveal import REVEAL_ASSETS, render_future_reveal
 from career_inputs import (
     COMMON_INTERESTS,
     COMMON_SUBJECTS,
@@ -23,6 +25,11 @@ from UI_theme import apply_theme
 st.set_page_config(page_title="NeuroVerse", page_icon="🧠")
 
 apply_theme()
+
+# Register in the app runtime (also works when AppTest creates a fresh runtime).
+_career_future_reveal = st.components.v2.component(
+    "neuroverse_career_reveal", **REVEAL_ASSETS,
+)
 
 _vibe_oracle_completion_listener = st.components.v2.component(
     "vibe_oracle_completion_listener",
@@ -640,113 +647,6 @@ QUEST_STAMPS = {
     "vibe_oracle": ("🔮", "Cosmic Forecaster"),
 }
 
-CAREER_SCAN_STEPS = (
-    (12, "Powering up the career scanner..."),
-    (29, "Reading subject energy..."),
-    (46, "Checking interest patterns..."),
-    (64, "Comparing 45 possible paths..."),
-    (82, "Locking onto your strongest match..."),
-    (100, "Prediction ready."),
-)
-
-CAREER_CLUE_STOP_WORDS = {
-    "and",
-    "are",
-    "at",
-    "from",
-    "for",
-    "how",
-    "in",
-    "into",
-    "of",
-    "on",
-    "or",
-    "that",
-    "the",
-    "to",
-    "when",
-    "with",
-    "your",
-}
-
-
-def render_career_scan() -> None:
-    """Show a short theatrical loading moment before revealing predictions."""
-    scan_slot = st.empty()
-    progress_slot = st.empty()
-
-    with scan_slot.container():
-        st.markdown(
-            """
-            <section class="career-scan-panel">
-                <div class="career-scan-orb">🎓</div>
-                <div>
-                    <p class="career-scan-eyebrow">Career Quest scanner</p>
-                    <h3>Building your future signal...</h3>
-                    <p>Subjects, hobbies and Open Day chaos are being matched.</p>
-                </div>
-                <div class="career-scan-beam"></div>
-            </section>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    for value, step in CAREER_SCAN_STEPS:
-        progress_slot.progress(value, text=step)
-        time.sleep(0.28)
-
-    progress_slot.empty()
-    scan_slot.empty()
-
-
-def format_career_clue(clue: str) -> str:
-    """Make model clue words look nicer for the visitor."""
-    special_words = {
-        "ai": "AI",
-        "pe": "PE",
-        "ui": "UI",
-        "ux": "UX",
-    }
-
-    return " ".join(
-        special_words.get(word, word.capitalize())
-        for word in clue.split()
-    )
-
-
-def collect_career_clues(result: dict, predictions: list[dict], limit: int = 5) -> list[str]:
-    """Pick a few clean clue words or phrases without showing a technical report."""
-    clues = []
-
-    def add_clue(term: str) -> None:
-        cleaned = term.strip().lower()
-
-        if (
-            not cleaned
-            or cleaned in CAREER_CLUE_STOP_WORDS
-            or len(cleaned) < 3
-            or cleaned in {clue.lower() for clue in clues}
-        ):
-            return
-
-        clues.append(format_career_clue(cleaned))
-
-    for prediction in predictions:
-        for clue in prediction.get("evidence", []):
-            add_clue(clue)
-
-            if len(clues) >= limit:
-                return clues
-
-    for clue in result.get("recognized_terms", []):
-        add_clue(clue)
-
-        if len(clues) >= limit:
-            break
-
-    return clues
-
-
 def render_career_voice_input() -> object | None:
     """Render optional browser speech-to-text controls for Career Quest."""
     voice_result = _career_voice_input(
@@ -801,17 +701,10 @@ def build_career_spoken_result(student_name: str, predictions: list[dict]) -> st
     """Create a short, informal text-to-speech prediction."""
     top_prediction = predictions[0]
     student_intro = f"{student_name}, " if student_name else ""
-    spoken = (
-        f"{student_intro}prediction locked. "
-        f"Your top match is {top_prediction['career']}, "
-        f"{top_prediction['score']} percent."
+    return (
+        f"{student_intro}career unlocked. {top_prediction['career']}! "
+        f"{career_card(top_prediction['career'])['line']}"
     )
-
-    if len(predictions) > 1:
-        backup_names = [prediction["career"] for prediction in predictions[1:]]
-        spoken += " Backup picks: " + " and ".join(backup_names) + "."
-
-    return spoken
 
 
 def render_career_voice_reader(spoken_result: str) -> None:
@@ -819,82 +712,6 @@ def render_career_voice_reader(spoken_result: str) -> None:
     _career_voice_reader(
         key="career_voice_reader",
         data={"text": spoken_result, "language": "en-US"},
-    )
-
-
-def render_career_reveal(student_name: str, predictions: list[dict], result: dict) -> None:
-    """Render the final Career Quest result as a dramatic prediction card."""
-    top_prediction = predictions[0]
-    backup_predictions = predictions[1:]
-    owner = (
-        f"{escape(student_name)}'s strongest career signal"
-        if student_name
-        else "Your strongest career signal"
-    )
-
-    st.markdown(
-        f"""
-        <section class="career-result-stage">
-            <p class="career-result-eyebrow">Prediction unlocked</p>
-            <p class="career-result-owner">{owner}</p>
-            <h2>{escape(top_prediction["career"])}</h2>
-            <div class="career-match-score">
-                <strong>{top_prediction["score"]}</strong>
-                <span>% match</span>
-            </div>
-            <p class="career-result-tagline">
-                Career Quest found this as your strongest match from the training data.
-            </p>
-        </section>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    if backup_predictions:
-        st.markdown(
-            '<p class="career-backup-title">Also detected in your future timeline</p>',
-            unsafe_allow_html=True,
-        )
-
-        columns = st.columns(len(backup_predictions), gap="medium")
-
-        for rank, column, prediction in zip(
-            range(2, len(backup_predictions) + 2),
-            columns,
-            backup_predictions,
-        ):
-            with column:
-                st.markdown(
-                    f"""
-                    <div class="career-path-card">
-                        <span>Option {rank}</span>
-                        <h3>{escape(prediction["career"])}</h3>
-                        <p>{prediction["score"]}% match</p>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-
-    clues = collect_career_clues(result, predictions)
-
-    if clues:
-        clue_markup = "".join(
-            f"<span>{escape(clue)}</span>"
-            for clue in clues
-        )
-        st.markdown(
-            f"""
-            <div class="career-clue-card">
-                <p>Clues caught by the scanner</p>
-                <div>{clue_markup}</div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.caption(
-        "These are interest-based suggestions from this project's training data, "
-        "not a decision about your future."
     )
 
 
@@ -1693,6 +1510,13 @@ elif page == "vibe_oracle":
 
 elif page == "career":
 
+    # Discard an obsolete preset from a browser session open during this update.
+    if "Food Technology" in st.session_state.get("career_more_subject_choices", []):
+        st.session_state.career_more_subject_choices = [
+            subject for subject in st.session_state.career_more_subject_choices
+            if subject != "Food Technology"
+        ]
+
     if st.button("← Back to NeuroVerse", key="back_from_career"):
         st.session_state.page = "home"
         st.rerun()
@@ -1781,7 +1605,10 @@ elif page == "career":
     # after a student changes their choices, free text, or nickname.
     profile = (subjects, hobbies, name.strip())
     saved_result = st.session_state.get("career_result")
-    if saved_result and saved_result["profile"] != profile:
+    if saved_result and (
+        saved_result["profile"] != profile
+        or any(p["career"] in EXCLUDED_CAREERS for p in saved_result["result"]["predictions"])
+    ):
         st.session_state.pop("career_result", None)
 
     if reveal_requested:
@@ -1799,8 +1626,11 @@ elif page == "career":
                 )
 
             else:
-                render_career_scan()
-                st.session_state.career_result = {"profile": profile, "result": result}
+                st.session_state.career_result = {
+                    "profile": profile, "result": result,
+                    "reveal_id": uuid4().hex,
+                    "choices": (all_subjects + all_interests) or result["recognized_terms"][:6],
+                }
 
                 if "career" not in st.session_state.quest_stamps:
                     award_questpass_stamp("career")
@@ -1810,5 +1640,11 @@ elif page == "career":
     if saved_result:
         result = saved_result["result"]
         predictions = result["predictions"]
-        render_career_reveal(name.strip(), predictions, result)
-        render_career_voice_reader(build_career_spoken_result(name.strip(), predictions))
+        render_future_reveal(
+            predictions, renderer=_career_future_reveal, nickname=name.strip(),
+            choices=saved_result.get("choices", []),
+            reveal_id=saved_result.get("reveal_id", "existing-result"),
+            animate=reveal_requested,
+        )
+        with st.expander("More voice options"):
+            render_career_voice_reader(build_career_spoken_result(name.strip(), predictions))

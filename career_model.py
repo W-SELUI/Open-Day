@@ -15,11 +15,37 @@ if not DATA_PATH.exists():
     DATA_PATH = Path(__file__).with_name("data.csv")
 
 TOKEN_PATTERN = re.compile(r"[a-zA-Z][a-zA-Z'-]*")
+# Common ways students describe the same subject or activity.  These aliases
+# are added to both the training rows and the query, so typed and tapped input
+# are compared in the same vocabulary.
+TEXT_ALIASES = (
+    (re.compile(r"\bmaths?\b"), "mathematics"),
+    (re.compile(r"\bmathematics\b"), "maths"),
+    (re.compile(r"\bcomputer science\b"), "computer studies computing"),
+    (re.compile(r"\bcomputer studies\b"), "computer science computing"),
+    (re.compile(r"\bcomputing\b"), "computer studies computer science"),
+    (re.compile(r"\bprogramming\b"), "coding software"),
+    (re.compile(r"\bcoding\b"), "programming software"),
+    (re.compile(r"\bphotograph(?:y|er|s)\b"), "photography taking photos"),
+    (re.compile(r"\bphotos?\b"), "photography taking photos"),
+    (re.compile(r"\bfootball\b|\bsoccer\b"), "sports"),
+    (re.compile(r"\bdesigning\b"), "design visual design"),
+    (re.compile(r"\bprograms?\b"), "software applications"),
+)
+
+# Preserve the editable CSV, but do not train or predict removed careers.
+EXCLUDED_CAREERS = frozenset({"Food Technologist"})
 
 
 def build_profile_text(subjects, hobbies):
     """Combine a student's free-text answers into one model input."""
-    return f"{subjects or ''} {hobbies or ''}".strip().lower()
+    raw_text = f"{subjects or ''} {hobbies or ''}".strip().lower()
+    if not raw_text:
+        return ""
+
+    expansions = [replacement for pattern, replacement in TEXT_ALIASES
+                  if pattern.search(raw_text)]
+    return " ".join([raw_text, *expansions]).strip()
 
 
 def find_recognized_terms(profile_text, vocabulary):
@@ -35,6 +61,7 @@ def find_recognized_terms(profile_text, vocabulary):
 
 # The data remains fully editable: each row describes a student and a career.
 df = pd.read_csv(DATA_PATH).fillna("")
+df = df.loc[~df["career"].str.strip().isin(EXCLUDED_CAREERS)].copy()
 training_text = [
     build_profile_text(subjects, hobbies)
     for subjects, hobbies in zip(df["subjects"], df["hobbies"])
@@ -75,7 +102,13 @@ model = Pipeline(
 model.fit(training_text, df["career"])
 
 word_vectorizer = model.named_steps["features"].transformer_list[0][1]
-known_words = set(word_vectorizer.vocabulary_)
+# `vocabulary_` also contains bigrams.  Keep only individual words for the
+# small "recognised words" display; prediction itself uses word and character
+# features and should not depend on an exact token match.
+known_words = {
+    term for term in word_vectorizer.vocabulary_
+    if " " not in term
+}
 
 
 def find_career_evidence(profile_text, career, limit=3):
@@ -122,10 +155,20 @@ def predict_careers(subjects, hobbies, limit=3):
     profile_text = build_profile_text(subjects, hobbies)
     recognized_terms = find_recognized_terms(profile_text, known_words)
 
-    if not recognized_terms:
+    if not profile_text:
         return {
             "predictions": [],
             "recognized_terms": [],
+        }
+
+    # Do not reject valid wording simply because it is not an exact training
+    # word (for example, "photography" versus "taking photos").  The model's
+    # character features can still recognise word forms and spelling variants.
+    feature_matrix = model.named_steps["features"].transform([profile_text])
+    if feature_matrix.nnz == 0:
+        return {
+            "predictions": [],
+            "recognized_terms": recognized_terms,
         }
 
     probabilities = model.predict_proba([profile_text])[0]

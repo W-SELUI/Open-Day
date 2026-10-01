@@ -19,13 +19,19 @@ from career_model import find_recognized_terms, known_words, predict_careers
 
 class CareerChoicesTests(unittest.TestCase):
     def test_taps_and_own_words_are_combined_without_duplicate_phrases(self):
-        self.assertEqual(
-            build_career_answers(
-                ["Biology", "Chemistry"], ["Drawing & design"],
-                "biology; Marine science", "drawing\ncarving",
-            ),
-            ("Biology, Chemistry, Marine science", "drawing, designing, carving"),
+        subjects, interests = build_career_answers(
+            ["Biology", "Chemistry"], ["Drawing & design"],
+            "biology; Marine science", "drawing\ncarving",
         )
+        # The visible labels remain present, while their hidden context gives
+        # the classifier more signal than a bare comma-separated checklist.
+        self.assertIn("Biology", subjects)
+        self.assertIn("Chemistry", subjects)
+        self.assertIn("Marine science", subjects)
+        self.assertEqual(subjects.casefold().count("biology"), 1)
+        self.assertIn("drawing", interests)
+        self.assertIn("designing", interests)
+        self.assertIn("carving", interests)
         self.assertEqual(build_career_answers([], []), ("", ""))
 
     def test_every_offered_choice_is_recognised_by_the_existing_model(self):
@@ -57,7 +63,11 @@ class CareerChoicesTests(unittest.TestCase):
         with patch("career_model.predict_careers", wraps=predict_careers) as predict:
             app.button(key="career_reveal").click().run()
             self.assertFalse(app.exception)
-            predict.assert_called_once_with("Biology, Chemistry", "Helping people, Science experiments")
+            expected_subjects, expected_interests = build_career_answers(
+                ["Biology", "Chemistry"],
+                ["Helping people", "Science experiments"],
+            )
+            predict.assert_called_once_with(expected_subjects, expected_interests)
         self.assertTrue(app.session_state.career_result["result"]["predictions"])
         self.assertIn("career", app.session_state.quest_stamps)
         app.run()
