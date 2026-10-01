@@ -1,0 +1,259 @@
+:host {
+  display: block;
+  width: 0;
+  height: 0;
+  color: #f7fbff;
+  font-family: var(--st-font, Inter, system-ui, sans-serif);
+}
+
+.nv-attract {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: clamp(1.25rem, 4vw, 4rem);
+  background:
+    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--nv-accent) 28%, transparent), transparent 28%),
+    radial-gradient(circle at 15% 78%, rgba(37, 99, 235, 0.28), transparent 32%),
+    linear-gradient(135deg, #030817 0%, #07152d 55%, #10104a 100%);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.025);
+  transition: opacity 520ms ease, transform 700ms cubic-bezier(.2,.8,.2,1);
+}
+
+.nv-attract.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+.nv-attract::before,
+.nv-attract::after {
+  position: absolute;
+  inset: -20%;
+  pointer-events: none;
+  content: "";
+}
+
+.nv-attract::before {
+  opacity: 0.34;
+  background-image:
+    linear-gradient(rgba(125, 211, 252, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+  animation: nv-grid-drift 18s linear infinite;
+}
+
+.nv-attract::after {
+  background: radial-gradient(circle at center, transparent 0 35%, rgba(2, 6, 23, 0.48) 88%);
+}
+
+.nv-attract-shell {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, 100%);
+}
+
+.nv-attract-top,
+.nv-attract-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: rgba(219, 234, 254, 0.68);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.nv-attract-brand {
+  color: #f8fafc;
+  font-size: 0.8rem;
+}
+
+.nv-attract-brand span {
+  color: var(--nv-accent);
+}
+
+.nv-attract-main {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: clamp(2rem, 7vw, 7rem);
+  align-items: center;
+  min-height: min(67vh, 620px);
+  padding: clamp(2rem, 7vw, 5rem) 0 3rem;
+}
+
+.nv-attract-kicker {
+  margin: 0 0 1rem;
+  color: var(--nv-accent);
+  font-size: clamp(0.65rem, 1.2vw, 0.8rem);
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.nv-attract-title {
+  max-width: 9ch;
+  margin: 0;
+  color: #f8fbff;
+  font-size: clamp(3rem, 8vw, 7.7rem);
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  line-height: 0.88;
+}
+
+.nv-attract-copy {
+  max-width: 32rem;
+  margin: 1.5rem 0 0;
+  color: #b8cbe4;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.55;
+}
+
+.nv-attract-orbit {
+  position: relative;
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+}
+
+.nv-attract-orbit::before,
+.nv-attract-orbit::after {
+  position: absolute;
+  width: min(31vw, 360px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--nv-accent) 42%, transparent);
+  border-radius: 50%;
+  content: "";
+  transform: rotate(-18deg) scaleX(1.28);
+  box-shadow: 0 0 50px color-mix(in srgb, var(--nv-accent) 13%, transparent);
+}
+
+.nv-attract-orbit::after {
+  width: min(22vw, 260px);
+  border-color: rgba(167, 139, 250, 0.35);
+  transform: rotate(31deg) scaleX(1.3);
+}
+
+.nv-attract-card {
+  position: relative;
+  display: grid;
+  width: min(330px, 72vw);
+  min-height: 280px;
+  align-content: center;
+  justify-items: center;
+  padding: 2rem;
+  border: 1px solid color-mix(in srgb, var(--nv-accent) 62%, rgba(255,255,255,.18));
+  border-radius: 34px;
+  background: linear-gradient(145deg, rgba(20, 43, 86, 0.84), rgba(8, 15, 42, 0.84));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.36), inset 0 1px rgba(255,255,255,.13);
+  text-align: center;
+  transform: rotate(-4deg);
+}
+
+.nv-attract-card::after {
+  position: absolute;
+  inset: 10px;
+  border: 1px dashed rgba(219, 234, 254, 0.22);
+  border-radius: 26px;
+  content: "";
+  pointer-events: none;
+}
+
+.nv-attract-icon {
+  display: grid;
+  width: 92px;
+  height: 92px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--nv-accent) 75%, transparent);
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--nv-accent) 19%, rgba(6, 14, 35, .7));
+  box-shadow: 0 0 45px color-mix(in srgb, var(--nv-accent) 32%, transparent);
+  font-size: 3.5rem;
+}
+
+.nv-attract-card-name {
+  margin: 1.25rem 0 0;
+  color: #f8fbff;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.nv-attract-card-tag {
+  margin: 0.45rem 0 0;
+  color: #b8cbe4;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nv-attract-footer {
+  justify-content: center;
+  gap: 0.75rem;
+  letter-spacing: 0.12em;
+}
+
+.nv-attract-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.nv-attract-dot {
+  width: 7px;
+  height: 7px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(219, 234, 254, 0.28);
+  transition: width 220ms ease, background 220ms ease;
+}
+
+.nv-attract-dot.active {
+  width: 28px;
+  background: var(--nv-accent);
+}
+
+.nv-attract-hint {
+  position: absolute;
+  right: clamp(1rem, 3vw, 3rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  z-index: 2;
+  color: rgba(219, 234, 254, 0.66);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+@keyframes nv-grid-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(42px, 42px, 0); }
+}
+
+@media (max-width: 760px) {
+  .nv-attract-main {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: auto;
+    padding-top: 3rem;
+  }
+
+  .nv-attract-title { max-width: 10ch; }
+  .nv-attract-copy { margin-top: 1rem; }
+  .nv-attract-orbit { min-height: 275px; }
+  .nv-attract-card { min-height: 220px; }
+  .nv-attract-icon { width: 70px; height: 70px; font-size: 2.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nv-attract,
+  .nv-attract-dot { transition: none; }
+  .nv-attract::before { animation: none; }
+}

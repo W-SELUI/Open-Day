@@ -31,6 +31,15 @@ _career_future_reveal = st.components.v2.component(
     "neuroverse_career_reveal", **REVEAL_ASSETS,
 )
 
+_attract_assets_dir = Path(__file__).with_name("static") / "attract-mode"
+_home_attract_mode = st.components.v2.component(
+    "neuroverse_home_attract",
+    html='<div class="nv-attract-root"></div>\n',
+    css=_attract_assets_dir.joinpath("attract.css").read_text(encoding="utf-8"),
+    js=_attract_assets_dir.joinpath("attract.js").read_text(encoding="utf-8"),
+    isolate_styles=True,
+)
+
 _vibe_oracle_completion_listener = st.components.v2.component(
     "vibe_oracle_completion_listener",
     js="""
@@ -729,6 +738,20 @@ if "quest_stamps" not in st.session_state:
 page = st.session_state.page
 
 if page == "home":
+    _home_attract_mode(
+        key="neuroverse_home_attract",
+        data={
+            "slides": [
+                {"icon": "🧩", "name": "Hand Puzzle", "tag": "Move it with your hands", "accent": "#67e8f9"},
+                {"icon": "⚡", "name": "Gravity Thief", "tag": "Steal the core. Beat the lasers.", "accent": "#a78bfa"},
+                {"icon": "🎓", "name": "Career Quest", "tag": "Your next direction is hiding in plain sight", "accent": "#f5dc85"},
+                {"icon": "✨", "name": "VibeLink", "tag": "Two strangers. One verdict.", "accent": "#c4b5fd"},
+                {"icon": "🔮", "name": "Vibe Oracle", "tag": "Ask the future something harmless", "accent": "#a7f3d0"},
+                {"icon": "🍉", "name": "Slice Club", "tag": "Slice fast. Dodge bombs.", "accent": "#fb7185"},
+                {"icon": "🎯", "name": "SkyShot", "tag": "Raise your hand. Take the shot.", "accent": "#38bdf8"},
+            ],
+        },
+    )
     if "quest_pass_notice" in st.session_state:
         st.toast(
             f"NeuroVerse QuestPass stamp collected: {st.session_state.quest_pass_notice}!",
