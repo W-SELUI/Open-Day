@@ -71,7 +71,7 @@
 
 <ul>
   <li>A 30-second finger-gun arcade experience using MediaPipe Hands.</li>
-  <li>Includes Solo Blast and independent two-player Duel modes.</li>
+  <li>Includes a focused Solo Blast mode with Easy, Medium, and Hard difficulty.</li>
   <li>Uses a stabilised thumb trigger, local tracking files, and separate game rendering for smooth play.</li>
   <li>Awards its QuestPass stamp only after a completed round.</li>
 </ul>

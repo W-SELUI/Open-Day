@@ -12,10 +12,9 @@ stable aiming and firing control.
 4. Lower the thumb once to fire.
 5. Raise it again before the next shot.
 
-## Open Day modes
+## Open Day mode
 
 - **Solo blast:** one visitor plays a 30-second score round.
-- **Side-by-side duel:** two visitors play simultaneously in separate lanes.
 - **Easy, Medium, Hard:** changes bird speed, target size, and bomb count.
 
 ## Reliability changes from the original prototype
@@ -26,8 +25,7 @@ stable aiming and firing control.
   camera frame into the game canvas.
 - Trigger pulls use hysteresis, consecutive-frame confirmation, and a lost
   tracking grace period.
-- Players have independent trigger cooldowns, effects, scores, and targets.
-- Multiplayer uses clear left and right lanes.
+- The single-player lane keeps the camera workload predictable for kiosk devices.
 - MediaPipe and its model/WASM files are stored locally.
 - QuestPass completion is sent only after a finished round and a deliberate
   "Collect QuestPass stamp" action.

@@ -174,10 +174,11 @@ function setSelectedChoice(selector, value, dataKey) {
 }
 
 function updateModeUI() {
-  const duel = state.mode === "duel";
-  elements.playerCards[1].classList.toggle("hidden", !duel);
-  elements.playerOneLabel.textContent = duel ? "Player 1" : "Score";
-  setSelectedChoice(".mode-choice", state.mode, "mode");
+  // SkyShot is intentionally single-player: it keeps hand tracking and the
+  // camera workload reliable on Open Day kiosk machines.
+  state.mode = "solo";
+  elements.playerCards[1].classList.add("hidden");
+  elements.playerOneLabel.textContent = "Score";
 }
 
 function updateDifficultyUI() {
@@ -995,14 +996,6 @@ async function setupCamera() {
     showCameraError(friendlyCameraError(error));
   }
 }
-
-document.querySelectorAll(".mode-choice").forEach((button) => {
-  button.addEventListener("click", () => {
-    state.mode = button.dataset.mode;
-    updateModeUI();
-    if (state.hands) state.hands.setOptions({ maxNumHands: state.mode === "duel" ? 2 : 1 });
-  });
-});
 
 document.querySelectorAll(".difficulty-choice").forEach((button) => {
   button.addEventListener("click", () => {

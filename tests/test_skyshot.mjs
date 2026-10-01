@@ -78,6 +78,11 @@ for (const id of referencedIds) {
 
 assert.match(indexSource, /\.\/mediapipe-hands\/hands\.js/);
 assert.match(indexSource, /<script type="module" src="\.\/game\.js"><\/script>/);
+assert.doesNotMatch(indexSource, /data-mode="duel"|Side-by-side duel/i,
+  "SkyShot should expose only the reliable solo mode");
+assert.doesNotMatch(readFileSync(path.resolve(testDirectory, "../app.py"), "utf8"),
+  /challenge a friend side by side/i,
+  "The NeuroVerse card should not advertise removed multiplayer mode");
 assert.equal((gameSource.match(/questpass:completed/g) || []).length, 1,
   "QuestPass completion must have one deliberate message source");
 assert.equal(/https?:\/\//.test(gameSource), false, "Game logic must not depend on a remote URL");

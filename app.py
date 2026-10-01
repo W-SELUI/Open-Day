@@ -924,7 +924,7 @@ if page == "home":
                 <h2>SkyShot</h2>
                 <p>
                     Turn your hand into a steady arcade blaster, track flying
-                    targets, dodge decoys, or challenge a friend side by side.
+                    targets, dodge decoys, and chase the highest 30-second score.
                 </p>
             </div>
             """,
