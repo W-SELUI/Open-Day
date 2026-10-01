@@ -19,19 +19,19 @@ function seededRandom(seed) {
     ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 4294967296);
 }
 
-test("The Oracle has 96 complete, unique, short fortunes", () => {
+test("The Oracle has 40 complete, unique, punchy fortunes", () => {
   const expectedCategories = [
-    "CRUSH DETECTED",
-    "ACADEMIC CRIME SCENE",
+    "CRUSH ALERT",
+    "SCHOOL SURVIVAL",
     "GROUP CHAT LEAK",
-    "FRIENDSHIP BETRAYAL",
-    "PUBLIC EMBARRASSMENT LOADING",
-    "MAIN CHARACTER MOMENT",
-    "SUSPICIOUSLY GOOD LUCK",
+    "FRIENDSHIP CRIME",
+    "PUBLIC DAMAGE",
+    "MAIN CHARACTER EVENT",
+    "SUSPICIOUSLY LUCKY",
     "OPEN DAY CHAOS",
   ];
-  assert.equal(FORTUNES.length, 96);
-  assert.equal(new Set(FORTUNES.map((fortune) => fortune.id)).size, 96);
+  assert.equal(FORTUNES.length, 40);
+  assert.equal(new Set(FORTUNES.map((fortune) => fortune.id)).size, 40);
   assert.equal(new Set(FORTUNES.map((fortune) => fortune.category)).size, 8);
   assert.deepEqual(
     Array.from(new Set(FORTUNES.map((fortune) => fortune.category))),
@@ -42,13 +42,18 @@ test("The Oracle has 96 complete, unique, short fortunes", () => {
     assert.match(fortune.id, /^[a-z0-9-]+$/);
     assert.ok(fortune.category.length > 3);
     assert.equal(fortune.lines.length, 3, fortune.id);
-    for (const line of fortune.lines) {
+    for (const line of fortune.lines.slice(0, 2)) {
       assert.equal(typeof line, "string");
       assert.ok(line.trim().length >= 12, fortune.id);
-      assert.ok(line.trim().length <= 75, `${fortune.id}: ${line}`);
+      assert.ok(line.trim().length <= 80, `${fortune.id}: ${line}`);
       assert.doesNotMatch(line, /undefined|null|\{\w+\}/i);
       allLines.push(line.trim());
     }
+    const reaction = fortune.lines[2].trim();
+    assert.ok(reaction.length >= 4, fortune.id);
+    assert.ok(reaction.length <= 28, `${fortune.id}: ${reaction}`);
+    assert.equal(reaction, reaction.toUpperCase(), fortune.id);
+    allLines.push(reaction);
   }
   assert.equal(new Set(allLines).size, allLines.length, "Every reveal line should be unique");
 });
@@ -58,7 +63,7 @@ test("Every category has the same amount of variety", () => {
   for (const fortune of FORTUNES) {
     counts.set(fortune.category, (counts.get(fortune.category) || 0) + 1);
   }
-  assert.deepEqual([...counts.values()], [12, 12, 12, 12, 12, 12, 12, 12]);
+  assert.deepEqual([...counts.values()], [5, 5, 5, 5, 5, 5, 5, 5]);
 });
 
 test("A full deck never repeats and a new deck never repeats consecutively", () => {

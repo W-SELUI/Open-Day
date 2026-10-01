@@ -703,17 +703,20 @@ h1 em {
 .line-three {
   width: fit-content;
   max-width: 920px;
-  margin: 20px auto 0;
-  padding: 12px 18px 14px;
-  border: 1px solid rgba(223, 255, 143, 0.5);
-  background: var(--acid);
+  margin: clamp(22px, 3vh, 36px) auto 0;
+  padding: clamp(15px, 2vw, 24px) clamp(22px, 3.2vw, 44px);
+  border: 2px solid rgba(255, 255, 255, 0.84);
+  background: linear-gradient(110deg, #dfff8f 0%, #bfffc5 100%);
   color: #161023;
-  font-size: clamp(18px, 2.3vw, 33px);
-  font-weight: 900;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-  transform: translateY(24px) rotate(-1deg);
-  box-shadow: 8px 9px 0 rgba(121, 85, 226, 0.5);
+  font-size: clamp(36px, 5.8vw, 78px);
+  font-weight: 950;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+  transform: translateY(34px) rotate(-2deg) scale(0.84);
+  box-shadow:
+    10px 12px 0 rgba(121, 85, 226, 0.72),
+    0 0 42px rgba(223, 255, 143, 0.16);
 }
 
 .reveal-screen.show-category .fortune-category,
@@ -723,6 +726,16 @@ h1 em {
 .reveal-screen.show-three .line-three {
   opacity: 1;
   transform: translateY(0) rotate(0);
+}
+
+.reveal-screen.show-three .line-one,
+.reveal-screen.show-three .line-two {
+  opacity: 0.34;
+  transform: translateY(-7px) scale(0.96);
+}
+
+.reveal-screen.show-three .line-three {
+  animation: verdict-slam 560ms cubic-bezier(0.16, 1.2, 0.32, 1) both;
 }
 
 .reveal-screen.show-category .fortune-category,
@@ -937,6 +950,24 @@ h1 em {
   from { opacity: 0; transform: translateY(12px); }
 }
 
+@keyframes verdict-slam {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) rotate(-3deg) scale(0.7);
+    filter: blur(7px);
+  }
+  64% {
+    opacity: 1;
+    transform: translateY(-4px) rotate(1deg) scale(1.06);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 @media (max-width: 900px) {
   .app { grid-template-rows: 64px minmax(0, 1fr) 38px; }
   .topbar { padding-left: 145px; padding-right: 14px; }
@@ -974,7 +1005,11 @@ h1 em {
   .chapter { display: none; }
   .reveal-screen { width: calc(100% - 42px); }
   .line-one, .line-two { font-size: clamp(23px, 6vw, 40px); }
-  .line-three { font-size: clamp(16px, 4vw, 24px); }
+  .line-three {
+    margin-top: 16px;
+    padding: 11px 18px 13px;
+    font-size: clamp(27px, 5.6vw, 46px);
+  }
   .exit-prompt { min-width: 300px; margin-top: 18px; }
 }
 
