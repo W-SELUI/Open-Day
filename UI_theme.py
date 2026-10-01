@@ -330,6 +330,61 @@ def apply_theme():
             color: #a5f3fc;
         }
 
+        /* Career Quest: scoped styles keep the choice buttons in the lab palette. */
+        .st-key-career_subject_panel,
+        .st-key-career_interest_panel {
+            border-radius: 22px;
+            border-color: rgba(103, 232, 249, 0.25);
+            background: linear-gradient(145deg, rgba(15, 35, 72, 0.78), rgba(8, 16, 37, 0.76));
+            padding: 1rem;
+        }
+
+        .st-key-career_picker h3 {
+            font-size: 1.3rem;
+            letter-spacing: -0.025em;
+        }
+
+        .st-key-career_picker button[aria-pressed] {
+            min-height: 44px;
+            padding: 0.55rem 0.85rem;
+            border: 1px solid rgba(148, 163, 184, 0.38);
+            border-radius: 999px;
+            background: rgba(8, 20, 44, 0.9);
+            color: #e2e8f0;
+            transition: background 120ms ease, border-color 120ms ease;
+        }
+
+        .st-key-career_picker button[aria-pressed="true"] {
+            color: #042036 !important;
+            border-color: #a5f3fc !important;
+            background: #67e8f9 !important;
+            font-weight: 750;
+            box-shadow: 0 0 0 1px rgba(103, 232, 249, 0.25);
+        }
+
+        .st-key-career_picker button[aria-pressed]:hover {
+            border-color: #67e8f9;
+        }
+
+        .st-key-career_picker button:focus-visible {
+            outline: 3px solid #a5f3fc;
+            outline-offset: 3px;
+        }
+
+        .st-key-career_picker [data-testid="stExpander"] details {
+            border-color: rgba(148, 163, 184, 0.28);
+            background: rgba(8, 20, 44, 0.62);
+            color: #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .st-key-career_clear button {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(148, 163, 184, 0.38);
+            box-shadow: none;
+            color: #d8e7f8;
+        }
+
         .career-scan-panel {
             position: relative;
             display: grid;

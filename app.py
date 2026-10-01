@@ -5,6 +5,13 @@ import time
 import streamlit as st
 
 from career_model import predict_careers
+from career_inputs import (
+    COMMON_INTERESTS,
+    COMMON_SUBJECTS,
+    MORE_INTERESTS,
+    MORE_SUBJECTS,
+    build_career_answers,
+)
 from questpass_bridge import (
     render_gravity_thief_activity,
     render_hand_puzzle_activity,
@@ -60,15 +67,15 @@ _career_voice_input = st.components.v2.component(
 <section class="voice-card">
   <div class="voice-copy">
     <p>Optional voice mode</p>
-    <h3>Say it instead of typing it</h3>
-    <span>Use this for the futuristic Open Day moment. You can still edit the text after.</span>
+    <h3>Got something else in mind?</h3>
+    <span>Say your subjects or interests. They’ll be added alongside your tapped choices.</span>
   </div>
   <div class="voice-actions">
     <button id="subjectsBtn" type="button">🎙️ Speak subjects</button>
     <button id="hobbiesBtn" type="button">🎙️ Speak interests</button>
     <button id="stopBtn" type="button">Stop</button>
   </div>
-  <div id="voiceStatus" class="voice-status">Mic is optional. Typing still works.</div>
+  <div id="voiceStatus" class="voice-status">Optional: speak or type below. Your choices stay selected.</div>
 </section>
 """,
     css="""
@@ -776,6 +783,18 @@ def apply_career_voice_transcript(transcript: object) -> None:
         st.session_state[state_key] = text
 
     st.toast(f"Voice added to {label}.", icon="🎙️")
+
+
+def clear_career_choices() -> None:
+    """Prepare the Career Quest form for another visitor, keeping earned stamps."""
+    for key in (
+        "career_subject_choices", "career_more_subject_choices",
+        "career_interest_choices", "career_more_interest_choices",
+    ):
+        st.session_state[key] = []
+    for key in ("career_name", "career_subjects", "career_hobbies"):
+        st.session_state[key] = ""
+    st.session_state.pop("career_result", None)
 
 
 def build_career_spoken_result(student_name: str, predictions: list[dict]) -> str:
@@ -1679,30 +1698,95 @@ elif page == "career":
         st.rerun()
 
     st.title("Career Quest 🎓")
-    st.write("Tell us about the subjects and activities you enjoy. Use your own words.")
+    st.write("Tap what sounds like you. Let’s find your next direction.")
+    st.caption("Pick as many as you like. Tap again to undo. No typing needed.")
 
-    voice_transcript = render_career_voice_input()
-    apply_career_voice_transcript(voice_transcript)
+    with st.container(key="career_picker"):
+        subject_column, interest_column = st.columns(2, gap="medium")
+        with subject_column, st.container(border=True, key="career_subject_panel"):
+            st.subheader("01 · Your subjects")
+            st.caption("Which classes do you enjoy?")
+            chosen_subjects = st.pills(
+                "Subjects you enjoy", COMMON_SUBJECTS,
+                selection_mode="multi", key="career_subject_choices",
+                label_visibility="collapsed", wrap=True,
+            )
+            with st.expander("More subjects"):
+                more_subjects = st.pills(
+                    "More subjects you enjoy", MORE_SUBJECTS,
+                    selection_mode="multi", key="career_more_subject_choices",
+                    label_visibility="collapsed", wrap=True,
+                )
 
-    name = st.text_input(
-        "What is your name?",
-        placeholder="e.g. Mary",
-        key="career_name",
-    )
-    subjects = st.text_area(
-        "Which subjects do you enjoy?",
-        placeholder="e.g. Chemistry, Biology, Maths",
-        key="career_subjects",
-    )
-    hobbies = st.text_area(
-        "What do you enjoy doing outside class?",
-        placeholder="e.g. Adventure, reading about nature, doing experiments",
-        key="career_hobbies",
-    )
+        with interest_column, st.container(border=True, key="career_interest_panel"):
+            st.subheader("02 · Your interests")
+            st.caption("What do you enjoy doing?")
+            chosen_interests = st.pills(
+                "Activities you enjoy", COMMON_INTERESTS,
+                selection_mode="multi", key="career_interest_choices",
+                label_visibility="collapsed", wrap=True,
+            )
+            with st.expander("More interests"):
+                more_interests = st.pills(
+                    "More activities you enjoy", MORE_INTERESTS,
+                    selection_mode="multi", key="career_more_interest_choices",
+                    label_visibility="collapsed", wrap=True,
+                )
 
-    if st.button("Explore careers"):
+        with st.expander("Something else? Speak or type", key="career_extra_options"):
+            voice_transcript = render_career_voice_input()
+            apply_career_voice_transcript(voice_transcript)
+            extra_subjects = st.text_area(
+                "Other subjects (optional)",
+                placeholder="Any subjects you couldn’t find above",
+                key="career_subjects", height=80,
+            )
+            extra_interests = st.text_area(
+                "Other interests (optional)",
+                placeholder="Tell us in your own words, or use the microphone",
+                key="career_hobbies", height=80,
+            )
+            name = st.text_input(
+                "Nickname (optional)", placeholder="What should we call you?",
+                key="career_name",
+            )
+
+        all_subjects = chosen_subjects + more_subjects
+        all_interests = chosen_interests + more_interests
+        subjects, hobbies = build_career_answers(
+            all_subjects, all_interests, extra_subjects, extra_interests,
+        )
+        selection_count = len(all_subjects) + len(all_interests)
+        if selection_count or subjects or hobbies:
+            summary = f"{selection_count} selected" if selection_count else "Your own words added"
+            if selection_count and (extra_subjects.strip() or extra_interests.strip()):
+                summary += " · plus your own words"
+            st.caption(f"{summary} · Ready when you are.")
+        else:
+            st.caption("Start with a subject or an interest—either works.")
+
+        reveal_column, reset_column = st.columns([3, 1], gap="small")
+        with reveal_column:
+            reveal_requested = st.button(
+                "Reveal my career", key="career_reveal", type="primary",
+                icon=":material/auto_awesome:", width="stretch",
+            )
+        with reset_column:
+            st.button(
+                "Clear choices", key="career_clear", on_click=clear_career_choices,
+                width="stretch",
+            )
+
+    # Retain the reveal during reader/component reruns, but never show stale results
+    # after a student changes their choices, free text, or nickname.
+    profile = (subjects, hobbies, name.strip())
+    saved_result = st.session_state.get("career_result")
+    if saved_result and saved_result["profile"] != profile:
+        st.session_state.pop("career_result", None)
+
+    if reveal_requested:
         if not subjects.strip() and not hobbies.strip():
-            st.warning("Tell us about at least one subject or activity first.")
+            st.warning("Tap at least one subject or interest, or add your own below ‘Something else?’.")
         else:
             result = predict_careers(subjects, hobbies)
             predictions = result["predictions"]
@@ -1710,18 +1794,21 @@ elif page == "career":
             if not predictions:
                 st.info(
                     "I could not find a strong connection to the current training "
-                    "data yet. Add a little more detail about subjects or activities "
-                    "you enjoy and try again."
+                    "data yet. Try choosing another subject or interest, or add "
+                    "some detail under ‘Something else?’."
                 )
 
             else:
-                student_name = name.strip()
                 render_career_scan()
-                render_career_reveal(student_name, predictions, result)
-                render_career_voice_reader(
-                    build_career_spoken_result(student_name, predictions)
-                )
+                st.session_state.career_result = {"profile": profile, "result": result}
 
                 if "career" not in st.session_state.quest_stamps:
                     award_questpass_stamp("career")
                     st.toast("QuestPass stamp collected: Future Explorer!", icon="✅")
+
+    saved_result = st.session_state.get("career_result")
+    if saved_result:
+        result = saved_result["result"]
+        predictions = result["predictions"]
+        render_career_reveal(name.strip(), predictions, result)
+        render_career_voice_reader(build_career_spoken_result(name.strip(), predictions))
